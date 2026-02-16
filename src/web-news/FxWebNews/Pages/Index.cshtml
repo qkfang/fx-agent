@@ -1,0 +1,42 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "FX News";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">FX Market News</h1>
+
+    <div class="mb-3">
+        <a href="/Admin" class="btn btn-primary">Admin Panel</a>
+    </div>
+
+    @if (Model.News != null && Model.News.Any())
+    {
+        foreach (var article in Model.News)
+        {
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">@article.Title</h3>
+                    <span class="badge @(article.Type == "Good" ? "bg-success" : "bg-danger")">
+                        @article.Type News
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@article.Content</p>
+                    <div class="text-muted">
+                        <small>
+                            By @article.Author | Published: @article.PublishedDate.ToString("MMMM dd, yyyy HH:mm")
+                        </small>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <p>No news articles available at the moment.</p>
+        </div>
+    }
+</div>
