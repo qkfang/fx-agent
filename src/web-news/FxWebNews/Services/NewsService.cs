@@ -21,7 +21,11 @@ namespace FxWebNews.Services
             if (File.Exists(_newsFilePath))
             {
                 var json = File.ReadAllText(_newsFilePath);
-                _newsArticles = JsonSerializer.Deserialize<List<NewsArticle>>(json) ?? new List<NewsArticle>();
+                var options = new JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true 
+                };
+                _newsArticles = JsonSerializer.Deserialize<List<NewsArticle>>(json, options) ?? new List<NewsArticle>();
             }
         }
 

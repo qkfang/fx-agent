@@ -19,12 +19,17 @@ namespace FxWebUI.Services
 
         private void LoadData()
         {
+            var options = new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true 
+            };
+
             // Load transactions
             var transactionsPath = Path.Combine(_env.ContentRootPath, "Data", "transactions.json");
             if (File.Exists(transactionsPath))
             {
                 var json = File.ReadAllText(transactionsPath);
-                _transactions = JsonSerializer.Deserialize<List<Transaction>>(json) ?? new List<Transaction>();
+                _transactions = JsonSerializer.Deserialize<List<Transaction>>(json, options) ?? new List<Transaction>();
             }
 
             // Load fund summary
@@ -32,7 +37,7 @@ namespace FxWebUI.Services
             if (File.Exists(fundPath))
             {
                 var json = File.ReadAllText(fundPath);
-                _fundSummary = JsonSerializer.Deserialize<FundSummary>(json) ?? new FundSummary();
+                _fundSummary = JsonSerializer.Deserialize<FundSummary>(json, options) ?? new FundSummary();
             }
         }
 
@@ -59,7 +64,11 @@ namespace FxWebUI.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<FxRate>(json);
+                    var options = new JsonSerializerOptions 
+                    { 
+                        PropertyNameCaseInsensitive = true 
+                    };
+                    return JsonSerializer.Deserialize<FxRate>(json, options);
                 }
             }
             catch
