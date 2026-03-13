@@ -1,0 +1,242 @@
+@page
+@model FxWebPortal.Pages.Admin.IndexModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Stats row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@Model.TotalArticles</div>
+            <div class="stat-label">Total Articles</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@Model.PublishedCount</div>
+            <div class="stat-label">Published</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@Model.TotalVisits</div>
+            <div class="stat-label">Total Visits</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-value">@Model.TotalLeads</div>
+            <div class="stat-label">Leads Captured</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs admin-tabs mb-4" id="adminTabs">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-articles">📄 Research Notes</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-visitors">👁 Visitor Analytics</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-leads">🎯 Leads</button></li>
+</ul>
+
+<div class="tab-content">
+
+    <!-- ── Tab 1: Articles ── -->
+    <div class="tab-pane fade show active" id="tab-articles">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Research Notes</h5>
+            <a href="/Admin/Edit" class="btn btn-primary btn-sm">+ New Research Note</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Sentiment</th>
+                        <th>Author</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.Articles)
+                    {
+                        <tr>
+                            <td>@a.Id</td>
+                            <td><a href="/Article?id=@a.Id" target="_blank" class="text-decoration-none">@a.Title</a></td>
+                            <td><span class="cat-badge cat-@(a.Category.Replace("/","-").Replace(" ","-").ToLower())">@a.Category</span></td>
+                            <td><span class="sentiment-badge sentiment-@a.Sentiment.ToLower()">@a.Sentiment</span></td>
+                            <td>@a.Author</td>
+                            <td>@a.PublishedDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <span class="badge @(a.Status == "Published" ? "bg-success" : "bg-secondary")">@a.Status</span>
+                            </td>
+                            <td class="d-flex gap-1 flex-wrap">
+                                <a href="/Admin/Edit?id=@a.Id" class="btn btn-xs btn-outline-primary">Edit</a>
+                                @if (a.Status == "Draft")
+                                {
+                                    <form method="post" asp-page-handler="Publish" asp-route-id="@a.Id" style="display:inline">
+                                        <button class="btn btn-xs btn-success" type="submit">Publish</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-page-handler="Unpublish" asp-route-id="@a.Id" style="display:inline">
+                                        <button class="btn btn-xs btn-warning" type="submit">Unpublish</button>
+                                    </form>
+                                }
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" style="display:inline">
+                                    <button class="btn btn-xs btn-danger" type="submit" onclick="return confirm('Delete this article?')">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── Tab 2: Visitor Analytics ── -->
+    <div class="tab-pane fade" id="tab-visitors">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value">@Model.UniqueSessions</div>
+                    <div class="stat-label">Unique Sessions</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value">@Model.AvgTimeSpent.ToString("0")s</div>
+                    <div class="stat-label">Avg Time on Page</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-value">@Model.TotalVisits</div>
+                    <div class="stat-label">Total Page Views</div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>Page</th>
+                        <th>Article</th>
+                        <th>Time Spent</th>
+                        <th>Clicks</th>
+                        <th>Language</th>
+                        <th>Timezone</th>
+                        <th>Screen</th>
+                        <th>IP</th>
+                        <th>Visited At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.Visitors)
+                    {
+                        <tr>
+                            <td><span class="session-id" title="@v.SessionId">@v.SessionId[..Math.Min(12, v.SessionId.Length)]…</span></td>
+                            <td class="text-truncate" style="max-width:160px" title="@v.PageUrl">@v.PageUrl</td>
+                            <td>
+                                @if (v.ArticleId.HasValue)
+                                {
+                                    var art = Model.Articles.FirstOrDefault(a => a.Id == v.ArticleId.Value);
+                                    if (art != null)
+                                    {
+                                        var artTitle = art.Title ?? string.Empty;
+                                        <a href="/Article?id=@art.Id" target="_blank">@artTitle[..Math.Min(30, artTitle.Length)]…</a>
+                                    }
+                                    else
+                                    {
+                                        <span>#@v.ArticleId</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Homepage</span>
+                                }
+                            </td>
+                            <td>@v.TimeSpentSeconds s</td>
+                            <td>@v.ClickCount</td>
+                            <td>@v.Language</td>
+                            <td>@v.Timezone</td>
+                            <td>@v.ScreenSize</td>
+                            <td>@v.IpAddress</td>
+                            <td>@v.VisitedAt.ToString("MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                    @if (!Model.Visitors.Any())
+                    {
+                        <tr><td colspan="10" class="text-center text-muted">No visitor data yet. Share your research to attract readers!</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── Tab 3: Leads ── -->
+    <div class="tab-pane fade" id="tab-leads">
+        <h5 class="mb-3">Lead Generation</h5>
+        <div class="table-responsive">
+            <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Article</th>
+                        <th>Time Spent</th>
+                        <th>Session</th>
+                        <th>IP</th>
+                        <th>Captured At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in Model.Leads)
+                    {
+                        <tr>
+                            <td>@l.UserName</td>
+                            <td><a href="mailto:@l.UserEmail">@l.UserEmail</a></td>
+                            <td>@l.UserCompany</td>
+                            <td>
+                                @if (l.ArticleId.HasValue)
+                                {
+                                    var art = Model.Articles.FirstOrDefault(a => a.Id == l.ArticleId.Value);
+                                    if (art != null)
+                                    {
+                                        var artTitle = art.Title ?? string.Empty;
+                                        <a href="/Article?id=@art.Id" target="_blank">@artTitle[..Math.Min(30, artTitle.Length)]…</a>
+                                    }
+                                }
+                            </td>
+                            <td>@l.TimeSpentSeconds s</td>
+                            <td><span class="session-id" title="@l.SessionId">@l.SessionId[..Math.Min(12, l.SessionId.Length)]…</span></td>
+                            <td>@l.IpAddress</td>
+                            <td>@l.VisitedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        </tr>
+                    }
+                    @if (!Model.Leads.Any())
+                    {
+                        <tr><td colspan="8" class="text-center text-muted">No leads captured yet. Leads appear when visitors submit the research subscription form.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

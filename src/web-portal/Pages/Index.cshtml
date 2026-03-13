@@ -1,0 +1,76 @@
+@page
+@model FxWebPortal.Pages.IndexModel
+@{
+    ViewData["Title"] = "Forex Research";
+    ViewData["Category"] = Model.SelectedCategory;
+}
+
+@if (Model.Articles.Any())
+{
+    <!-- Featured article (first article) -->
+    var featured = Model.Articles.First();
+    var rest = Model.Articles.Skip(1).ToList();
+
+    <section class="featured-section mt-4 mb-5">
+        <div class="row g-0 featured-card">
+            <div class="col-md-8 featured-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="cat-badge cat-@(featured.Category.Replace("/","-").Replace(" ","-").ToLower())">@featured.Category</span>
+                    <span class="sentiment-badge sentiment-@featured.Sentiment.ToLower()">@featured.Sentiment</span>
+                </div>
+                <h1 class="featured-title">
+                    <a href="/Article?id=@featured.Id" class="text-decoration-none text-dark">@featured.Title</a>
+                </h1>
+                <p class="featured-summary">@featured.Summary</p>
+                <div class="d-flex align-items-center gap-3 mt-3">
+                    <span class="article-author">By @featured.Author</span>
+                    <span class="article-date">@featured.PublishedDate.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <a href="/Article?id=@featured.Id" class="btn btn-primary mt-3">Read Full Analysis &rarr;</a>
+            </div>
+            <div class="col-md-4 featured-visual d-flex align-items-center justify-content-center">
+                <div class="pair-display">
+                    <div class="pair-name">@featured.Category</div>
+                    <div class="pair-sentiment @featured.Sentiment.ToLower()">
+                        @(featured.Sentiment == "Bullish" ? "▲ BULLISH" : featured.Sentiment == "Bearish" ? "▼ BEARISH" : "◆ NEUTRAL")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    if (rest.Any())
+    {
+        <section class="articles-grid">
+            <div class="row g-4">
+                @foreach (var article in rest)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="article-card h-100">
+                            <div class="article-card-header">
+                                <span class="cat-badge cat-@(article.Category.Replace("/","-").Replace(" ","-").ToLower())">@article.Category</span>
+                                <span class="sentiment-badge sentiment-@article.Sentiment.ToLower()">@article.Sentiment</span>
+                            </div>
+                            <div class="article-card-body">
+                                <h2 class="article-title">
+                                    <a href="/Article?id=@article.Id" class="text-decoration-none">@article.Title</a>
+                                </h2>
+                                <p class="article-summary">@article.Summary</p>
+                            </div>
+                            <div class="article-card-footer">
+                                <span class="article-author">@article.Author</span>
+                                <span class="article-date">@article.PublishedDate.ToString("MMM dd, yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+}
+else
+{
+    <div class="mt-5 text-center text-muted">
+        <p class="fs-5">No research notes published in this category yet.</p>
+    </div>
+}

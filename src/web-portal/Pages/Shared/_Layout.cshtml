@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FX Research Portal</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <!-- Top bar -->
+    <div class="topbar">
+        <div class="container-xl d-flex justify-content-between align-items-center">
+            <div class="topbar-date">@DateTime.UtcNow.ToString("dddd, MMMM dd, yyyy") &nbsp;|&nbsp; UTC</div>
+            <div class="topbar-links">
+                <a href="/Admin/Login" class="text-white text-decoration-none small">Admin</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main header -->
+    <header class="site-header">
+        <div class="container-xl">
+            <div class="d-flex align-items-center justify-content-between py-3">
+                <a class="site-logo text-decoration-none" asp-page="/Index">
+                    <span class="logo-fx">FX</span><span class="logo-research">Research</span>
+                </a>
+                <div class="header-tagline d-none d-md-block">
+                    Independent Forex Research &amp; Market Intelligence
+                </div>
+                <button class="navbar-toggler d-md-none" type="button" id="mobileMenuToggle">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Category nav -->
+    <nav class="category-nav">
+        <div class="container-xl">
+            <div class="category-nav-inner">
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "All" || ViewData["Category"] == null ? "active" : "")" href="/?category=All">All</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "EUR/USD" ? "active" : "")" href="/?category=EUR%2FUSD">EUR/USD</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "GBP/USD" ? "active" : "")" href="/?category=GBP%2FUSD">GBP/USD</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "USD/JPY" ? "active" : "")" href="/?category=USD%2FJPY">USD/JPY</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "AUD/USD" ? "active" : "")" href="/?category=AUD%2FUSD">AUD/USD</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "USD/CHF" ? "active" : "")" href="/?category=USD%2FCHF">USD/CHF</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "Technical Analysis" ? "active" : "")" href="/?category=Technical+Analysis">Technical</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "Fundamental Analysis" ? "active" : "")" href="/?category=Fundamental+Analysis">Fundamental</a>
+                <a class="cat-link @(ViewData["Category"]?.ToString() == "Market Outlook" ? "active" : "")" href="/?category=Market+Outlook">Outlook</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-xl main-content">
+        <main role="main" class="pb-5">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container-xl">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="footer-brand"><span class="logo-fx">FX</span><span class="logo-research">Research</span></div>
+                    <p class="footer-desc mt-2">Independent forex research and market analysis for professional traders and institutional clients.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-heading">Research Categories</h6>
+                    <ul class="footer-links">
+                        <li><a href="/?category=Technical+Analysis">Technical Analysis</a></li>
+                        <li><a href="/?category=Fundamental+Analysis">Fundamental Analysis</a></li>
+                        <li><a href="/?category=Market+Outlook">Market Outlook</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="footer-heading">Currency Pairs</h6>
+                    <ul class="footer-links">
+                        <li><a href="/?category=EUR%2FUSD">EUR/USD</a></li>
+                        <li><a href="/?category=GBP%2FUSD">GBP/USD</a></li>
+                        <li><a href="/?category=USD%2FJPY">USD/JPY</a></li>
+                        <li><a href="/?category=AUD%2FUSD">AUD/USD</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom mt-4">
+                <span>&copy; @DateTime.UtcNow.Year FX Research Portal &mdash; For informational purposes only. Not financial advice.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/tracker.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

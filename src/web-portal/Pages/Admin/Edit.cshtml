@@ -1,0 +1,88 @@
+@page
+@model FxWebPortal.Pages.Admin.EditModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = Model.IsNew ? "New Research Note" : "Edit Research Note";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Admin" class="btn btn-outline-secondary btn-sm">&larr; Back</a>
+    <h4 class="mb-0">@(Model.IsNew ? "New Research Note" : "Edit Research Note")</h4>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+<form method="post">
+    <input type="hidden" name="Id" value="@Model.Article.Id" />
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card admin-form-card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Title *</label>
+                        <input type="text" class="form-control" name="Title" value="@Model.Article.Title" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Summary *</label>
+                        <textarea class="form-control" name="Summary" rows="3" required>@Model.Article.Summary</textarea>
+                        <div class="form-text">A 1–2 sentence overview shown on the research grid.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Full Content (HTML) *</label>
+                        <textarea class="form-control content-editor" name="Content" rows="16" required>@Model.Article.Content</textarea>
+                        <div class="form-text">You may use basic HTML tags: &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;h3&gt;.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card admin-form-card">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category *</label>
+                        <select class="form-select" name="Category" required>
+                            @foreach (var cat in new[]{"EUR/USD","GBP/USD","USD/JPY","AUD/USD","USD/CHF","Technical Analysis","Fundamental Analysis","Market Outlook"})
+                            {
+                                if (Model.Article.Category == cat) { <option value="@cat" selected>@cat</option> }
+                                else { <option value="@cat">@cat</option> }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Sentiment</label>
+                        <select class="form-select" name="Sentiment">
+                            @foreach (var s in new[]{"Bullish","Bearish","Neutral"})
+                            {
+                                if (Model.Article.Sentiment == s) { <option value="@s" selected>@s</option> }
+                                else { <option value="@s">@s</option> }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Author *</label>
+                        <input type="text" class="form-control" name="Author" value="@Model.Article.Author" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tags</label>
+                        <input type="text" class="form-control" name="Tags" value="@Model.Article.Tags" placeholder="e.g. EUR/USD, Bullish, ECB" />
+                        <div class="form-text">Comma-separated tags.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Status</label>
+                        <select class="form-select" name="Status">
+                            @if (Model.Article.Status == "Draft") { <option value="Draft" selected>Draft</option> } else { <option value="Draft">Draft</option> }
+                            @if (Model.Article.Status == "Published") { <option value="Published" selected>Published</option> } else { <option value="Published">Published</option> }
+                        </select>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Save Research Note</button>
+                        <a href="/Admin" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,99 @@
+@page
+@model FxWebPortal.Pages.ArticleModel
+@{
+    ViewData["Title"] = Model.Article?.Title ?? "Article Not Found";
+}
+
+@if (Model.Article == null)
+{
+    <div class="mt-5 text-center">
+        <h2 class="text-muted">Article not found</h2>
+        <a href="/" class="btn btn-primary mt-3">Back to Research</a>
+    </div>
+}
+else
+{
+    <!-- Tracking meta -->
+    <meta name="article-id" content="@Model.Article.Id" />
+
+    <div class="row mt-4">
+        <!-- Main content -->
+        <div class="col-lg-8">
+            <div class="mb-3 d-flex align-items-center gap-2">
+                <a href="/?category=@Uri.EscapeDataString(Model.Article.Category)" class="text-decoration-none">
+                    <span class="cat-badge cat-@(Model.Article.Category.Replace("/","-").Replace(" ","-").ToLower())">@Model.Article.Category</span>
+                </a>
+                <span class="sentiment-badge sentiment-@Model.Article.Sentiment.ToLower()">@Model.Article.Sentiment</span>
+            </div>
+
+            <h1 class="article-page-title">@Model.Article.Title</h1>
+
+            <div class="article-meta mb-4">
+                <span class="article-author-lg">By @Model.Article.Author</span>
+                <span class="separator">|</span>
+                <span class="article-date">@Model.Article.PublishedDate.ToString("MMMM dd, yyyy")</span>
+                @if (!string.IsNullOrEmpty(Model.Article.Tags))
+                {
+                    <span class="separator">|</span>
+                    @foreach (var tag in Model.Article.Tags.Split(','))
+                    {
+                        <span class="article-tag">@tag.Trim()</span>
+                    }
+                }
+            </div>
+
+            <div class="article-summary-box">
+                <strong>Summary:</strong> @Model.Article.Summary
+            </div>
+
+            <div class="article-content mt-4">
+                @Html.Raw(Model.Article.Content)
+            </div>
+
+            <div class="article-disclaimer mt-4">
+                <strong>Disclaimer:</strong> This research note is for informational purposes only and does not constitute financial advice. Past performance is not indicative of future results. Always conduct your own due diligence.
+            </div>
+
+            <div class="mt-4">
+                <a href="/" class="btn btn-outline-secondary">&larr; Back to Research</a>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Lead capture form -->
+            <div class="lead-capture-card">
+                <h5 class="lead-capture-title">Stay Ahead of the Market</h5>
+                <p class="lead-capture-desc">Get exclusive FX research notes delivered directly to your inbox. Join professional traders receiving our analysis.</p>
+                <form id="lead-form">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="lead-name" placeholder="Your Name" />
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" class="form-control" id="lead-email" placeholder="Work Email *" required />
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="lead-company" placeholder="Company / Fund (optional)" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Get Research Updates</button>
+                </form>
+            </div>
+
+            <!-- Related articles -->
+            @if (Model.Related.Any())
+            {
+                <div class="related-card mt-4">
+                    <h6 class="related-title">Related Research</h6>
+                    @foreach (var rel in Model.Related)
+                    {
+                        <div class="related-item">
+                            <span class="cat-badge cat-@(rel.Category.Replace("/","-").Replace(" ","-").ToLower()) mb-1">@rel.Category</span>
+                            <a href="/Article?id=@rel.Id" class="related-link d-block">@rel.Title</a>
+                            <small class="text-muted">@rel.PublishedDate.ToString("MMM dd, yyyy")</small>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

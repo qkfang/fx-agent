@@ -1,0 +1,13 @@
+@page
+@model FxWebPortal.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+<div class="mt-5 text-center">
+    <h1 class="text-danger">An error occurred</h1>
+    @if (Model.RequestId != null)
+    {
+        <p class="text-muted">Request ID: <code>@Model.RequestId</code></p>
+    }
+    <a href="/" class="btn btn-primary mt-3">Go Home</a>
+</div>
