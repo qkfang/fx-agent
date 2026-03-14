@@ -68,12 +68,17 @@ async def get_status():
 
 # ── Workflow ──────────────────────────────────────────────────────────────────
 
+class WorkflowRequest(BaseModel):
+    scenario: str = ""
+
+
 @app.post("/api/workflow/run")
-async def run_workflow():
+async def run_workflow(body: WorkflowRequest = WorkflowRequest()):
     if orchestrator.running:
         raise HTTPException(status_code=409, detail="A workflow is already running")
+    scenario = body.scenario
     # Fire-and-forget so HTTP response returns immediately
-    asyncio.create_task(orchestrator.run_workflow())
+    asyncio.create_task(orchestrator.run_workflow(scenario=scenario))
     return {"status": "started", "message": "Workflow started – connect to /ws for live events"}
 
 

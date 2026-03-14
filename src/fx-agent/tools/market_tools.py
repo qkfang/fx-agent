@@ -12,6 +12,25 @@ import httpx
 
 from config import settings
 
+# ── Scenario context (used in demo/fallback mode) ────────────────────────────
+# Set via set_scenario() before running a workflow to inject specific news data.
+# Safe for concurrent use because the Orchestrator enforces a single active
+# workflow at a time (orchestrator.running guard).
+
+_scenario_context: str = ""
+
+
+def set_scenario(scenario: str) -> None:
+    """Set the current scenario context so demo-mode news reflects the event."""
+    global _scenario_context
+    _scenario_context = scenario
+
+
+def reset_scenario() -> None:
+    """Clear the scenario context after a workflow completes."""
+    global _scenario_context
+    _scenario_context = ""
+
 
 async def get_fx_rate() -> str:
     """Return the current AUD/USD FX rate from the broker back-office service."""
@@ -57,23 +76,47 @@ async def get_market_news() -> str:
             return json.dumps({"news": headlines})
     except Exception as exc:
         # Return mock news when service is unavailable
-        mock_news = [
-            {
-                "title": "RBA holds interest rates steady amid inflation concerns",
-                "sentiment": "negative",
-                "publishedAt": datetime.now(timezone.utc).isoformat(),
-            },
-            {
-                "title": "USD strengthens on positive US jobs data",
-                "sentiment": "negative",
-                "publishedAt": datetime.now(timezone.utc).isoformat(),
-            },
-            {
-                "title": "AUD recovers on strong commodity exports",
-                "sentiment": "positive",
-                "publishedAt": datetime.now(timezone.utc).isoformat(),
-            },
-        ]
+        if _scenario_context == "middle_east_war":
+            mock_news = [
+                {
+                    "title": "War erupts in Middle East: oil prices surge on supply fears",
+                    "sentiment": "positive",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+                {
+                    "title": "Australia commodity exports to benefit from oil price spike",
+                    "sentiment": "positive",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+                {
+                    "title": "AUD/USD dips on initial risk-off – analysts see buying opportunity",
+                    "sentiment": "positive",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+                {
+                    "title": "USD safe-haven demand temporarily weighs on AUD/USD",
+                    "sentiment": "negative",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+            ]
+        else:
+            mock_news = [
+                {
+                    "title": "RBA holds interest rates steady amid inflation concerns",
+                    "sentiment": "negative",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+                {
+                    "title": "USD strengthens on positive US jobs data",
+                    "sentiment": "negative",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+                {
+                    "title": "AUD recovers on strong commodity exports",
+                    "sentiment": "positive",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                },
+            ]
         return json.dumps(
             {
                 "news": mock_news,
