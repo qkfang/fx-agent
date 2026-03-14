@@ -467,6 +467,1173 @@
     setInterval(updateStatus,   3000);
     setInterval(updateBlotter,  5000);
   })();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Prime — Broker Backoffice</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b27;
+            --bg-card: #1a2236;
+            --bg-card-hover: #1f2a42;
+            --border: #2a3655;
+            --text-primary: #e2e8f0;
+            --text-secondary: #7c8db5;
+            --text-muted: #4a5568;
+            --green: #00c853;
+            --green-dim: #1a3d2b;
+            --red: #ff4757;
+            --red-dim: #3d1a1a;
+            --blue: #4080ff;
+            --blue-dim: #1a2a4a;
+            --gold: #f59e0b;
+            --navbar-h: 56px;
+            --sidebar-w: 290px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* ─── NAVBAR ─────────────────────────────────── */
+        .top-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--navbar-h);
+            background: #0a0f1e;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--blue) 0%, #7b6cf6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .ticker-strip {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 5px 14px;
+        }
+
+        .ticker-pair { font-weight: 600; color: var(--text-secondary); font-size: 11px; }
+        .ticker-rate { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+        .ticker-change { font-size: 11px; }
+        .tick-up { color: var(--green); }
+        .tick-down { color: var(--red); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--green);
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ─── LAYOUT ──────────────────────────────────── */
+        .app-layout {
+            display: flex;
+            margin-top: var(--navbar-h);
+            min-height: calc(100vh - var(--navbar-h));
+        }
+
+        /* ─── SIDEBAR ─────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: var(--navbar-h);
+            bottom: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 16px 18px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-search {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-search input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            padding: 6px 10px 6px 30px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .sidebar-search input:focus { border-color: var(--blue); }
+        .sidebar-search input::placeholder { color: var(--text-muted); }
+
+        .search-icon {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .account-card {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .account-card:hover { background: var(--bg-card-hover); }
+        .account-card.active { background: var(--blue-dim); border-left: 3px solid var(--blue); }
+
+        .ac-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .ac-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .ac-badge {
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge-standard { background: rgba(64, 128, 255, 0.15); color: var(--blue); }
+        .badge-professional { background: rgba(124, 77, 255, 0.15); color: #9b6bff; }
+        .badge-vip { background: rgba(245, 158, 11, 0.15); color: var(--gold); }
+
+        .ac-number {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .ac-financials {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ac-balance {
+            font-size: 14px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ac-pnl {
+            font-size: 12px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ac-positions {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ─── MAIN CONTENT ───────────────────────────── */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            padding: 20px 24px;
+            min-height: calc(100vh - var(--navbar-h));
+        }
+
+        /* ─── WELCOME SCREEN ─────────────────────────── */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - var(--navbar-h) - 40px);
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .welcome-screen i { font-size: 48px; margin-bottom: 16px; color: var(--border); }
+        .welcome-screen h4 { color: var(--text-secondary); margin-bottom: 8px; }
+
+        /* ─── ACCOUNT HEADER ─────────────────────────── */
+        .account-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ah-left { display: flex; align-items: center; gap: 14px; }
+
+        .ah-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--blue) 0%, #7b6cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .ah-name { font-size: 18px; font-weight: 700; }
+
+        .ah-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 3px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .status-active {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        /* ─── BALANCE CARDS ──────────────────────────── */
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ─── SECTION HEADERS ────────────────────────── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 22px 0 12px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i { color: var(--blue); }
+
+        /* ─── TABLES ─────────────────────────────────── */
+        .fx-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .fx-table thead th {
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 9px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .fx-table tbody tr {
+            border-bottom: 1px solid rgba(42, 54, 85, 0.4);
+            transition: background 0.1s;
+        }
+
+        .fx-table tbody tr:hover { background: var(--bg-card-hover); }
+
+        .fx-table tbody td {
+            padding: 10px 12px;
+            vertical-align: middle;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .fx-table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px !important;
+            font-style: italic;
+        }
+
+        /* ─── TRADE PANEL ─────────────────────────────── */
+        .trade-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .trade-panel-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trade-panel-title i { color: var(--blue); }
+
+        .trade-rate-display {
+            text-align: center;
+            padding: 14px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .trade-rate-pair {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .trade-rate-value {
+            font-size: 26px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .trade-rate-spread {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .buy-sell-rates {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .rate-side {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .rate-side-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .rate-side-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+        .sell-side { background: rgba(255, 71, 87, 0.12); border: 1px solid rgba(255, 71, 87, 0.3); }
+        .sell-side .rate-side-label { color: var(--red); }
+        .sell-side .rate-side-value { color: var(--red); }
+
+        .buy-side { background: rgba(0, 200, 83, 0.12); border: 1px solid rgba(0, 200, 83, 0.3); }
+        .buy-side .rate-side-label { color: var(--green); }
+        .buy-side .rate-side-value { color: var(--green); }
+
+        .form-label-sm {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .fx-input {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            outline: none;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .fx-input:focus { border-color: var(--blue); }
+
+        .lot-buttons {
+            display: flex;
+            gap: 5px;
+            margin: 8px 0 14px;
+        }
+
+        .lot-btn {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .lot-btn:hover { background: var(--bg-card-hover); border-color: var(--blue); color: var(--blue); }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #00c853, #00a846);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            transition: opacity 0.15s;
+        }
+
+        .btn-sell {
+            background: linear-gradient(135deg, #ff4757, #e63946);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            letter-spacing: 0.5px;
+            transition: opacity 0.15s;
+        }
+
+        .btn-buy:hover, .btn-sell:hover { opacity: 0.88; }
+        .btn-buy:disabled, .btn-sell:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .trade-margin-info {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* ─── TRADE RESULT TOAST ──────────────────────── */
+        .trade-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 9999;
+            max-width: 340px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .toast-success { background: var(--green-dim); border: 1px solid var(--green); color: var(--green); }
+        .toast-error { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); }
+
+        /* ─── TYPE BADGES ─────────────────────────────── */
+        .type-buy { color: var(--green); font-weight: 700; }
+        .type-sell { color: var(--red); font-weight: 700; }
+        .type-close-buy { color: #7c8db5; }
+        .type-close-sell { color: #7c8db5; }
+        .type-deposit { color: var(--gold); }
+
+        .pnl-pos { color: var(--green); font-weight: 600; }
+        .pnl-neg { color: var(--red); font-weight: 600; }
+        .pnl-zero { color: var(--text-muted); }
+
+        /* ─── CLOSE POSITION BTN ─────────────────────── */
+        .btn-close-pos {
+            background: rgba(255, 71, 87, 0.12);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: var(--red);
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .btn-close-pos:hover { background: rgba(255, 71, 87, 0.25); }
+
+        /* ─── DIVIDER ─────────────────────────────────── */
+        .divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+        /* ─── SCROLLBAR ───────────────────────────────── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     TOP NAVBAR
+════════════════════════════════════════════ -->
+<nav class="top-navbar">
+    <a class="brand" href="#">
+        <div class="brand-icon"><i class="fa-solid fa-chart-line"></i></div>
+        FX Prime
+        <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:4px;">Broker Backoffice</span>
+    </a>
+
+    <div class="ticker-strip">
+        <div class="ticker-item">
+            <span class="ticker-pair">AUD/USD</span>
+            <span class="ticker-rate" id="navRate">—</span>
+            <span class="ticker-change" id="navChange"></span>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+        <span style="color:var(--border)">|</span>
+        <i class="fa-regular fa-user" style="font-size:14px;"></i>
+        <span>Broker Manager</span>
+    </div>
+</nav>
+
+<!-- ════════════════════════════════════════════
+     APP LAYOUT
+════════════════════════════════════════════ -->
+<div class="app-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-users" style="margin-right:6px;"></i>Client Accounts
+        </div>
+        <div style="position:relative;" class="sidebar-search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search accounts…" oninput="filterAccounts()">
+        </div>
+        <div id="accountList">
+            <!-- populated by JS -->
+        </div>
+        <div style="padding:14px 18px;margin-top:auto;border-top:1px solid var(--border);color:var(--text-muted);font-size:11px;">
+            <i class="fa-solid fa-shield-halved" style="margin-right:5px;"></i>FX Prime Brokerage System v2.4
+        </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <main class="main-content">
+
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <i class="fa-regular fa-chart-bar"></i>
+            <h4>Select a client account</h4>
+            <p>Choose an account from the sidebar to view the balance sheet, open positions, and manage trades.</p>
+        </div>
+
+        <!-- Account Dashboard -->
+        <div id="accountDashboard" style="display:none;">
+
+            <!-- Account Header -->
+            <div class="account-header-bar">
+                <div class="ah-left">
+                    <div class="ah-avatar" id="ahAvatar">JW</div>
+                    <div>
+                        <div class="ah-name" id="ahName">James Wilson</div>
+                        <div class="ah-meta">
+                            <span id="ahNumber" style="font-weight:600;">FX10001</span>
+                            <span style="color:var(--border)">•</span>
+                            <span id="ahCountry">Australia</span>
+                            <span style="color:var(--border)">•</span>
+                            <span id="ahTypeBadge" class="ac-badge badge-standard">Standard</span>
+                            <span style="color:var(--border)">•</span>
+                            <div class="status-active"><div class="status-dot"></div>Active</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:right;font-size:11px;color:var(--text-muted);">
+                    <div>Leverage: <span id="ahLeverage" style="color:var(--text-secondary);font-weight:600;">1:100</span></div>
+                    <div style="margin-top:3px;">Member since: <span id="ahSince" style="color:var(--text-secondary);">—</span></div>
+                </div>
+            </div>
+
+            <!-- Balance Sheet Cards -->
+            <div class="row g-3" id="balanceCards">
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fa-solid fa-wallet" style="margin-right:4px;"></i>Balance</div>
+                        <div class="stat-value" id="cardBalance">—</div>
+                        <div class="stat-sub">Settled funds</div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fa-solid fa-scale-balanced" style="margin-right:4px;"></i>Equity</div>
+                        <div class="stat-value" id="cardEquity">—</div>
+                        <div class="stat-sub">Balance + Open P&amp;L</div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="margin-right:4px;"></i>Open P&amp;L</div>
+                        <div class="stat-value" id="cardPnl">—</div>
+                        <div class="stat-sub" id="cardMarginLevel">Margin level: —</div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fa-solid fa-shield" style="margin-right:4px;"></i>Free Margin</div>
+                        <div class="stat-value" id="cardFreeMargin">—</div>
+                        <div class="stat-sub" id="cardUsedMargin">Used: —</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Positions + Trade Panel -->
+            <div class="row g-3 mt-1">
+
+                <!-- Open Positions -->
+                <div class="col-lg-8">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-bolt"></i>
+                            Open Positions
+                            <span id="posCount" style="background:var(--blue-dim);color:var(--blue);font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px;">0</span>
+                        </div>
+                    </div>
+                    <div class="fx-table-wrapper">
+                        <table class="fx-table">
+                            <thead>
+                                <tr>
+                                    <th>Position ID</th>
+                                    <th>Pair</th>
+                                    <th>Type</th>
+                                    <th>Lots</th>
+                                    <th>Open Rate</th>
+                                    <th>Current</th>
+                                    <th>P&amp;L (USD)</th>
+                                    <th>Margin</th>
+                                    <th>Opened</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="positionsTable">
+                                <tr class="empty-row"><td colspan="10">No open positions</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Trade Panel -->
+                <div class="col-lg-4">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                            Execute Trade
+                        </div>
+                    </div>
+                    <div class="trade-panel">
+                        <div class="buy-sell-rates">
+                            <div class="rate-side sell-side">
+                                <div class="rate-side-label">SELL</div>
+                                <div class="rate-side-value" id="tradeSellRate">—</div>
+                            </div>
+                            <div class="rate-side buy-side">
+                                <div class="rate-side-label">BUY</div>
+                                <div class="rate-side-value" id="tradeBuyRate">—</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-1">
+                            <div class="form-label-sm">Currency Pair</div>
+                            <div class="fx-input" style="cursor:default;color:var(--text-secondary);">AUD / USD</div>
+                        </div>
+
+                        <div class="mt-3 mb-1">
+                            <div class="form-label-sm">Volume (Lots)</div>
+                            <input type="number" class="fx-input" id="tradeLotsInput" value="0.10" min="0.01" max="100" step="0.01">
+                        </div>
+
+                        <div class="lot-buttons">
+                            <button class="lot-btn" onclick="setLots(0.01)">0.01</button>
+                            <button class="lot-btn" onclick="setLots(0.1)">0.10</button>
+                            <button class="lot-btn" onclick="setLots(0.5)">0.50</button>
+                            <button class="lot-btn" onclick="setLots(1)">1.00</button>
+                            <button class="lot-btn" onclick="setLots(5)">5.00</button>
+                        </div>
+
+                        <button class="btn-buy" onclick="executeTrade('buy')">
+                            <i class="fa-solid fa-arrow-trend-up"></i>&nbsp; BUY AUD/USD
+                        </button>
+                        <button class="btn-sell" onclick="executeTrade('sell')">
+                            <i class="fa-solid fa-arrow-trend-down"></i>&nbsp; SELL AUD/USD
+                        </button>
+
+                        <div class="trade-margin-info" id="tradeMarginEstimate">
+                            Est. margin: — &nbsp;|&nbsp; Free margin: —
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="row g-3 mt-1 mb-4">
+                <div class="col-12">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            Transaction History
+                            <span style="color:var(--text-muted);font-weight:400;font-size:11px;">(Last 10)</span>
+                        </div>
+                    </div>
+                    <div class="fx-table-wrapper">
+                        <table class="fx-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Pair</th>
+                                    <th>Lots</th>
+                                    <th>Rate</th>
+                                    <th>P&amp;L</th>
+                                    <th>Balance After</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable">
+                                <tr class="empty-row"><td colspan="8">No transactions yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /accountDashboard -->
+    </main>
+</div>
+
+<script>
+    let selectedAccountId = null;
+    let allAccounts = [];
+    let currentRate = 0;
+    let prevRate = 0;
+    let currentBalanceSheet = null;
+
+    // ── TICKER ──────────────────────────────────────────
+    async function updateTicker() {
+        try {
+            const res = await fetch('/api/fx/rate');
+            const data = await res.json();
+            prevRate = currentRate;
+            currentRate = parseFloat(data.rate);
+
+            document.getElementById('navRate').textContent = currentRate.toFixed(4);
+            const change = currentRate - prevRate;
+            const changeEl = document.getElementById('navChange');
+            if (change > 0) { changeEl.textContent = '▲ +' + change.toFixed(4); changeEl.className = 'ticker-change tick-up'; }
+            else if (change < 0) { changeEl.textContent = '▼ ' + change.toFixed(4); changeEl.className = 'ticker-change tick-down'; }
+            else { changeEl.textContent = ''; }
+
+            // Update trade panel rates
+            document.getElementById('tradeSellRate').textContent = currentRate.toFixed(4);
+            document.getElementById('tradeBuyRate').textContent = (currentRate + 0.0002).toFixed(4);
+            updateMarginEstimate();
+        } catch (e) { /* ignore */ }
+    }
+
+    // ── ACCOUNTS LIST ────────────────────────────────────
+    async function loadAccounts() {
+        try {
+            const res = await fetch('/api/accounts');
+            allAccounts = await res.json();
+            renderAccountList(allAccounts);
+        } catch (e) {
+            document.getElementById('accountList').innerHTML =
+                '<div style="padding:20px;color:var(--red);font-size:12px;"><i class="fa-solid fa-triangle-exclamation"></i> Failed to load accounts</div>';
+        }
+    }
+
+    function renderAccountList(accounts) {
+        const container = document.getElementById('accountList');
+        if (!accounts.length) {
+            container.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:12px;">No accounts found</div>';
+            return;
+        }
+        container.innerHTML = accounts.map(a => {
+            const initials = a.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const pnlClass = a.openPnL > 0 ? 'pnl-pos' : a.openPnL < 0 ? 'pnl-neg' : 'pnl-zero';
+            const pnlSign = a.openPnL >= 0 ? '+' : '';
+            const typeBadgeClass = a.accountType === 'VIP' ? 'badge-vip' : a.accountType === 'Professional' ? 'badge-professional' : 'badge-standard';
+            const isActive = a.id === selectedAccountId;
+            return `
+            <div class="account-card ${isActive ? 'active' : ''}" onclick="selectAccount(${a.id})" id="ac-${a.id}">
+                <div class="ac-header">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--blue),#7b6cf6);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
+                        <span class="ac-name">${a.customerName}</span>
+                    </div>
+                    <span class="ac-badge ${typeBadgeClass}">${a.accountType}</span>
+                </div>
+                <div class="ac-number">${a.accountNumber} &nbsp;·&nbsp; ${a.country}</div>
+                <div class="ac-financials">
+                    <span class="ac-balance">${fmtUSD(a.balance)}</span>
+                    <span class="ac-pnl ${pnlClass}">${pnlSign}${fmtUSD(a.openPnL)}</span>
+                </div>
+                <div class="ac-positions">
+                    <i class="fa-solid fa-circle-dot" style="font-size:8px;margin-right:3px;"></i>
+                    ${a.openPositionsCount} open position${a.openPositionsCount !== 1 ? 's' : ''}
+                    &nbsp;·&nbsp; Equity: ${fmtUSD(a.equity)}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function filterAccounts() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allAccounts.filter(a =>
+            a.customerName.toLowerCase().includes(q) ||
+            a.accountNumber.toLowerCase().includes(q) ||
+            a.country.toLowerCase().includes(q)
+        );
+        renderAccountList(filtered);
+    }
+
+    // ── SELECT ACCOUNT ───────────────────────────────────
+    async function selectAccount(id) {
+        selectedAccountId = id;
+        renderAccountList(allAccounts); // refresh active state
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('accountDashboard').style.display = 'block';
+        await loadBalanceSheet();
+    }
+
+    async function loadBalanceSheet() {
+        if (!selectedAccountId) return;
+        try {
+            const res = await fetch(`/api/accounts/${selectedAccountId}/balance`);
+            if (!res.ok) return;
+            const data = await res.json();
+            currentBalanceSheet = data;
+            renderDashboard(data);
+        } catch (e) { /* ignore */ }
+    }
+
+    function renderDashboard(data) {
+        // Header
+        const initials = data.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('ahAvatar').textContent = initials;
+        document.getElementById('ahName').textContent = data.customerName;
+        document.getElementById('ahNumber').textContent = data.accountNumber;
+
+        const account = allAccounts.find(a => a.id === data.accountId);
+        if (account) {
+            document.getElementById('ahCountry').textContent = account.country;
+            document.getElementById('ahLeverage').textContent = '1:' + account.leverage;
+            document.getElementById('ahSince').textContent = new Date(account.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' });
+        }
+
+        const typeBadgeMap = { 'VIP': 'badge-vip', 'Professional': 'badge-professional', 'Standard': 'badge-standard' };
+        const badgeEl = document.getElementById('ahTypeBadge');
+        badgeEl.textContent = data.accountType;
+        badgeEl.className = 'ac-badge ' + (typeBadgeMap[data.accountType] || 'badge-standard');
+
+        // Balance cards
+        document.getElementById('cardBalance').textContent = fmtUSD(data.balance);
+        document.getElementById('cardEquity').textContent = fmtUSD(data.equity);
+
+        const pnlEl = document.getElementById('cardPnl');
+        pnlEl.textContent = (data.openPnL >= 0 ? '+' : '') + fmtUSD(data.openPnL);
+        pnlEl.className = 'stat-value ' + (data.openPnL > 0 ? 'pnl-pos' : data.openPnL < 0 ? 'pnl-neg' : '');
+        document.getElementById('cardMarginLevel').textContent = data.margin > 0 ? `Margin level: ${data.marginLevel.toFixed(0)}%` : 'No open positions';
+
+        document.getElementById('cardFreeMargin').textContent = fmtUSD(data.freeMargin);
+        document.getElementById('cardUsedMargin').textContent = `Used: ${fmtUSD(data.margin)}`;
+
+        // Positions
+        document.getElementById('posCount').textContent = data.openPositions.length;
+        const posBody = document.getElementById('positionsTable');
+        if (!data.openPositions.length) {
+            posBody.innerHTML = '<tr class="empty-row"><td colspan="10">No open positions</td></tr>';
+        } else {
+            posBody.innerHTML = data.openPositions.map(p => {
+                const pnlClass = p.pnL > 0 ? 'pnl-pos' : p.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
+                const typeClass = p.type === 'Buy' ? 'type-buy' : 'type-sell';
+                const pnlSign = p.pnL >= 0 ? '+' : '';
+                return `
+                <tr>
+                    <td style="font-size:11px;color:var(--text-muted);">${p.positionId}</td>
+                    <td style="font-weight:600;">${p.currencyPair}</td>
+                    <td class="${typeClass}"><i class="fa-solid ${p.type === 'Buy' ? 'fa-arrow-up' : 'fa-arrow-down'}" style="font-size:10px;margin-right:3px;"></i>${p.type.toUpperCase()}</td>
+                    <td>${p.lots.toFixed(2)}</td>
+                    <td>${p.openRate.toFixed(4)}</td>
+                    <td>${p.currentRate.toFixed(4)}</td>
+                    <td class="${pnlClass}">${pnlSign}$${Math.abs(p.pnL).toFixed(2)}</td>
+                    <td>$${p.margin.toFixed(2)}</td>
+                    <td style="font-size:11px;color:var(--text-muted);">${timeAgo(p.openTime)}</td>
+                    <td><button class="btn-close-pos" onclick="closePosition('${p.positionId}')"><i class="fa-solid fa-xmark" style="margin-right:3px;"></i>Close</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // History
+        const histBody = document.getElementById('historyTable');
+        if (!data.recentTransactions.length) {
+            histBody.innerHTML = '<tr class="empty-row"><td colspan="8">No transactions yet</td></tr>';
+        } else {
+            histBody.innerHTML = data.recentTransactions.map(t => {
+                const typeClass = t.type === 'Buy' ? 'type-buy' : t.type === 'Sell' ? 'type-sell' : t.type === 'Deposit' ? 'type-deposit' : t.type.startsWith('Close') ? (t.type === 'Close Buy' ? 'type-close-buy' : 'type-close-sell') : '';
+                const pnlClass = t.pnL > 0 ? 'pnl-pos' : t.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
+                const pnlStr = t.pnL !== 0 ? (t.pnL > 0 ? '+$' : '-$') + Math.abs(t.pnL).toFixed(2) : t.type === 'Deposit' ? '+$' + Math.abs(t.balanceAfter).toFixed(2) : '—';
+                const pnlCls = t.pnL > 0 || t.type === 'Deposit' ? 'pnl-pos' : t.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
+                return `
+                <tr>
+                    <td style="font-size:11px;color:var(--text-muted);">${new Date(t.timestamp).toLocaleString()}</td>
+                    <td style="font-size:11px;color:var(--text-muted);">${t.transactionId}</td>
+                    <td class="${typeClass}" style="font-weight:600;">${t.type}</td>
+                    <td>${t.currencyPair}</td>
+                    <td>${t.lots > 0 ? t.lots.toFixed(2) : '—'}</td>
+                    <td>${t.rate > 0 ? t.rate.toFixed(4) : '—'}</td>
+                    <td class="${pnlCls}">${pnlStr}</td>
+                    <td style="font-weight:600;">${fmtUSD(t.balanceAfter)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        updateMarginEstimate();
+    }
+
+    // ── EXECUTE TRADE ─────────────────────────────────────
+    async function executeTrade(type) {
+        if (!selectedAccountId) return showToast('Please select an account first.', false);
+        const lots = parseFloat(document.getElementById('tradeLotsInput').value);
+        if (isNaN(lots) || lots <= 0) return showToast('Enter a valid lot size.', false);
+
+        const btns = document.querySelectorAll('.btn-buy, .btn-sell');
+        btns.forEach(b => b.disabled = true);
+
+        try {
+            const res = await fetch(`/api/accounts/${selectedAccountId}/${type}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currencyPair: 'AUD/USD', lots: lots })
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                showToast(`✓ ${result.message}`, true);
+                await loadBalanceSheet();
+                await loadAccounts();
+            } else {
+                showToast(`✗ ${result.message}`, false);
+            }
+        } catch (e) {
+            showToast('Request failed. Please try again.', false);
+        } finally {
+            btns.forEach(b => b.disabled = false);
+        }
+    }
+
+    // ── CLOSE POSITION ────────────────────────────────────
+    async function closePosition(positionId) {
+        if (!selectedAccountId) return;
+        try {
+            const res = await fetch(`/api/accounts/${selectedAccountId}/close/${positionId}`, { method: 'POST' });
+            const result = await res.json();
+            if (result.success) {
+                showToast(`✓ ${result.message}`, true);
+                await loadBalanceSheet();
+                await loadAccounts();
+            } else {
+                showToast(`✗ ${result.message}`, false);
+            }
+        } catch (e) {
+            showToast('Failed to close position.', false);
+        }
+    }
+
+    // ── HELPERS ───────────────────────────────────────────
+    function setLots(v) {
+        document.getElementById('tradeLotsInput').value = v.toFixed(2);
+        updateMarginEstimate();
+    }
+
+    function updateMarginEstimate() {
+        if (!currentBalanceSheet || !currentRate) return;
+        const lots = parseFloat(document.getElementById('tradeLotsInput').value) || 0;
+        const account = allAccounts.find(a => a.id === selectedAccountId);
+        if (!account) return;
+        const margin = (lots * 100000 * currentRate) / account.leverage;
+        document.getElementById('tradeMarginEstimate').textContent =
+            `Est. margin: $${margin.toFixed(2)} | Free margin: ${fmtUSD(currentBalanceSheet.freeMargin)}`;
+    }
+
+    function fmtUSD(v) {
+        if (v == null) return '—';
+        const abs = Math.abs(v);
+        const prefix = v < 0 ? '-$' : '$';
+        return prefix + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function timeAgo(dt) {
+        const diff = Math.floor((Date.now() - new Date(dt)) / 1000);
+        if (diff < 60) return diff + 's ago';
+        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    let toastTimer = null;
+    function showToast(msg, success) {
+        if (toastTimer) { clearTimeout(toastTimer); const old = document.getElementById('tradeToast'); if (old) old.remove(); }
+        const div = document.createElement('div');
+        div.id = 'tradeToast';
+        div.className = 'trade-toast ' + (success ? 'toast-success' : 'toast-error');
+        div.innerHTML = msg;
+        document.body.appendChild(div);
+        toastTimer = setTimeout(() => div.remove(), 4000);
+    }
+
+    // ── INIT & INTERVALS ──────────────────────────────────
+    async function init() {
+        await updateTicker();
+        await loadAccounts();
+    }
+
+    setInterval(async () => {
+        await updateTicker();
+        if (selectedAccountId) await loadBalanceSheet();
+        await loadAccounts();
+    }, 2000);
+
+    document.getElementById('tradeLotsInput').addEventListener('input', updateMarginEstimate);
+
+    init();
 </script>
 </body>
 </html>

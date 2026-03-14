@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FX Agent Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --accent: #4f8ef7;
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --purple: #a78bfa;
+      --orange: #fb923c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
+    header h1 span { color: var(--accent); }
+    #status-badge {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .badge-demo    { background: #1e3a5f; color: var(--accent); }
+    .badge-foundry { background: #1e3350; color: var(--purple); }
+    .badge-running { background: #3b1f0a; color: var(--orange); }
+
+    /* ── Layout ── */
+    main {
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+      padding: 16px 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      height: calc(100vh - 54px);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    /* ── Left column ── */
+    #left-col { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; gap: 16px; }
+
+    /* FX Rate */
+    #rate-value { font-size: 36px; font-weight: 800; color: var(--green); letter-spacing: -1px; }
+    #rate-pair { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    #rate-ts { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+    /* Agents status */
+    .agent-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .agent-row:last-child { border-bottom: none; }
+    .agent-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .agent-icon.analysis { background: #1e3a5f; }
+    .agent-icon.comm     { background: #1e3350; }
+    .agent-icon.trader   { background: #1e3b2e; }
+    .agent-name { font-weight: 600; font-size: 13px; }
+    .agent-sub  { font-size: 11px; color: var(--muted); }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted); margin-left: auto; flex-shrink: 0;
+    }
+    .dot.active  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.error   { background: var(--red); }
+    .dot.waiting { background: var(--yellow); }
+
+    /* Controls */
+    #btn-run {
+      width: 100%; padding: 12px;
+      background: var(--accent);
+      color: #fff; border: none;
+      border-radius: 8px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s;
+    }
+    #btn-run:hover { opacity: .85; }
+    #btn-run:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Centre column – event log ── */
+    #centre-col { grid-column: 2; grid-row: 1 / 3; }
+    #log-container {
+      flex: 1; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .log-entry {
+      background: var(--surface2);
+      border-left: 3px solid var(--border);
+      border-radius: 0 6px 6px 0;
+      padding: 8px 12px;
+      font-size: 12px;
+      animation: fadeIn .2s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: none; } }
+    .log-entry .log-meta {
+      display: flex; gap: 8px; align-items: center;
+      margin-bottom: 4px;
+    }
+    .log-type {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      padding: 1px 6px; border-radius: 4px;
+    }
+    .log-agent { font-size: 10px; color: var(--muted); }
+    .log-ts    { font-size: 10px; color: var(--muted); margin-left: auto; }
+    .log-content { color: var(--text); line-height: 1.5; }
+    .log-detail {
+      margin-top: 6px; padding: 6px 8px;
+      background: rgba(0,0,0,.3); border-radius: 4px;
+      font-family: monospace; font-size: 11px; color: var(--muted);
+      white-space: pre-wrap; word-break: break-all; max-height: 120px; overflow: auto;
+    }
+
+    /* log type colours */
+    .lt-workflow_start, .lt-workflow_end { border-left-color: var(--accent); }
+    .lt-workflow_start .log-type, .lt-workflow_end .log-type { background: #1e3a5f; color: var(--accent); }
+    .lt-phase { border-left-color: var(--purple); }
+    .lt-phase .log-type { background: #2e1e5f; color: var(--purple); }
+    .lt-tool_call { border-left-color: #334155; }
+    .lt-tool_call .log-type { background: #1e2740; color: #64748b; }
+    .lt-tool_result { border-left-color: #1e3350; }
+    .lt-tool_result .log-type { background: #1e3350; color: #7dd3fc; }
+    .lt-recommendation, .lt-result { border-left-color: var(--green); }
+    .lt-recommendation .log-type, .lt-result .log-type { background: #063b2e; color: var(--green); }
+    .lt-approval_result, .lt-awaiting_approval, .lt-approval_decision { border-left-color: var(--yellow); }
+    .lt-approval_result .log-type, .lt-awaiting_approval .log-type, .lt-approval_decision .log-type { background: #3b2c0a; color: var(--yellow); }
+    .lt-error { border-left-color: var(--red); }
+    .lt-error .log-type { background: #3b0e0e; color: var(--red); }
+    .lt-status { border-left-color: #334155; }
+    .lt-status .log-type { background: #1e2740; color: var(--muted); }
+    .lt-ping { display: none; }
+
+    /* ── Right column ── */
+    #right-col { grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; gap: 16px; }
+
+    /* Approvals */
+    #approvals-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .approval-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px;
+    }
+    .approval-card .rec-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .rec-action {
+      font-size: 12px; font-weight: 800; padding: 2px 10px;
+      border-radius: 4px;
+    }
+    .rec-action.buy  { background: #063b2e; color: var(--green); }
+    .rec-action.sell { background: #3b0e0e; color: var(--red); }
+    .rec-amount { font-size: 12px; color: var(--muted); }
+    .approval-summary { font-size: 12px; margin-bottom: 10px; line-height: 1.5; }
+    .approval-btns { display: flex; gap: 8px; }
+    .btn-approve, .btn-reject {
+      flex: 1; padding: 6px;
+      border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .btn-approve { background: var(--green); color: #0a1a12; }
+    .btn-approve:hover { opacity: .85; }
+    .btn-reject  { background: var(--red);   color: #1a0505; }
+    .btn-reject:hover { opacity: .85; }
+
+    /* Notifications */
+    #notif-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .notif-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .notif-subject { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .notif-ts      { font-size: 11px; color: var(--muted); }
+    .notif-body    { font-size: 11px; color: var(--muted); margin-top: 6px; white-space: pre-wrap; }
+
+    .empty-state { font-size: 12px; color: var(--muted); padding: 12px 0; text-align: center; }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FX <span>Agent</span> Dashboard</h1>
+    <span id="status-badge" class="badge-demo">Demo Mode</span>
+  </header>
+
+  <main>
+    <!-- Left column -->
+    <div id="left-col">
+      <!-- FX Rate -->
+      <div class="card">
+        <div class="card-title">Live FX Rate</div>
+        <div id="rate-value">—</div>
+        <div id="rate-pair">AUD/USD</div>
+        <div id="rate-ts">—</div>
+      </div>
+
+      <!-- Agent Status -->
+      <div class="card">
+        <div class="card-title">Agents</div>
+        <div class="agent-row">
+          <div class="agent-icon analysis">📊</div>
+          <div>
+            <div class="agent-name">Analysis Agent</div>
+            <div class="agent-sub">Market research & decisions</div>
+          </div>
+          <div id="dot-analysis" class="dot"></div>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon comm">💬</div>
+          <div>
+            <div class="agent-name">Comm Agent</div>
+            <div class="agent-sub">Broker & customer comms</div>
+          </div>
+          <div id="dot-comm" class="dot"></div>
+        </div>
+        <div class="agent-row">
+          <div class="agent-icon trader">⚡</div>
+          <div>
+            <div class="agent-name">Trader Agent</div>
+            <div class="agent-sub">Trade execution</div>
+          </div>
+          <div id="dot-trader" class="dot"></div>
+        </div>
+      </div>
+
+      <!-- Run Controls -->
+      <div class="card">
+        <div class="card-title">Controls</div>
+        <button id="btn-run" onclick="runWorkflow()">▶ Run Workflow</button>
+        <div id="run-status" style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;"></div>
+      </div>
+    </div>
+
+    <!-- Centre column – event log -->
+    <div class="card" id="centre-col">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Agent Execution Log</span>
+        <span id="ws-indicator" style="font-size:11px;color:var(--muted);">● disconnected</span>
+        <button onclick="clearLog()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;">Clear</button>
+      </div>
+      <div id="log-container"></div>
+    </div>
+
+    <!-- Right column -->
+    <div id="right-col">
+      <!-- Broker Approvals -->
+      <div class="card" style="flex:1">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Broker Approvals</span>
+          <span id="approval-count" style="font-size:11px;color:var(--yellow);font-weight:700;"></span>
+        </div>
+        <div id="approvals-list"><div class="empty-state">No pending approvals</div></div>
+      </div>
+
+      <!-- Customer Notifications -->
+      <div class="card" style="flex:1">
+        <div class="card-title">Customer Notifications</div>
+        <div id="notif-list"><div class="empty-state">No notifications sent yet</div></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ── Config ────────────────────────────────────────────────────────────────
+    const BASE = '';   // same origin
+    const WS_URL = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/ws';
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let ws = null;
+    let wsRetries = 0;
+    let activeAgent = null;
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      connectWS();
+      refreshRate();
+      refreshApprovals();
+      refreshNotifications();
+      loadStatus();
+      setInterval(refreshRate, 3000);
+      setInterval(refreshApprovals, 4000);
+      setInterval(refreshNotifications, 5000);
+    });
+
+    // ── Status ────────────────────────────────────────────────────────────────
+    async function loadStatus() {
+      try {
+        const r = await fetch(BASE + '/api/status');
+        const d = await r.json();
+        const badge = document.getElementById('status-badge');
+        if (d.mode === 'azure-ai-foundry') {
+          badge.className = 'badge-foundry';
+          badge.textContent = 'Azure AI Foundry';
+        } else {
+          badge.className = 'badge-demo';
+          badge.textContent = 'Demo Mode';
+        }
+        if (d.workflow_running) {
+          badge.className = 'badge-running';
+          badge.textContent = 'Running…';
+        }
+      } catch {}
+    }
+
+    // ── FX Rate ───────────────────────────────────────────────────────────────
+    async function refreshRate() {
+      try {
+        const r = await fetch(BASE + '/api/fx/rate');
+        const d = await r.json();
+        document.getElementById('rate-value').textContent = parseFloat(d.rate).toFixed(4);
+        document.getElementById('rate-pair').textContent = d.currency_pair || 'AUD/USD';
+        const ts = d.timestamp ? new Date(d.timestamp).toLocaleTimeString() : '';
+        document.getElementById('rate-ts').textContent = ts ? `Updated ${ts}` : '';
+      } catch {}
+    }
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────
+    function connectWS() {
+      const ind = document.getElementById('ws-indicator');
+      ind.style.color = 'var(--yellow)';
+      ind.textContent = '● connecting…';
+
+      ws = new WebSocket(WS_URL);
+
+      ws.onopen = () => {
+        ind.style.color = 'var(--green)';
+        ind.textContent = '● connected';
+        wsRetries = 0;
+      };
+
+      ws.onmessage = (e) => {
+        try { handleEvent(JSON.parse(e.data)); } catch (err) { console.warn('WS parse error:', err, e.data); }
+      };
+
+      ws.onclose = () => {
+        ind.style.color = 'var(--red)';
+        ind.textContent = '● disconnected';
+        const delay = Math.min(1000 * Math.pow(2, wsRetries++), 15000);
+        setTimeout(connectWS, delay);
+      };
+
+      ws.onerror = () => ws.close();
+    }
+
+    // ── Event handler ─────────────────────────────────────────────────────────
+    function handleEvent(ev) {
+      if (ev.type === 'ping') return;
+
+      const agentDots = { analysis: null, comm: null, trader: null };
+
+      // Update agent dots
+      if (ev.agent && ev.agent !== 'orchestrator') {
+        // Deactivate previous agent
+        if (activeAgent && activeAgent !== ev.agent) {
+          const prev = document.getElementById('dot-' + activeAgent);
+          if (prev) { prev.className = 'dot'; }
+        }
+        activeAgent = ev.agent;
+        const dot = document.getElementById('dot-' + ev.agent);
+        if (dot) {
+          dot.className = ev.type === 'error' ? 'dot error' : 'dot active';
+        }
+      }
+
+      if (ev.type === 'workflow_end') {
+        ['analysis','comm','trader'].forEach(a => {
+          const d = document.getElementById('dot-' + a);
+          if (d) d.className = 'dot';
+        });
+        activeAgent = null;
+        document.getElementById('btn-run').disabled = false;
+        document.getElementById('run-status').textContent = 'Last run: ' + new Date().toLocaleTimeString();
+        loadStatus();
+      }
+
+      appendLog(ev);
+
+      if (ev.type === 'awaiting_approval' || ev.type === 'approval_result') {
+        refreshApprovals();
+      }
+      if (ev.type === 'result' && ev.agent === 'comm') {
+        refreshNotifications();
+      }
+    }
+
+    // ── Log ───────────────────────────────────────────────────────────────────
+    function appendLog(ev) {
+      const container = document.getElementById('log-container');
+      const entry = document.createElement('div');
+      entry.className = `log-entry lt-${ev.type}`;
+
+      const agentLabel = ev.agent ? `<span class="log-agent">${agentIcon(ev.agent)} ${ev.agent}</span>` : '';
+      const ts = ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+
+      let detail = '';
+      if (ev.result && ev.type === 'tool_result') {
+        try {
+          const parsed = JSON.parse(ev.result);
+          detail = `<div class="log-detail">${JSON.stringify(parsed, null, 2)}</div>`;
+        } catch {
+          detail = `<div class="log-detail">${ev.result}</div>`;
+        }
+      } else if (ev.recommendation && ev.type === 'recommendation') {
+        const rec = ev.recommendation;
+        const actionColor = rec.recommendation === 'BUY' ? 'var(--green)' : rec.recommendation === 'SELL' ? 'var(--red)' : 'var(--yellow)';
+        detail = `<div class="log-detail" style="color:${actionColor};font-family:inherit;font-size:12px;">
+  Action: <strong>${rec.recommendation}</strong>  |  Amount: ${(rec.amount||0).toLocaleString()}  |  Rate: ${(rec.current_rate||0).toFixed(4)}
+  ${rec.reasons ? '\nReasons:\n' + rec.reasons.map(r => '  • ' + r).join('\n') : ''}
+  ${rec.risks ? '\nRisks:\n' + rec.risks.map(r => '  • ' + r).join('\n') : ''}
+</div>`;
+      }
+
+      entry.innerHTML = `
+        <div class="log-meta">
+          <span class="log-type">${ev.type.replace(/_/g,' ')}</span>
+          ${agentLabel}
+          <span class="log-ts">${ts}</span>
+        </div>
+        <div class="log-content">${escHtml(ev.content || '')}</div>
+        ${detail}`;
+
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function agentIcon(a) {
+      return { analysis: '📊', comm: '💬', trader: '⚡', orchestrator: '🔄' }[a] || '🤖';
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function clearLog() {
+      document.getElementById('log-container').innerHTML = '';
+    }
+
+    // ── Workflow ──────────────────────────────────────────────────────────────
+    async function runWorkflow() {
+      const btn = document.getElementById('btn-run');
+      btn.disabled = true;
+      document.getElementById('run-status').textContent = 'Workflow started…';
+      const badge = document.getElementById('status-badge');
+      badge.className = 'badge-running';
+      badge.textContent = 'Running…';
+      try {
+        const r = await fetch(BASE + '/api/workflow/run', { method: 'POST' });
+        if (!r.ok) {
+          const d = await r.json();
+          alert(d.detail || 'Could not start workflow');
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+        btn.disabled = false;
+      }
+    }
+
+    // ── Approvals ─────────────────────────────────────────────────────────────
+    async function refreshApprovals() {
+      try {
+        const r = await fetch(BASE + '/api/approvals');
+        const d = await r.json();
+        const list = document.getElementById('approvals-list');
+        const count = document.getElementById('approval-count');
+        const items = d.approvals || [];
+        count.textContent = items.length ? `${items.length} pending` : '';
+
+        if (!items.length) {
+          list.innerHTML = '<div class="empty-state">No pending approvals</div>';
+          return;
+        }
+
+        list.innerHTML = items.map(a => `
+          <div class="approval-card" id="appr-${a.approval_id}">
+            <div class="rec-header">
+              <span class="rec-action ${a.action}">${a.action.toUpperCase()}</span>
+              <span class="rec-amount">${Number(a.amount).toLocaleString()} ${a.currency_pair}</span>
+            </div>
+            <div class="approval-summary">${escHtml(a.recommendation)}</div>
+            <div class="approval-btns">
+              <button class="btn-approve" onclick="decideApproval('${a.approval_id}','approve')">✓ Approve</button>
+              <button class="btn-reject"  onclick="decideApproval('${a.approval_id}','reject')">✗ Reject</button>
+            </div>
+          </div>`).join('');
+      } catch {}
+    }
+
+    async function decideApproval(id, decision) {
+      const card = document.getElementById('appr-' + id);
+      if (card) card.style.opacity = '0.5';
+      try {
+        await fetch(`${BASE}/api/approvals/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ decision, notes: '' }),
+        });
+        setTimeout(refreshApprovals, 500);
+      } catch (e) {
+        alert('Error: ' + e.message);
+        if (card) card.style.opacity = '1';
+      }
+    }
+
+    // ── Notifications ─────────────────────────────────────────────────────────
+    async function refreshNotifications() {
+      try {
+        const r = await fetch(BASE + '/api/notifications');
+        const d = await r.json();
+        const list = document.getElementById('notif-list');
+        const items = d.notifications || [];
+        if (!items.length) {
+          list.innerHTML = '<div class="empty-state">No notifications sent yet</div>';
+          return;
+        }
+        list.innerHTML = items.slice(0, 10).map(n => `
+          <div class="notif-item">
+            <div class="notif-subject">📬 ${escHtml(n.subject)}</div>
+            <div class="notif-ts">${new Date(n.sent_at).toLocaleString()}</div>
+            <details><summary style="cursor:pointer;color:var(--muted);font-size:11px;">View message</summary>
+              <div class="notif-body">${escHtml(n.message)}</div>
+            </details>
+          </div>`).join('');
+      } catch {}
+    }
+  </script>
+</body>
+</html>
