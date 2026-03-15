@@ -100,7 +100,7 @@ The Research Analytics service automatically:
    - **Company:** `Wilson Capital`
 4. Click **"Get Research Updates"**.
 
-**What happens:** The tracker fires a POST to `/api/track` with the customer's email and the article ID. Research Analytics then fires a non-blocking notification to Broker Back-Office at `http://localhost:5269/api/leads`.
+**What happens:** The tracker fires a POST to `/api/track` with the customer's email and the article ID. Research Analytics then fires a non-blocking notification to Broker Back-Office at `http://localhost:5269/api/accounts/leads`.
 
 ---
 
@@ -108,7 +108,7 @@ The Research Analytics service automatically:
 
 1. Open Broker Back-Office: **http://localhost:5269**
 2. Navigate to **Swagger UI** at `http://localhost:5269/swagger`
-3. Call `GET /api/leads` to see the incoming lead:
+3. Call `GET /api/accounts/leads` to see the incoming lead:
    ```json
    [
      {
@@ -211,7 +211,7 @@ The FX Agent (port 8000) can run the full scenario autonomously using AI:
 │  └──────────────┘                                  │   :5003         │  │
 │                                                    └────────┬────────┘  │
 │                                                             │           │
-│                                          POST /api/leads    │           │
+│                                          POST /api/accounts/leads    │           │
 │                                          (customer email)   ▼           │
 │  ┌──────────────┐    POST /api/trades   ┌─────────────────┐            │
 │  │  Trading     │ ◄──────────────────── │   Broker        │            │
@@ -242,8 +242,8 @@ The FX Agent (port 8000) can run the full scenario autonomously using AI:
 | Endpoint | Service | Description |
 |----------|---------|-------------|
 | `POST /api/articles/receive` | Research Analytics | Accepts news from News Feed; auto-creates research note |
-| `GET /api/leads` | Broker Back-Office | Lists customer leads generated from article reads |
-| `POST /api/leads` | Broker Back-Office | Receives lead notification from Research Analytics |
+| `GET /api/accounts/leads` | Broker Back-Office | Lists customer leads generated from article reads |
+| `POST /api/accounts/leads` | Broker Back-Office | Receives lead notification from Research Analytics |
 | `POST /api/trades` | Trading Platform | Receives settled trade from Broker Back-Office |
 | `GET /api/portfolio` | Trading Platform | Exposes fund summary to FX Agent |
 
@@ -254,6 +254,6 @@ The FX Agent (port 8000) can run the full scenario autonomously using AI:
 | Issue | Resolution |
 |-------|-----------|
 | Research note not created after publish | Check `NewsPublish:EndpointUrl` in `news-feed/appsettings.Development.json` points to `http://localhost:5003/api/articles/receive` |
-| Broker lead not received | Check `BrokerNotification:EndpointUrl` in `research-analytics/appsettings.json` points to `http://localhost:5269/api/leads` |
+| Broker lead not received | Check `BrokerNotification:EndpointUrl` in `research-analytics/appsettings.json` points to `http://localhost:5269/api/accounts/leads` |
 | Trade not appearing on Trading Platform | Check `TradingPlatformUrl` in `broker-backoffice/appsettings.json` points to `http://localhost:5249` |
 | FX Agent workflow fails | Ensure all .NET services are running; AI features require `AZURE_AI_CONNECTION_STRING` in `src/fx-agent/.env` |

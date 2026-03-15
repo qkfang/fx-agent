@@ -68,7 +68,11 @@ app.MapPost("/api/track", async (TrackingRequest req, HttpContext ctx, TrackingS
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(ex, "Failed to notify broker of lead for {Email}", req.UserEmail);
+                    // Mask the email to avoid PII exposure in logs.
+                    var maskedEmail = req.UserEmail.Length > 3
+                        ? $"{req.UserEmail[0]}***@{req.UserEmail.Split('@').LastOrDefault()}"
+                        : "***";
+                    logger.LogWarning(ex, "Failed to notify broker of lead for {Email}", maskedEmail);
                 }
             });
         }

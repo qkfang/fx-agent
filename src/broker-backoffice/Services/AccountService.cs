@@ -418,6 +418,9 @@ namespace FxWebApi.Services
                 }
                 catch (Exception ex)
                 {
+                    // TODO: For production resilience, implement retry-with-backoff or a
+                    // dead-letter queue here to guarantee at-least-once delivery of trade
+                    // settlements to the Trading Platform.
                     _logger.LogWarning(ex, "Failed to notify trading platform of trade settlement ({Type} {Amount} {Pair})",
                         type, amount, currencyPair);
                 }
