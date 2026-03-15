@@ -188,4 +188,29 @@ namespace FxWebApi.Models
         public decimal Leverage { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+
+    /// <summary>Lead notification received from Research Analytics when a customer reads an article.</summary>
+    public class LeadNotification
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+        public string UserCompany { get; set; } = string.Empty;
+        public int? ArticleId { get; set; }
+        public string ArticleTitle { get; set; } = string.Empty;
+        public int TimeSpentSeconds { get; set; }
+        public string SessionId { get; set; } = string.Empty;
+        public DateTime ReceivedAt { get; set; }
+    }
+
+    /// <summary>Trade settlement payload sent to the Trading Platform after a trade executes.</summary>
+    public class TradeSettlementRequest
+    {
+        public string Type { get; set; } = string.Empty;
+        public string CurrencyPair { get; set; } = "AUD/USD";
+        public decimal Amount { get; set; }
+        public decimal Rate { get; set; }
+        public decimal Total { get; set; }
+        public string Source { get; set; } = "BrokerBackOffice";
+        public DateTime DateTime { get; set; }
+    }
 }

@@ -1,18 +1,28 @@
 using FxWebApi.Models;
+using System.Text;
+using System.Text.Json;
 
 namespace FxWebApi.Services
 {
     public class AccountService
     {
         private readonly FxRateService _fxRateService;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
+        private readonly ILogger<AccountService> _logger;
         private readonly List<Account> _accounts;
         private readonly Dictionary<int, List<Position>> _positions;
         private readonly Dictionary<int, List<AccountTransaction>> _transactions;
+        private readonly List<LeadNotification> _leads = new();
         private readonly object _lock = new();
 
-        public AccountService(FxRateService fxRateService)
+        public AccountService(FxRateService fxRateService, IHttpClientFactory httpClientFactory,
+            IConfiguration config, ILogger<AccountService> logger)
         {
             _fxRateService = fxRateService;
+            _httpClientFactory = httpClientFactory;
+            _config = config;
+            _logger = logger;
 
             _accounts = new List<Account>
             {
@@ -296,7 +306,7 @@ namespace FxWebApi.Services
                     Timestamp = DateTime.UtcNow
                 });
 
-                return new FxTransactionResult
+                var result = new FxTransactionResult
                 {
                     Success = true,
                     Message = $"{type} {lots} lots AUD/USD at {currentRate:F4} executed successfully",
@@ -308,6 +318,12 @@ namespace FxWebApi.Services
                         Rate = currentRate
                     }
                 };
+
+                // Fire-and-forget settlement to Trading Platform
+                var notionalAmount = lots * 100000m;
+                NotifyTradingPlatformAsync(type, "AUD/USD", notionalAmount, currentRate);
+
+                return result;
             }
         }
 
@@ -356,6 +372,59 @@ namespace FxWebApi.Services
                     }
                 };
             }
+        }
+
+        public void AddLead(LeadNotification lead)
+        {
+            lock (_lock)
+            {
+                _leads.Add(lead);
+            }
+        }
+
+        public List<LeadNotification> GetLeads()
+        {
+            lock (_lock)
+            {
+                return _leads.OrderByDescending(l => l.ReceivedAt).ToList();
+            }
+        }
+
+        private void NotifyTradingPlatformAsync(string type, string currencyPair, decimal amount, decimal rate)
+        {
+            var tradingPlatformUrl = _config["TradingPlatformUrl"];
+            if (string.IsNullOrWhiteSpace(tradingPlatformUrl)) return;
+
+            var settlement = new TradeSettlementRequest
+            {
+                Type = type,
+                CurrencyPair = currencyPair,
+                Amount = amount,
+                Rate = rate,
+                Total = Math.Round(amount * rate, 2),
+                Source = "BrokerBackOffice",
+                DateTime = DateTime.UtcNow
+            };
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var client = _httpClientFactory.CreateClient();
+                    var json = JsonSerializer.Serialize(settlement);
+                    await client.PostAsync(
+                        $"{tradingPlatformUrl}/api/trades",
+                        new StringContent(json, Encoding.UTF8, "application/json"));
+                }
+                catch (Exception ex)
+                {
+                    // TODO: For production resilience, implement retry-with-backoff or a
+                    // dead-letter queue here to guarantee at-least-once delivery of trade
+                    // settlements to the Trading Platform.
+                    _logger.LogWarning(ex, "Failed to notify trading platform of trade settlement ({Type} {Amount} {Pair})",
+                        type, amount, currencyPair);
+                }
+            });
         }
     }
 }

@@ -55,5 +55,23 @@ namespace FxWebApi.Controllers
             var result = _accountService.ClosePosition(id, positionId);
             return result.Success ? Ok(result) : BadRequest(result);
         }
+
+        /// <summary>Receive a customer lead notification from Research Analytics.</summary>
+        [HttpPost("leads")]
+        public ActionResult ReceiveLead([FromBody] LeadNotification notification)
+        {
+            notification.ReceivedAt = DateTime.UtcNow;
+            _accountService.AddLead(notification);
+            _logger.LogInformation("Lead received: {Email} read article {ArticleId}",
+                notification.UserEmail, notification.ArticleId);
+            return Ok(new { received = true, email = notification.UserEmail });
+        }
+
+        /// <summary>List all customer leads received from Research Analytics.</summary>
+        [HttpGet("leads")]
+        public ActionResult<List<LeadNotification>> GetLeads()
+        {
+            return Ok(_accountService.GetLeads());
+        }
     }
 }
