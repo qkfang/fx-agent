@@ -1,3 +1,4 @@
+using FxWebNews.Models;
 using FxWebNews.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<NewsService>();
 builder.Services.AddHttpClient<NewsPublishService>();
+
+// Add CORS for local development (fx-agent Python service needs cross-origin access)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
@@ -19,11 +29,22 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseCors();
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapRazorPages();
+
+// ── REST API endpoints (consumed by fx-agent simulation) ─────────────────────
+
+// GET /api/news – list all news articles
+app.MapGet("/api/news", (NewsService svc) =>
+    Results.Ok(svc.GetAllNews()));
+
+// POST /api/news – create and return a new news article
+app.MapPost("/api/news", (NewsArticle article, NewsService svc) =>
+{
+    svc.AddNews(article);
+    return Results.Ok(article);
+});
 
 app.Run();

@@ -21,6 +21,7 @@ from typing import Any
 from agents.analysis_agent import AnalysisAgent
 from agents.comm_agent import CommAgent
 from agents.trader_agent import TraderAgent
+from config import SCENARIO_MIDDLE_EAST_WAR
 
 logger = logging.getLogger(__name__)
 
@@ -65,9 +66,13 @@ class Orchestrator:
 
     # ── Main workflow ─────────────────────────────────────────────────────────
 
-    async def run_workflow(self) -> dict[str, Any]:
+    async def run_workflow(self, scenario: str = "") -> dict[str, Any]:
         """
         Execute the full FX trading workflow.
+
+        Args:
+            scenario: Optional scenario key to inject specific market context.
+                      Supported values: "middle_east_war"
         Returns a summary dict when complete.
         """
         if self.running:
@@ -80,6 +85,11 @@ class Orchestrator:
         recommendation: dict[str, Any] = {}
         trade_result: dict[str, Any] = {}
 
+        # Apply scenario context for demo-mode tools
+        if scenario:
+            from tools.market_tools import set_scenario
+            set_scenario(scenario)
+
         def emit(event: dict[str, Any]) -> None:
             event.setdefault("run_id", run_id)
             event.setdefault("timestamp", datetime.now(timezone.utc).isoformat())
@@ -90,9 +100,52 @@ class Orchestrator:
         try:
             emit({"type": "workflow_start", "content": f"Starting FX trading workflow (run {run_id})", "agent": "orchestrator"})
 
-            # ── Phase 1: Analysis ─────────────────────────────────────────────
-            emit({"type": "phase", "content": "Phase 1: Market Analysis", "agent": "analysis"})
-            async for event in self._analysis_agent.run():
+            # ── Phase 0: News Feed – publish article to news-feed service ─────
+            if scenario == SCENARIO_MIDDLE_EAST_WAR:
+                emit({"type": "phase", "content": "Phase 0: News Feed", "agent": "news_feed"})
+                from tools.market_tools import publish_news_article
+                news_title = "War erupts in Middle East: oil prices surge on supply fears"
+                news_content = (
+                    "A major armed conflict has broken out in the Middle East, sending crude oil "
+                    "prices sharply higher on fears of supply disruptions. The Australian dollar "
+                    "came under initial selling pressure as risk-off sentiment swept markets, but "
+                    "analysts note that Australia's commodity export revenue stands to benefit "
+                    "materially from elevated energy prices. AUD/USD is seen as a buying "
+                    "opportunity on any dip below 0.6580."
+                )
+                news_result_json = await publish_news_article(
+                    title=news_title,
+                    content=news_content,
+                    article_type="Good",
+                    category="FX",
+                    author="Global FX Wire",
+                    summary="Middle East war drives oil prices higher; AUD seen as buy on dips.",
+                )
+                news_result = json.loads(news_result_json)
+                emit({
+                    "type": "news_published",
+                    "content": f"Breaking: {news_title}",
+                    "agent": "news_feed",
+                    "article": {
+                        "id": news_result.get("article_id"),
+                        "title": news_title,
+                        "service": "news-feed",
+                        "status": news_result.get("status"),
+                    },
+                })
+                emit({
+                    "type": "status",
+                    "content": "News article published to news-feed service and forwarded to Research Analytics",
+                    "agent": "news_feed",
+                })
+
+            # ── Phase 1: Research Analytics / Market Analysis ──────────────────
+            analysis_label = "Phase 1: Research Analytics & Market Analysis" if scenario else "Phase 1: Market Analysis"
+            emit({"type": "phase", "content": analysis_label, "agent": "analysis"})
+            # Pass scenario as human-readable context for the Azure AI Foundry LLM prompt.
+            # The demo-mode news tool uses the globally set _scenario_context separately.
+            llm_context = f"Scenario: {scenario}. " if scenario else ""
+            async for event in self._analysis_agent.run(context=llm_context):
                 event["agent"] = "analysis"
                 emit(event)
                 if event.get("type") == "result" and event.get("recommendation"):
@@ -126,13 +179,85 @@ class Orchestrator:
                 "recommendation": recommendation,
             })
 
-            # ── Phase 2: Broker Approval (skip for HOLD) ──────────────────────
+            # ── Scenario: Publish research note + track customer view ──────────
+            research_article_id: int | None = None
+            if scenario == SCENARIO_MIDDLE_EAST_WAR:
+                from tools.research_tools import publish_research_note, track_article_view
+
+                rec_action = recommendation.get("recommendation", "BUY")
+                rec_summary = recommendation.get("summary", "")
+                note_title = "AUD/USD – Buying Opportunity Amid Middle East Uncertainty"
+                note_content = (
+                    f"Research Note – {datetime.now(timezone.utc).strftime('%d %b %Y')}\n\n"
+                    f"**Recommendation: {rec_action} AUD/USD**\n\n"
+                    f"{rec_summary}\n\n"
+                    "**Key Drivers:**\n"
+                    + "\n".join(f"- {r}" for r in recommendation.get("reasons", []))
+                    + "\n\n**Risk Factors:**\n"
+                    + "\n".join(f"- {r}" for r in recommendation.get("risks", []))
+                )
+                note_result_json = await publish_research_note(
+                    title=note_title,
+                    summary=rec_summary or "AUD/USD buy opportunity driven by Middle East commodity tailwinds.",
+                    content=note_content,
+                    category="AUD/USD",
+                    sentiment="Bullish" if rec_action == "BUY" else ("Bearish" if rec_action == "SELL" else "Neutral"),
+                    author="FX Research Team",
+                    tags="AUD/USD,Middle East,Commodities,Geopolitical",
+                )
+                note_result = json.loads(note_result_json)
+                research_article_id = note_result.get("article_id")
+                emit({
+                    "type": "research_note",
+                    "content": f"Research note published to research-analytics portal: '{note_title}'",
+                    "agent": "analysis",
+                    "note": {
+                        "id": research_article_id,
+                        "title": note_title,
+                        "sentiment": note_result.get("sentiment"),
+                        "published_to": "Research Analytics Portal",
+                        "service": "research-analytics",
+                        "status": note_result.get("status"),
+                    },
+                })
+
+                # Phase 2: Customer views the research note on the portal
+                emit({"type": "phase", "content": "Phase 2: Customer Engagement", "agent": "comm"})
+                view_result_json = await track_article_view(
+                    article_id=research_article_id or 0,
+                    user_name="John Smith",
+                    user_email="john.smith@smithcapital.com",
+                    user_company="Smith Capital",
+                    time_spent_seconds=187,
+                )
+                view_result = json.loads(view_result_json)
+                emit({
+                    "type": "customer_view",
+                    "content": "Customer 'John Smith' viewed research note on Research Analytics Portal – engagement recorded",
+                    "agent": "comm",
+                    "customer": {
+                        "name": "John Smith",
+                        "email": "john.smith@smithcapital.com",
+                        "company": "Smith Capital",
+                        "session_id": view_result.get("session_id"),
+                        "time_spent_seconds": view_result.get("time_spent_seconds"),
+                        "service": "research-analytics",
+                    },
+                })
+                emit({
+                    "type": "broker_outreach",
+                    "content": "Customer engagement logged in research-analytics. Broker notified to reach out to John Smith (Smith Capital).",
+                    "agent": "comm",
+                })
+
+            # ── Phase 3 (or Phase 2): Broker Approval (skip for HOLD) ─────────
+            approval_phase_label = "Phase 3: Broker Approval" if scenario else "Phase 2: Broker Approval"
             action = recommendation.get("recommendation", "HOLD")
             broker_decision = "not_required"
             approval_id: str | None = None
 
             if action in ("BUY", "SELL"):
-                emit({"type": "phase", "content": "Phase 2: Broker Approval", "agent": "comm"})
+                emit({"type": "phase", "content": approval_phase_label, "agent": "comm"})
                 async for event in self._comm_agent.request_approval(recommendation):
                     event["agent"] = "comm"
                     emit(event)
@@ -164,9 +289,11 @@ class Orchestrator:
                 "decision": broker_decision,
             })
 
-            # ── Phase 3: Trade Execution ──────────────────────────────────────
+            # ── Phase 4 (or Phase 3): Trade Execution ────────────────────────
+            trade_phase_label = "Phase 4: Trade Execution" if scenario else "Phase 3: Trade Execution"
+            notification_phase_label = "Phase 5: Customer Notification" if scenario else "Phase 4: Customer Notification"
             if action in ("BUY", "SELL") and broker_decision in ("approve", "not_required"):
-                emit({"type": "phase", "content": "Phase 3: Trade Execution", "agent": "trader"})
+                emit({"type": "phase", "content": trade_phase_label, "agent": "trader"})
                 amount = float(recommendation.get("amount", 100000))
                 currency_pair = recommendation.get("currency_pair", "AUD/USD")
 
@@ -187,9 +314,9 @@ class Orchestrator:
                                 pass
                             break
 
-                # ── Phase 4: Customer Notification ────────────────────────────
+                # ── Phase 5 (or Phase 4): Customer Notification ───────────────
                 if trade_result:
-                    emit({"type": "phase", "content": "Phase 4: Customer Notification", "agent": "comm"})
+                    emit({"type": "phase", "content": notification_phase_label, "agent": "comm"})
                     async for event in self._comm_agent.send_trade_notification(trade_result):
                         event["agent"] = "comm"
                         emit(event)
@@ -227,6 +354,9 @@ class Orchestrator:
             }
         finally:
             self.running = False
+            if scenario:
+                from tools.market_tools import reset_scenario
+                reset_scenario()
 
         emit({"type": "workflow_end", "content": f"Workflow {run_id} finished", "agent": "orchestrator", "summary": summary})
         self.run_history.append(summary)

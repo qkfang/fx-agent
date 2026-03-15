@@ -95,14 +95,28 @@ async def execute_sell(amount: float, currency_pair: str = "AUD/USD") -> str:
 
 
 async def get_transaction_history() -> str:
-    """Retrieve recent FX transaction history from the trading platform."""
+    """Retrieve recent FX transaction history from the broker back-office service."""
     try:
         async with httpx.AsyncClient(timeout=5) as client:
             resp = await client.get(
-                f"{settings.trading_platform_url}/api/transactions"
+                f"{settings.broker_backoffice_url}/api/fx/transactions?limit=20"
             )
             resp.raise_for_status()
-            return json.dumps(resp.json())
+            records = resp.json()
+            # Normalise field names to a consistent shape
+            transactions = [
+                {
+                    "id": r.get("id", ""),
+                    "type": r.get("type", ""),
+                    "currency_pair": r.get("currencyPair", "AUD/USD"),
+                    "amount": r.get("amount", 0),
+                    "rate": r.get("rate", 0),
+                    "source": r.get("source", ""),
+                    "timestamp": r.get("timestamp", ""),
+                }
+                for r in (records if isinstance(records, list) else [])
+            ]
+            return json.dumps({"transactions": transactions, "source": "broker-backoffice"})
     except Exception as exc:
         return json.dumps(
             {
@@ -122,7 +136,7 @@ async def get_transaction_history() -> str:
                         "timestamp": "2024-01-15T14:00:00Z",
                     },
                 ],
-                "note": f"Trading platform unavailable ({exc}); using sample data",
+                "note": f"Broker back-office unavailable ({exc}); using sample data",
             }
         )
 

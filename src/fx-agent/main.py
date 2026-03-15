@@ -60,20 +60,26 @@ async def get_status():
         "mode": "azure-ai-foundry" if settings.azure_ai_connection_string else "demo",
         "model": settings.azure_ai_model,
         "broker_backoffice_url": settings.broker_backoffice_url,
-        "trading_platform_url": settings.trading_platform_url,
+        "research_analytics_url": settings.research_analytics_url,
         "news_feed_url": settings.news_feed_url,
+        "trading_platform_url": settings.trading_platform_url,
         "workflow_running": orchestrator.running,
     }
 
 
 # ── Workflow ──────────────────────────────────────────────────────────────────
 
+class WorkflowRequest(BaseModel):
+    scenario: str = ""
+
+
 @app.post("/api/workflow/run")
-async def run_workflow():
+async def run_workflow(body: WorkflowRequest = WorkflowRequest()):
     if orchestrator.running:
         raise HTTPException(status_code=409, detail="A workflow is already running")
+    scenario = body.scenario
     # Fire-and-forget so HTTP response returns immediately
-    asyncio.create_task(orchestrator.run_workflow())
+    asyncio.create_task(orchestrator.run_workflow(scenario=scenario))
     return {"status": "started", "message": "Workflow started – connect to /ws for live events"}
 
 

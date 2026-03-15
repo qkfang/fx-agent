@@ -170,7 +170,10 @@ class AnalysisAgent:
     # ── Local demo path (no Azure credentials needed) ────────────────────────
 
     async def _run_demo(self, context: str) -> AsyncIterator[dict]:
-        yield {"type": "status", "content": "Analysis Agent started (demo mode – no Azure AI credentials)"}
+        status_msg = "Analysis Agent started (demo mode – no Azure AI credentials)"
+        if context:
+            status_msg += f" | Context: {context.strip()}"
+        yield {"type": "status", "content": status_msg}
 
         # Step 1 – get FX rate
         yield {"type": "tool_call", "content": "Calling tool: get_fx_rate", "tool": "get_fx_rate"}
