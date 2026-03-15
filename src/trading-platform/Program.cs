@@ -1,3 +1,4 @@
+using FxWebUI.Models;
 using FxWebUI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,21 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// Receive a settled trade from Broker Back-Office
+app.MapPost("/api/trades", (Transaction transaction, FxDataService fxData) =>
+{
+    var settled = fxData.AddTransaction(transaction);
+    return Results.Ok(new { settled = true, id = settled.Id });
+});
+
+// Expose transaction history as JSON (used by FX Agent)
+app.MapGet("/api/trades", (FxDataService fxData) =>
+    Results.Ok(fxData.GetTransactions()));
+
+// Expose portfolio/fund summary (used by FX Agent)
+app.MapGet("/api/portfolio", (FxDataService fxData) =>
+    Results.Ok(fxData.GetFundSummary()));
 
 app.MapRazorPages();
 

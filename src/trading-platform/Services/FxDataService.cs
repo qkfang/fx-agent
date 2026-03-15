@@ -9,6 +9,7 @@ namespace FxWebUI.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private List<Transaction> _transactions = new();
         private FundSummary _fundSummary = new();
+        private readonly object _lock = new();
 
         public FxDataService(IWebHostEnvironment env, IHttpClientFactory httpClientFactory)
         {
@@ -41,14 +42,48 @@ namespace FxWebUI.Services
             }
         }
 
+        private void SaveTransactions()
+        {
+            var transactionsPath = Path.Combine(_env.ContentRootPath, "Data", "transactions.json");
+            var json = JsonSerializer.Serialize(_transactions, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(transactionsPath, json);
+        }
+
         public List<Transaction> GetTransactions()
         {
-            return _transactions;
+            lock (_lock) return _transactions.OrderByDescending(t => t.DateTime).ToList();
         }
 
         public FundSummary GetFundSummary()
         {
-            return _fundSummary;
+            lock (_lock) return _fundSummary;
+        }
+
+        /// <summary>Record an incoming settled trade from the Broker Back-Office.</summary>
+        public Transaction AddTransaction(Transaction transaction)
+        {
+            lock (_lock)
+            {
+                transaction.Id = _transactions.Any() ? _transactions.Max(t => t.Id) + 1 : 1;
+                if (transaction.DateTime == default) transaction.DateTime = DateTime.UtcNow;
+                _transactions.Add(transaction);
+
+                // Update fund summary balances
+                if (transaction.Type == "Buy")
+                {
+                    _fundSummary.AudBalance += transaction.Amount;
+                    _fundSummary.UsdBalance -= transaction.Total;
+                }
+                else if (transaction.Type == "Sell")
+                {
+                    _fundSummary.AudBalance -= transaction.Amount;
+                    _fundSummary.UsdBalance += transaction.Total;
+                }
+                _fundSummary.TotalBalance = _fundSummary.AudBalance + _fundSummary.UsdBalance;
+
+                SaveTransactions();
+                return transaction;
+            }
         }
 
         public async Task<FxRate?> GetCurrentFxRate()
