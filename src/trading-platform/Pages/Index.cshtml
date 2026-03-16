@@ -1,98 +1,328 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = "FX Trading Dashboard";
+    ViewData["Title"] = "Trading Platform";
+    var initialRate = Model.CurrentRate?.Rate ?? 0.6550m;
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">FX Trading Dashboard</h1>
+<!-- Live Price Ticker -->
+<div class="price-ticker">
+    <span class="ticker-pair">AUD/USD</span>
+    <span class="ticker-price" id="livePrice">@initialRate.ToString("F4")</span>
+    <span class="ticker-change up" id="priceChange">▲ +0.0000 (+0.00%)</span>
+    <div class="ticker-meta">
+        <span>High <strong id="sessionHigh">@initialRate.ToString("F4")</strong></span>
+        <span>Low <strong id="sessionLow">@initialRate.ToString("F4")</strong></span>
+        <span>Spread <strong id="spread">0.0002</strong></span>
+        <span>Trades <strong id="tradeCount">@(Model.Transactions?.Count ?? 0)</strong></span>
+    </div>
+</div>
 
-    <!-- Current FX Rate -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3>Current FX Rate - AUD/USD</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <h2 class="text-primary">@Model.CurrentRate?.Rate.ToString("F4")</h2>
-                    <small class="text-muted">Last updated: @Model.CurrentRate?.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</small>
-                </div>
-            </div>
+<!-- Real-time Chart -->
+<div class="card mb-3 mt-3">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span class="section-title">AUD/USD &mdash; Live Chart</span>
+        <span class="text-success small"><span class="live-dot me-1">●</span>Real-time</span>
+    </div>
+    <div class="card-body p-2">
+        <div class="chart-wrapper">
+            <canvas id="forexChart"></canvas>
         </div>
     </div>
+</div>
 
-    <!-- Fund Summary -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3>Fund Summary</h3>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <h5>Total Balance</h5>
-                    <p class="h4 text-success">$@Model.FundSummary?.TotalBalance.ToString("N2")</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>AUD Balance</h5>
-                    <p class="h4">$@Model.FundSummary?.AudBalance.ToString("N2")</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>USD Balance</h5>
-                    <p class="h4">$@Model.FundSummary?.UsdBalance.ToString("N2")</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>Total P&L</h5>
-                    <p class="h4 @(Model.FundSummary?.TotalProfitLoss >= 0 ? "text-success" : "text-danger")">
-                        $@Model.FundSummary?.TotalProfitLoss.ToString("N2")
-                    </p>
-                </div>
-            </div>
-        </div>
+<!-- Fund Summary -->
+<div class="card mb-3">
+    <div class="card-header">
+        <span class="section-title">Fund Summary</span>
     </div>
-
-    <!-- Transaction History -->
-    <div class="card">
-        <div class="card-header">
-            <h3>Buy & Sell Activity</h3>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Type</th>
-                            <th>Currency Pair</th>
-                            <th>Amount</th>
-                            <th>Rate</th>
-                            <th>Total</th>
-                            <th>Date/Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Transactions != null)
-                        {
-                            foreach (var transaction in Model.Transactions)
-                            {
-                                <tr>
-                                    <td>@transaction.Id</td>
-                                    <td>
-                                        <span class="badge @(transaction.Type == "Buy" ? "bg-success" : "bg-danger")">
-                                            @transaction.Type
-                                        </span>
-                                    </td>
-                                    <td>@transaction.CurrencyPair</td>
-                                    <td>$@transaction.Amount.ToString("N2")</td>
-                                    <td>@transaction.Rate.ToString("F4")</td>
-                                    <td>$@transaction.Total.ToString("N2")</td>
-                                    <td>@transaction.DateTime.ToString("yyyy-MM-dd HH:mm")</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="fund-label">Total Balance</div>
+                <div class="fund-value accent">$@Model.FundSummary?.TotalBalance.ToString("N2")</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fund-label">AUD Balance</div>
+                <div class="fund-value">$@Model.FundSummary?.AudBalance.ToString("N2")</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fund-label">USD Balance</div>
+                <div class="fund-value">$@Model.FundSummary?.UsdBalance.ToString("N2")</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="fund-label">Total P&amp;L</div>
+                <div class="fund-value @(Model.FundSummary?.TotalProfitLoss >= 0 ? "positive" : "negative")">
+                    $@Model.FundSummary?.TotalProfitLoss.ToString("N2")
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Buy & Sell Activity -->
+<div class="card">
+    <div class="card-header">
+        <span class="section-title">Buy &amp; Sell Activity</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th>Pair</th>
+                        <th>Amount</th>
+                        <th>Rate</th>
+                        <th>Total</th>
+                        <th>Date / Time</th>
+                    </tr>
+                </thead>
+                <tbody id="tradeTableBody">
+                    @if (Model.Transactions != null)
+                    {
+                        foreach (var transaction in Model.Transactions)
+                        {
+                            <tr>
+                                <td>@transaction.Id</td>
+                                <td>
+                                    <span class="badge @(transaction.Type == "Buy" ? "badge-buy" : "badge-sell")">
+                                        @transaction.Type
+                                    </span>
+                                </td>
+                                <td>@transaction.CurrencyPair</td>
+                                <td>$@transaction.Amount.ToString("N2")</td>
+                                <td>@transaction.Rate.ToString("F4")</td>
+                                <td>$@transaction.Total.ToString("N2")</td>
+                                <td>@transaction.DateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    'use strict';
+
+    // ── Initial state ────────────────────────────────────────────────────────
+    var BASE_PRICE   = parseFloat(document.getElementById('livePrice').textContent) || 0.6550;
+    var currentPrice = BASE_PRICE;
+    var openPrice    = BASE_PRICE;
+    var sessionHigh  = BASE_PRICE;
+    var sessionLow   = BASE_PRICE;
+    var MAX_POINTS   = 120;   // 2 minutes of 1-second ticks
+    var TICK_MS      = 1000;  // tick interval
+    var POLL_MS      = 4000;  // trade poll interval
+
+    var labels       = [];
+    var prices       = [];
+    var buyPressure  = 0;     // accumulated directional pressure from trades
+    var knownTradeCount = parseInt(document.getElementById('tradeCount').textContent) || 0;
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function fmt4(n) { return n.toFixed(4); }
+    function fmtTime(d) {
+        return d.toTimeString().slice(0, 8);
+    }
+
+    // ── Build historical seed data (last MAX_POINTS seconds) ────────────────
+    (function seedHistory() {
+        var p = BASE_PRICE;
+        var now = Date.now();
+        for (var i = MAX_POINTS; i >= 0; i--) {
+            p += (Math.random() - 0.5) * 0.00025;
+            p = parseFloat(p.toFixed(5));
+            labels.push(fmtTime(new Date(now - i * TICK_MS)));
+            prices.push(p);
+        }
+        sessionHigh  = Math.max.apply(null, prices);
+        sessionLow   = Math.min.apply(null, prices);
+        currentPrice = prices[prices.length - 1];
+    })();
+
+    // ── Chart.js setup ───────────────────────────────────────────────────────
+    var ctx   = document.getElementById('forexChart').getContext('2d');
+
+    function makeGradient(color) {
+        var grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, color.replace('1)', '0.25)'));
+        grad.addColorStop(1, color.replace('1)', '0.0)'));
+        return grad;
+    }
+
+    var upColor   = 'rgba(0,200,83,1)';
+    var downColor = 'rgba(255,61,87,1)';
+
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'AUD/USD',
+                data: prices,
+                borderColor: upColor,
+                backgroundColor: makeGradient(upColor),
+                borderWidth: 1.5,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 0 },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1c2230',
+                    titleColor: '#8b949e',
+                    bodyColor: '#e6edf3',
+                    borderColor: '#2d3748',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(ctx) {
+                            return ' ' + fmt4(ctx.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#8b949e',
+                        maxTicksLimit: 8,
+                        font: { size: 11 }
+                    },
+                    grid: { color: 'rgba(45,55,72,0.6)' }
+                },
+                y: {
+                    position: 'right',
+                    ticks: {
+                        color: '#8b949e',
+                        font: { size: 11 },
+                        callback: function(v) { return fmt4(v); }
+                    },
+                    grid: { color: 'rgba(45,55,72,0.6)' }
+                }
+            }
+        }
+    });
+
+    // ── Tick: advance price by random walk + accumulated trade pressure ───────
+    function tick() {
+        // Random walk: sum of 3 uniform randoms approximates a normal distribution (CLT)
+        var rand   = (Math.random() + Math.random() + Math.random() - 1.5) / 3;
+        var drift  = rand * 0.00018;
+
+        // Apply any queued trade pressure and decay it
+        drift      += buyPressure * 0.0003;
+        buyPressure = buyPressure * 0.7;
+
+        currentPrice = parseFloat((currentPrice + drift).toFixed(5));
+
+        // Clamp to a sensible range around open price
+        if (currentPrice > openPrice + 0.0200) currentPrice = openPrice + 0.0200;
+        if (currentPrice < openPrice - 0.0200) currentPrice = openPrice - 0.0200;
+
+        if (currentPrice > sessionHigh) sessionHigh = currentPrice;
+        if (currentPrice < sessionLow)  sessionLow  = currentPrice;
+
+        // Push to chart data
+        labels.push(fmtTime(new Date()));
+        prices.push(currentPrice);
+        if (labels.length > MAX_POINTS) { labels.shift(); prices.shift(); }
+
+        // Recolour line based on direction vs open
+        var isUp  = currentPrice >= openPrice;
+        var color = isUp ? upColor : downColor;
+        chart.data.datasets[0].borderColor     = color;
+        chart.data.datasets[0].backgroundColor = makeGradient(color);
+        chart.update('none');
+
+        // Update DOM ticker
+        updateTicker();
+    }
+
+    function updateTicker() {
+        var change    = currentPrice - openPrice;
+        var changePct = (change / openPrice) * 100;
+        var isUp      = change >= 0;
+
+        document.getElementById('livePrice').textContent  = fmt4(currentPrice);
+        document.getElementById('sessionHigh').textContent = fmt4(sessionHigh);
+        document.getElementById('sessionLow').textContent  = fmt4(sessionLow);
+
+        var el = document.getElementById('priceChange');
+        el.textContent = (isUp ? '▲ +' : '▼ ') + fmt4(change) +
+                         ' (' + (isUp ? '+' : '') + changePct.toFixed(2) + '%)';
+        el.className = 'ticker-change ' + (isUp ? 'up' : 'down');
+    }
+
+    // ── Poll /api/trades for new activity ────────────────────────────────────
+    function pollTrades() {
+        fetch('/api/trades')
+            .then(function(r) { return r.json(); })
+            .then(function(trades) {
+                if (!Array.isArray(trades)) return;
+                var newCount = trades.length;
+                if (newCount > knownTradeCount) {
+                    // API returns trades newest-first (OrderByDescending); slice from front to get the newly added ones
+                    var added = trades.slice(0, newCount - knownTradeCount);
+                    added.forEach(function(t) {
+                        if (t.type === 'Buy'  || t.Type === 'Buy')  buyPressure += 1;
+                        if (t.type === 'Sell' || t.Type === 'Sell') buyPressure -= 1;
+                    });
+                    knownTradeCount = newCount;
+                    document.getElementById('tradeCount').textContent = newCount;
+                    refreshTradeTable(trades);
+                }
+            })
+            .catch(function(err) { console.error('[Trading Platform] trade poll error:', err); });
+    }
+
+    function refreshTradeTable(trades) {
+        var tbody = document.getElementById('tradeTableBody');
+        var html  = '';
+        trades.forEach(function(t) {
+            var type    = t.type || t.Type || '';
+            var isGreen = type === 'Buy';
+            html += '<tr>' +
+                '<td>' + (t.id || t.Id || '') + '</td>' +
+                '<td><span class="badge ' + (isGreen ? 'badge-buy' : 'badge-sell') + '">' + type + '</span></td>' +
+                '<td>' + (t.currencyPair || t.CurrencyPair || '') + '</td>' +
+                '<td>$' + parseFloat(t.amount || t.Amount || 0).toFixed(2) + '</td>' +
+                '<td>' + parseFloat(t.rate || t.Rate || 0).toFixed(4) + '</td>' +
+                '<td>$' + parseFloat(t.total || t.Total || 0).toFixed(2) + '</td>' +
+                '<td>' + formatDateTime(t.dateTime || t.DateTime || '') + '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function formatDateTime(dt) {
+        if (!dt) return '';
+        var d = new Date(dt);
+        if (isNaN(d)) return dt;
+        return d.getFullYear() + '-' +
+               String(d.getMonth() + 1).padStart(2, '0') + '-' +
+               String(d.getDate()).padStart(2, '0') + ' ' +
+               String(d.getHours()).padStart(2, '0') + ':' +
+               String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // ── Start loops ──────────────────────────────────────────────────────────
+    setInterval(tick,        TICK_MS);
+    setInterval(pollTrades,  POLL_MS);
+    pollTrades(); // immediate first poll
+})();
+</script>
+}
+
