@@ -204,6 +204,7 @@
                         <th>Session</th>
                         <th>IP</th>
                         <th>Captured At</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -228,11 +229,19 @@
                             <td><span class="session-id" title="@l.SessionId">@l.SessionId[..Math.Min(12, l.SessionId.Length)]…</span></td>
                             <td>@l.IpAddress</td>
                             <td>@l.VisitedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>
+                                <form method="post" asp-page-handler="SendToBroker" asp-route-id="@l.Id" style="display:inline">
+                                    <button class="btn btn-xs btn-outline-primary" type="submit"
+                                            title="Send this lead to Broker Backoffice">
+                                        <i class="fa-solid fa-paper-plane"></i> Send to Broker
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     }
                     @if (!Model.Leads.Any())
                     {
-                        <tr><td colspan="8" class="text-center text-muted">No leads captured yet. Leads appear when visitors submit the research subscription form.</td></tr>
+                        <tr><td colspan="9" class="text-center text-muted">No leads captured yet. Leads appear when visitors submit the research subscription form.</td></tr>
                     }
                 </tbody>
             </table>

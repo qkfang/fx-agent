@@ -1,472 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FX Broker Backoffice — AUD/USD</title>
-  <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
-  <style>
-    /* ── Reset & base ──────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:       #0d0e12;
-      --surface:  #16181f;
-      --border:   #252830;
-      --muted:    #5a5f72;
-      --text:     #d4d8e8;
-      --bright:   #ffffff;
-      --accent:   #3b8cf8;
-      --green:    #26a65b;
-      --red:      #e74c3c;
-      --orange:   #f39c12;
-      --yellow:   #f1c40f;
-    }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
-
-    /* ── Layout ────────────────────────────────────────────────────────── */
-    .terminal { display: grid; grid-template-rows: 48px 1fr; height: 100vh; }
-    .header { display: flex; align-items: center; gap: 16px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
-    .header .logo { font-size: 15px; font-weight: 700; color: var(--bright); letter-spacing: 1px; }
-    .header .logo span { color: var(--accent); }
-    .header .session-badge { background: #1a2a1a; color: var(--green); border: 1px solid #2a4a2a; padding: 2px 10px; border-radius: 20px; font-size: 11px; }
-    .header .spacer { flex: 1; }
-    .header .clock { font-family: monospace; font-size: 13px; color: var(--muted); }
-
-    .main { display: grid; grid-template-columns: 320px 1fr 280px; gap: 0; overflow: hidden; }
-
-    /* ── Left panel ────────────────────────────────────────────────────── */
-    .left-panel { display: flex; flex-direction: column; gap: 0; border-right: 1px solid var(--border); overflow-y: auto; }
-
-    /* ── Quote card ────────────────────────────────────────────────────── */
-    .quote-card { padding: 16px; border-bottom: 1px solid var(--border); }
-    .quote-card .pair { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
-    .quote-row { display: flex; align-items: flex-end; gap: 8px; margin: 6px 0; }
-    .quote-bid, .quote-ask { flex: 1; }
-    .quote-bid .label, .quote-ask .label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
-    .quote-bid .price { font-size: 28px; font-weight: 700; font-family: monospace; color: var(--red); }
-    .quote-ask .price { font-size: 28px; font-weight: 700; font-family: monospace; color: var(--green); }
-    .quote-spread { text-align: center; }
-    .quote-spread .label { font-size: 10px; color: var(--muted); }
-    .quote-spread .value { font-size: 16px; font-weight: 600; color: var(--orange); }
-    .quote-meta { display: flex; gap: 12px; font-size: 11px; color: var(--muted); margin-top: 4px; }
-    .quote-change { font-size: 13px; font-weight: 600; }
-    .up { color: var(--green); } .down { color: var(--red); } .flat { color: var(--muted); }
-
-    /* ── Market status ─────────────────────────────────────────────────── */
-    .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-bottom: 1px solid var(--border); }
-    .stat-cell { padding: 10px 12px; background: var(--surface); }
-    .stat-cell .label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
-    .stat-cell .value { font-size: 14px; font-weight: 600; color: var(--bright); margin-top: 2px; }
-
-    /* ── Trend simulation ──────────────────────────────────────────────── */
-    .sim-panel { padding: 14px 16px; border-bottom: 1px solid var(--border); }
-    .sim-panel h4 { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-    .sim-buttons { display: flex; gap: 8px; }
-    .btn-sim { flex: 1; padding: 10px 4px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
-    .btn-sim:hover { opacity: .85; }
-    .btn-bull { background: #1a3a1a; color: var(--green); border: 1px solid var(--green); }
-    .btn-bear { background: #3a1a1a; color: var(--red);   border: 1px solid var(--red);   }
-    .btn-flat { background: #2a2a1a; color: var(--orange); border: 1px solid var(--orange); }
-    .strength-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-    .strength-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
-    .strength-row input[type=range] { flex: 1; accent-color: var(--accent); }
-    .strength-row .val { font-size: 12px; font-weight: 600; color: var(--bright); width: 28px; text-align: right; }
-    .trend-indicator { margin-top: 8px; text-align: center; font-size: 12px; font-weight: 600; padding: 4px; border-radius: 4px; }
-
-    /* ── Trade execution ───────────────────────────────────────────────── */
-    .trade-panel { padding: 14px 16px; }
-    .trade-panel h4 { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-    .trade-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--bright); border-radius: 6px; padding: 8px 10px; font-size: 14px; margin-bottom: 10px; }
-    .trade-input:focus { outline: none; border-color: var(--accent); }
-    .trade-btns { display: flex; gap: 8px; }
-    .btn-buy, .btn-sell { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: .5px; transition: opacity .15s; }
-    .btn-buy:hover, .btn-sell:hover { opacity: .85; }
-    .btn-buy  { background: var(--green); color: #fff; }
-    .btn-sell { background: var(--red);   color: #fff; }
-    .trade-feedback { margin-top: 8px; font-size: 12px; padding: 6px 10px; border-radius: 4px; display: none; }
-    .trade-feedback.ok  { background: #1a3a1a; color: var(--green); border: 1px solid var(--green); display: block; }
-    .trade-feedback.err { background: #3a1a1a; color: var(--red);   border: 1px solid var(--red);   display: block; }
-
-    /* ── Center: chart ─────────────────────────────────────────────────── */
-    .chart-panel { display: flex; flex-direction: column; overflow: hidden; }
-    .chart-toolbar { display: flex; align-items: center; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
-    .chart-toolbar .title { font-size: 13px; font-weight: 600; color: var(--bright); }
-    .toolbar-spacer { flex: 1; }
-    .interval-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .interval-btn.active { border-color: var(--accent); color: var(--accent); }
-    #chartContainer { flex: 1; }
-
-    /* ── Right panel: order book + blotter ─────────────────────────────── */
-    .right-panel { display: flex; flex-direction: column; border-left: 1px solid var(--border); overflow: hidden; }
-    .panel-section { display: flex; flex-direction: column; overflow: hidden; }
-    .panel-section.grow { flex: 1; min-height: 0; }
-    .section-header { padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
-    .ob-table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 12px; }
-    .ob-table th { padding: 4px 8px; color: var(--muted); font-size: 10px; text-transform: uppercase; background: var(--bg); border-bottom: 1px solid var(--border); text-align: right; }
-    .ob-table th:first-child { text-align: left; }
-    .ob-table td { padding: 3px 8px; text-align: right; border-bottom: 1px solid #1a1c22; }
-    .ob-table td:first-child { text-align: left; }
-    .ask-row td:first-child { color: var(--green); }
-    .bid-row td:first-child { color: var(--red); }
-    .ob-scroll { overflow-y: auto; flex: 1; }
-    .ob-spread-row { background: #1a1c22; }
-    .ob-spread-row td { color: var(--orange); font-weight: 600; text-align: center !important; padding: 4px; }
-
-    /* ── Blotter ───────────────────────────────────────────────────────── */
-    .blotter-scroll { overflow-y: auto; flex: 1; }
-    .blotter-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .blotter-table th { padding: 4px 8px; color: var(--muted); font-size: 10px; text-transform: uppercase; background: var(--bg); border-bottom: 1px solid var(--border); text-align: right; position: sticky; top: 0; z-index: 1; }
-    .blotter-table th:first-child { text-align: left; }
-    .blotter-table td { padding: 4px 8px; border-bottom: 1px solid #1a1c22; text-align: right; font-family: monospace; }
-    .blotter-table td:first-child { text-align: left; }
-    .badge-buy  { background: #1a3a1a; color: var(--green); border-radius: 3px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
-    .badge-sell { background: #3a1a1a; color: var(--red);   border-radius: 3px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
-  </style>
-</head>
-<body>
-<div class="terminal">
-
-  <!-- ── Header ─────────────────────────────────────────────────────── -->
-  <header class="header">
-    <div class="logo">FX <span>BROKER</span> BACKOFFICE</div>
-    <div class="session-badge" id="sessionBadge">⬤ Sydney / Tokyo</div>
-    <div class="spacer"></div>
-    <div class="clock" id="utcClock">UTC 00:00:00</div>
-  </header>
-
-  <!-- ── Main layout ────────────────────────────────────────────────── -->
-  <div class="main">
-
-    <!-- ── LEFT PANEL ─────────────────────────────────────────────── -->
-    <aside class="left-panel">
-
-      <!-- Quote -->
-      <div class="quote-card">
-        <div class="pair">AUD / USD &nbsp;•&nbsp; FX SPOT</div>
-        <div class="quote-row">
-          <div class="quote-bid">
-            <div class="label">BID (Sell)</div>
-            <div class="price" id="bidPrice">0.0000</div>
-          </div>
-          <div class="quote-spread">
-            <div class="label">SPREAD</div>
-            <div class="value" id="spreadPips">–</div>
-          </div>
-          <div class="quote-ask">
-            <div class="label">ASK (Buy)</div>
-            <div class="price" id="askPrice">0.0000</div>
-          </div>
-        </div>
-        <div class="quote-meta">
-          <span>MID <strong id="midPrice">–</strong></span>
-          <span class="quote-change" id="dayChange">–</span>
-          <span id="lastUpdated" style="margin-left:auto">–</span>
-        </div>
-      </div>
-
-      <!-- Day stats -->
-      <div class="status-grid">
-        <div class="stat-cell"><div class="label">Day Open</div><div class="value" id="dayOpen">–</div></div>
-        <div class="stat-cell"><div class="label">Day High</div><div class="value up" id="dayHigh">–</div></div>
-        <div class="stat-cell"><div class="label">Day Low</div><div class="value down" id="dayLow">–</div></div>
-        <div class="stat-cell"><div class="label">Volatility</div><div class="value" id="volatility">–</div></div>
-      </div>
-
-      <!-- Trend simulation -->
-      <div class="sim-panel">
-        <h4>🎮 Price Simulation</h4>
-        <div class="sim-buttons">
-          <button class="btn-sim btn-bull" onclick="setTrend('up')">▲ Bull Run</button>
-          <button class="btn-sim btn-flat" onclick="setTrend('neutral')">─ Consolidate</button>
-          <button class="btn-sim btn-bear" onclick="setTrend('down')">▼ Bear Drop</button>
-        </div>
-        <div class="strength-row">
-          <label>Strength</label>
-          <input type="range" id="trendStrength" min="20" max="100" value="70">
-          <span class="val" id="strengthVal">70</span>
-        </div>
-        <div class="trend-indicator flat" id="trendIndicator">● Neutral — No trend bias</div>
-      </div>
-
-      <!-- Trade execution -->
-      <div class="trade-panel">
-        <h4>⚡ Execute Trade (MCP / API)</h4>
-        <input class="trade-input" type="number" id="tradeAmount" value="100000" placeholder="Amount (AUD)" min="1">
-        <div class="trade-btns">
-          <button class="btn-buy"  onclick="executeTrade('buy')">BUY AUD</button>
-          <button class="btn-sell" onclick="executeTrade('sell')">SELL AUD</button>
-        </div>
-        <div class="trade-feedback" id="tradeFeedback"></div>
-      </div>
-    </aside>
-
-    <!-- ── CENTER: CHART ───────────────────────────────────────────── -->
-    <div class="chart-panel">
-      <div class="chart-toolbar">
-        <span class="title">AUD/USD — Candlestick</span>
-        <span class="toolbar-spacer"></span>
-        <span style="font-size:11px;color:var(--muted)">30s candles · live</span>
-      </div>
-      <div id="chartContainer"></div>
-    </div>
-
-    <!-- ── RIGHT PANEL: ORDER BOOK + BLOTTER ──────────────────────── -->
-    <div class="right-panel">
-
-      <!-- Order book -->
-      <div class="panel-section" style="height:55%">
-        <div class="section-header">Order Book — Market Depth</div>
-        <div class="ob-scroll">
-          <table class="ob-table">
-            <thead><tr><th>Price</th><th>Size</th><th>Total</th></tr></thead>
-            <tbody id="obAsks"></tbody>
-            <tbody><tr class="ob-spread-row"><td colspan="3" id="obSpread">Spread: –</td></tr></tbody>
-            <tbody id="obBids"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Trade blotter -->
-      <div class="panel-section grow">
-        <div class="section-header">Trade Blotter</div>
-        <div class="blotter-scroll">
-          <table class="blotter-table">
-            <thead><tr><th>Type</th><th>Amount</th><th>Rate</th><th>Total</th><th>Time</th></tr></thead>
-            <tbody id="blotterBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div><!-- end .main -->
-</div><!-- end .terminal -->
-
-<script>
-  // ── Chart setup ──────────────────────────────────────────────────────────
-  const chartContainer = document.getElementById('chartContainer');
-  const chart = LightweightCharts.createChart(chartContainer, {
-    width: chartContainer.clientWidth,
-    height: chartContainer.clientHeight,
-    layout: { background: { color: '#0d0e12' }, textColor: '#d4d8e8' },
-    grid: { vertLines: { color: '#1e2028' }, horzLines: { color: '#1e2028' } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#252830' },
-    timeScale: { borderColor: '#252830', timeVisible: true, secondsVisible: false },
-  });
-
-  const candleSeries = chart.addCandlestickSeries({
-    upColor: '#26a65b', downColor: '#e74c3c',
-    borderUpColor: '#26a65b', borderDownColor: '#e74c3c',
-    wickUpColor: '#26a65b', wickDownColor: '#e74c3c',
-  });
-
-  const volumeSeries = chart.addHistogramSeries({
-    priceFormat: { type: 'volume' },
-    priceScaleId: 'vol',
-    color: '#26a65b44',
-  });
-  chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } });
-
-  new ResizeObserver(() => {
-    chart.applyOptions({ width: chartContainer.clientWidth, height: chartContainer.clientHeight });
-  }).observe(chartContainer);
-
-  // ── State ─────────────────────────────────────────────────────────────────
-  let prevBid = null;
-  let candleData = [];
-
-  // ── Clock ─────────────────────────────────────────────────────────────────
-  function tick() {
-    const now = new Date();
-    document.getElementById('utcClock').textContent =
-      'UTC ' + now.getUTCHours().toString().padStart(2,'0') + ':' +
-               now.getUTCMinutes().toString().padStart(2,'0') + ':' +
-               now.getUTCSeconds().toString().padStart(2,'0');
-  }
-  setInterval(tick, 1000); tick();
-
-  // ── Trend strength slider ─────────────────────────────────────────────────
-  document.getElementById('trendStrength').addEventListener('input', e => {
-    document.getElementById('strengthVal').textContent = e.target.value;
-  });
-
-  // ── Fetch helpers ─────────────────────────────────────────────────────────
-  async function get(url) {
-    const r = await fetch(url); if (!r.ok) throw new Error(r.status); return r.json();
-  }
-  async function post(url, body) {
-    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    return r.json();
-  }
-
-  // ── Update quote display ──────────────────────────────────────────────────
-  async function updateQuote() {
-    try {
-      const q = await get('/api/fx/quote');
-      const bid = q.bid.toFixed(4), ask = q.ask.toFixed(4), mid = q.mid.toFixed(4);
-      document.getElementById('bidPrice').textContent = bid;
-      document.getElementById('askPrice').textContent = ask;
-      document.getElementById('midPrice').textContent = mid;
-      document.getElementById('spreadPips').textContent = q.spreadPips + ' pip' + (q.spreadPips !== 1 ? 's' : '');
-      document.getElementById('lastUpdated').textContent = new Date(q.timestamp).toLocaleTimeString();
-
-      // Flash colour
-      if (prevBid !== null) {
-        const bidEl = document.getElementById('bidPrice');
-        bidEl.style.transition = 'none';
-        bidEl.style.textShadow = q.bid > prevBid ? '0 0 10px #26a65b' : '0 0 10px #e74c3c';
-        setTimeout(() => bidEl.style.textShadow = '', 600);
-      }
-      prevBid = q.bid;
-    } catch {}
-  }
-
-  // ── Update market status ──────────────────────────────────────────────────
-  async function updateStatus() {
-    try {
-      const s = await get('/api/fx/status');
-      document.getElementById('dayOpen').textContent   = s.dayOpen.toFixed(4);
-      document.getElementById('dayHigh').textContent   = s.dayHigh.toFixed(4);
-      document.getElementById('dayLow').textContent    = s.dayLow.toFixed(4);
-      document.getElementById('volatility').textContent = s.volatility.toFixed(1) + ' pip';
-      document.getElementById('sessionBadge').textContent = '⬤ ' + s.session;
-
-      const chg = s.dayChange.toFixed(4);
-      const pct = s.dayChangePct.toFixed(2);
-      const el = document.getElementById('dayChange');
-      el.textContent = (s.dayChange >= 0 ? '▲ +' : '▼ ') + chg + '  (' + pct + '%)';
-      el.className = 'quote-change ' + (s.dayChange > 0 ? 'up' : s.dayChange < 0 ? 'down' : 'flat');
-    } catch {}
-  }
-
-  // ── Update candle chart ───────────────────────────────────────────────────
-  async function updateChart() {
-    try {
-      const candles = await get('/api/fx/history?bars=200');
-      candleData = candles.map(c => ({
-        time: Math.floor(new Date(c.timestamp).getTime() / 1000),
-        open: c.open, high: c.high, low: c.low, close: c.close
-      }));
-      const volData = candles.map(c => ({
-        time: Math.floor(new Date(c.timestamp).getTime() / 1000),
-        value: c.volume,
-        color: c.close >= c.open ? '#26a65b44' : '#e74c3c44'
-      }));
-      candleSeries.setData(candleData);
-      volumeSeries.setData(volData);
-      chart.timeScale().fitContent();
-    } catch {}
-  }
-
-  // ── Append latest candle ──────────────────────────────────────────────────
-  async function appendCandle() {
-    try {
-      const candles = await get('/api/fx/history?bars=3');
-      candles.forEach(c => {
-        candleSeries.update({ time: Math.floor(new Date(c.timestamp).getTime() / 1000), open: c.open, high: c.high, low: c.low, close: c.close });
-        volumeSeries.update({ time: Math.floor(new Date(c.timestamp).getTime() / 1000), value: c.volume, color: c.close >= c.open ? '#26a65b44' : '#e74c3c44' });
-      });
-    } catch {}
-  }
-
-  // ── Order book ────────────────────────────────────────────────────────────
-  async function updateOrderBook() {
-    try {
-      const ob = await get('/api/fx/orderbook');
-      const fmtSz = v => (v/1000000).toFixed(2) + 'M';
-      let html = '';
-      [...ob.asks].reverse().forEach(a => {
-        html += `<tr class="ask-row"><td>${a.price.toFixed(4)}</td><td>${fmtSz(a.size)}</td><td>${fmtSz(a.total)}</td></tr>`;
-      });
-      document.getElementById('obAsks').innerHTML = html;
-
-      html = '';
-      ob.bids.forEach(b => {
-        html += `<tr class="bid-row"><td>${b.price.toFixed(4)}</td><td>${fmtSz(b.size)}</td><td>${fmtSz(b.total)}</td></tr>`;
-      });
-      document.getElementById('obBids').innerHTML = html;
-
-      const spread = ob.asks.length && ob.bids.length
-        ? ((ob.asks[0].price - ob.bids[0].price) * 10000).toFixed(1)
-        : '–';
-      document.getElementById('obSpread').textContent = `Spread: ${spread} pips`;
-    } catch {}
-  }
-
-  // ── Trade blotter ─────────────────────────────────────────────────────────
-  async function updateBlotter() {
-    try {
-      const txns = await get('/api/fx/transactions?limit=30');
-      let html = '';
-      txns.forEach(t => {
-        const badge = t.type === 'Buy'
-          ? '<span class="badge-buy">BUY</span>'
-          : '<span class="badge-sell">SELL</span>';
-        const time = new Date(t.timestamp).toLocaleTimeString();
-        html += `<tr>
-          <td>${badge}</td>
-          <td>${(t.amount/1000).toFixed(0)}K</td>
-          <td>${t.rate.toFixed(4)}</td>
-          <td>${t.total.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0})}</td>
-          <td>${time}</td>
-        </tr>`;
-      });
-      document.getElementById('blotterBody').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:12px">No trades yet</td></tr>';
-    } catch {}
-  }
-
-  // ── Trend control ─────────────────────────────────────────────────────────
-  async function setTrend(direction) {
-    const strength = parseInt(document.getElementById('trendStrength').value);
-    try {
-      await post('/api/fx/trend', { direction, strength });
-      const indicator = document.getElementById('trendIndicator');
-      const labels = { up: ['up','● Bull Run Active — Upward pressure', 'up'], down: ['down','● Bear Drop Active — Downward pressure', 'down'], neutral: ['flat','● Neutral — No trend bias', 'flat'] };
-      const [cls, text] = labels[direction] || labels.neutral;
-      indicator.className = 'trend-indicator ' + cls;
-      indicator.textContent = text;
-
-      // Auto-reset indicator after 30s
-      setTimeout(() => {
-        indicator.className = 'trend-indicator flat';
-        indicator.textContent = '● Neutral — No trend bias';
-      }, 30000);
-    } catch(e) { console.error('Trend error', e); }
-  }
-
-  // ── Trade execution ───────────────────────────────────────────────────────
-  async function executeTrade(type) {
-    const amount = parseFloat(document.getElementById('tradeAmount').value);
-    if (!amount || amount <= 0) return;
-    const fb = document.getElementById('tradeFeedback');
-    try {
-      const res = await post(`/api/fx/${type}`, { currencyPair:'AUD/USD', amount, rate:0 });
-      if (res.success) {
-        fb.className = 'trade-feedback ok';
-        fb.textContent = `✓ ${res.message}`;
-        updateBlotter();
-      } else {
-        fb.className = 'trade-feedback err';
-        fb.textContent = `✗ ${res.message}`;
-      }
-    } catch {
-      fb.className = 'trade-feedback err';
-      fb.textContent = '✗ Connection error';
-    }
-    setTimeout(() => { fb.className = 'trade-feedback'; }, 5000);
-  }
-
-  // ── Polling schedule ──────────────────────────────────────────────────────
-  (async () => {
-    await updateChart();
-    await Promise.all([updateQuote(), updateStatus(), updateOrderBook(), updateBlotter()]);
-
-    setInterval(updateQuote,    1000);
-    setInterval(appendCandle,   2000);
-    setInterval(updateOrderBook,2000);
-    setInterval(updateStatus,   3000);
-    setInterval(updateBlotter,  5000);
-  })();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FX Prime — Broker Backoffice</title>
@@ -1095,6 +629,73 @@
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* ─── LEADS NAV BTN ───────────────────────────── */
+        .nav-tab-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-tab-btn:hover, .nav-tab-btn.active {
+            background: var(--blue-dim);
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+        .leads-count-badge {
+            background: var(--red);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 10px;
+            padding: 1px 6px;
+            font-weight: 700;
+        }
+
+        /* ─── LEADS PANEL ─────────────────────────────── */
+        .leads-panel {
+            padding: 0 4px;
+        }
+        .leads-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .lead-row-email { color: var(--blue); font-size: 12px; }
+        .lead-badge-new {
+            background: rgba(0, 200, 83, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(0, 200, 83, 0.3);
+            border-radius: 4px;
+            font-size: 10px;
+            padding: 2px 7px;
+            font-weight: 600;
+        }
+        .lead-time-spent {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .btn-send-broker {
+            background: var(--blue-dim);
+            border: 1px solid var(--blue);
+            color: var(--blue);
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+        .btn-send-broker:hover { background: rgba(64,128,255,0.25); }
     </style>
 </head>
 <body>
@@ -1118,10 +719,15 @@
     </div>
 
     <div class="nav-right">
+        <button class="nav-tab-btn" id="navLeadsBtn" onclick="showLeadsPanel()">
+            <i class="fa-solid fa-user-plus"></i> Leads
+            <span class="leads-count-badge" id="leadsCountBadge" style="display:none;">0</span>
+        </button>
         <div class="live-badge"><div class="live-dot"></div> LIVE</div>
         <span style="color:var(--border)">|</span>
-        <i class="fa-regular fa-user" style="font-size:14px;"></i>
-        <span>Broker Manager</span>
+        <i class="fa-solid fa-user-tie" style="font-size:14px;color:var(--blue);"></i>
+        <span>Marcus Webb</span>
+        <span style="font-size:10px;color:var(--text-muted);margin-left:2px;">Senior Broker</span>
     </div>
 </nav>
 
@@ -1335,6 +941,69 @@
             </div>
 
         </div><!-- /accountDashboard -->
+
+        <!-- Leads Panel -->
+        <div id="leadsDashboard" style="display:none;" class="leads-panel">
+
+            <div class="account-header-bar" style="margin-bottom:20px;">
+                <div class="ah-left">
+                    <div class="ah-avatar" style="background:linear-gradient(135deg,#00c853,#009624);">
+                        <i class="fa-solid fa-user-plus" style="font-size:16px;"></i>
+                    </div>
+                    <div>
+                        <div class="ah-name">Leads Inbox</div>
+                        <div class="ah-meta">Research Analytics — Prospect leads captured from article readership</div>
+                    </div>
+                </div>
+                <button class="btn-close-pos" onclick="refreshLeads()" style="padding:6px 14px;font-size:12px;">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+
+            <div class="leads-stats-row">
+                <div class="stat-card">
+                    <div class="stat-label"><i class="fa-solid fa-users" style="margin-right:4px;"></i>Total Leads</div>
+                    <div class="stat-value" id="leadsTotal">—</div>
+                    <div class="stat-sub">From research portal</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label"><i class="fa-solid fa-clock" style="margin-right:4px;"></i>Avg. Engagement</div>
+                    <div class="stat-value" id="leadsAvgTime">—</div>
+                    <div class="stat-sub">Avg. time on article</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label"><i class="fa-solid fa-building" style="margin-right:4px;"></i>Organisations</div>
+                    <div class="stat-value" id="leadsOrgs">—</div>
+                    <div class="stat-sub">Unique companies</div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-inbox"></i>
+                    Prospect Leads
+                </div>
+            </div>
+
+            <div class="fx-table-wrapper mb-4">
+                <table class="fx-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Company / Fund</th>
+                            <th>Article Read</th>
+                            <th>Engagement</th>
+                            <th>Received</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTable">
+                        <tr class="empty-row"><td colspan="6">Loading leads…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -1428,6 +1097,9 @@
     async function selectAccount(id) {
         selectedAccountId = id;
         renderAccountList(allAccounts); // refresh active state
+        // Hide leads panel if open
+        document.getElementById('leadsDashboard').style.display = 'none';
+        document.getElementById('navLeadsBtn').classList.remove('active');
         document.getElementById('welcomeScreen').style.display = 'none';
         document.getElementById('accountDashboard').style.display = 'block';
         await loadBalanceSheet();
@@ -1631,8 +1303,94 @@
         await loadAccounts();
     }, 2000);
 
+
+    // ── LEADS PANEL ──────────────────────────────────────
+    let leadsData = [];
+
+    async function loadLeads() {
+        try {
+            const res = await fetch('/api/accounts/leads');
+            leadsData = await res.json();
+            renderLeads(leadsData);
+            // Update badge
+            const badge = document.getElementById('leadsCountBadge');
+            if (leadsData.length > 0) {
+                badge.textContent = leadsData.length;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        } catch (e) {
+            document.getElementById('leadsTable').innerHTML =
+                '<tr class="empty-row"><td colspan="6">Failed to load leads</td></tr>';
+        }
+    }
+
+    function renderLeads(leads) {
+        document.getElementById('leadsTotal').textContent = leads.length;
+        const avgTime = leads.length
+            ? Math.round(leads.reduce((s, l) => s + l.timeSpentSeconds, 0) / leads.length)
+            : 0;
+        const avgMin = Math.floor(avgTime / 60);
+        const avgSec = avgTime % 60;
+        document.getElementById('leadsAvgTime').textContent =
+            avgMin > 0 ? `${avgMin}m ${avgSec}s` : `${avgSec}s`;
+        const orgs = new Set(leads.filter(l => l.userCompany).map(l => l.userCompany)).size;
+        document.getElementById('leadsOrgs').textContent = orgs;
+
+        const tbody = document.getElementById('leadsTable');
+        if (!leads.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No leads yet. Leads appear when visitors subscribe on the Research Analytics portal.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = leads.map(l => {
+            const name = l.userName || '<span style="color:var(--text-muted)">Anonymous</span>';
+            const company = l.userCompany || '<span style="color:var(--text-muted)">—</span>';
+            const article = l.articleTitle
+                ? `<span title="${l.articleTitle}">${l.articleTitle.substring(0, 32)}${l.articleTitle.length > 32 ? '…' : ''}</span>`
+                : '<span style="color:var(--text-muted)">—</span>';
+            const mins = Math.floor(l.timeSpentSeconds / 60);
+            const secs = l.timeSpentSeconds % 60;
+            const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+            const receivedRaw = l.receivedAt || l.ReceivedAt;
+            const received = receivedRaw ? new Date(receivedRaw).toLocaleString() : '—';
+            return `<tr>
+                <td style="font-weight:600;">${name}</td>
+                <td class="lead-row-email"><a href="mailto:${l.userEmail}" style="color:var(--blue);">${l.userEmail}</a></td>
+                <td>${company}</td>
+                <td style="font-size:12px;">${article}</td>
+                <td class="lead-time-spent"><i class="fa-regular fa-clock" style="margin-right:4px;"></i>${timeStr}</td>
+                <td style="font-size:11px;color:var(--text-muted);">${received}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    function showLeadsPanel() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('accountDashboard').style.display = 'none';
+        document.getElementById('leadsDashboard').style.display = 'block';
+        document.getElementById('navLeadsBtn').classList.add('active');
+        // deselect account
+        selectedAccountId = null;
+        renderAccountList(allAccounts);
+        loadLeads();
+    }
+
+    function showAccountPanel() {
+        document.getElementById('leadsDashboard').style.display = 'none';
+        document.getElementById('navLeadsBtn').classList.remove('active');
+    }
+
+    async function refreshLeads() {
+        document.getElementById('leadsTable').innerHTML =
+            '<tr class="empty-row"><td colspan="6">Refreshing…</td></tr>';
+        await loadLeads();
+    }
+
     document.getElementById('tradeLotsInput').addEventListener('input', updateMarginEstimate);
 
+    // Load leads count on init
+    loadLeads();
     init();
 </script>
 </body>
