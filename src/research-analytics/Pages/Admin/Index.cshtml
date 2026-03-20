@@ -308,7 +308,7 @@
                                 }
                             </td>
                             <td class="suggestion-analysis" title="@s.Analysis">
-                                @s.Analysis[..Math.Min(90, s.Analysis.Length)]…
+                                @TextHelper.Truncate(s.Analysis, 90)
                             </td>
                             <td class="text-muted small">@s.SuggestedBy</td>
                             <td class="text-muted small">@s.ReceivedAt.ToString("yyyy-MM-dd HH:mm")</td>

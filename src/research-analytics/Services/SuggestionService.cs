@@ -20,7 +20,7 @@ public class SuggestionService
                 Company = "Golden State Superannuation",
                 CurrencyPair = "AUD/USD",
                 Direction = "Buy",
-                Analysis = "David manages a $450M commodity-linked equities fund. With the RBA signalling a rate pause and iron ore prices up 8% MoM, he is actively seeking AUD upside exposure. His fund's mandate allows 10% FX overlay, and he expressed interest in structured AUD/USD call options during last week's investor day.",
+                Analysis = "David manages a $450M commodity-linked equities fund. With the RBA signaling a rate pause and iron ore prices up 8% MoM, he is actively seeking AUD upside exposure. His fund's mandate allows 10% FX overlay, and he expressed interest in structured AUD/USD call options during last week's investor day.",
                 Confidence = "High",
                 SuggestedBy = "AI Market Intelligence",
                 ReceivedAt = DateTime.UtcNow.AddMinutes(-42)

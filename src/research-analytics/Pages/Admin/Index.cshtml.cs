@@ -1,5 +1,6 @@
 using FxWebPortal.Models;
 using FxWebPortal.Services;
+using FxWebPortal.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text;
@@ -152,13 +153,16 @@ public class IndexModel : PageModel
         {
             try
             {
+                var analysis = TextHelper.Truncate(suggestion.Analysis, 80);
                 var payload = new
                 {
                     userName = suggestion.CustomerName,
                     userEmail = suggestion.Email,
                     userCompany = suggestion.Company,
                     articleId = (int?)null,
-                    articleTitle = $"AI Suggestion: {suggestion.Direction} {suggestion.CurrencyPair} — {suggestion.Analysis[..Math.Min(80, suggestion.Analysis.Length)]}…",
+                    articleTitle = analysis.Length > 0
+                        ? $"AI Suggestion: {suggestion.Direction} {suggestion.CurrencyPair} — {analysis}"
+                        : $"AI Suggestion: {suggestion.Direction} {suggestion.CurrencyPair}",
                     timeSpentSeconds = 0,
                     sessionId = $"suggestion-{suggestion.Id}"
                 };
