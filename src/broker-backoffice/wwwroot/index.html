@@ -8,997 +8,831 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b27;
-            --bg-card: #1a2236;
-            --bg-card-hover: #1f2a42;
-            --border: #2a3655;
-            --text-primary: #e2e8f0;
-            --text-secondary: #7c8db5;
-            --text-muted: #4a5568;
-            --green: #00c853;
-            --green-dim: #1a3d2b;
-            --red: #ff4757;
-            --red-dim: #3d1a1a;
-            --blue: #4080ff;
-            --blue-dim: #1a2a4a;
-            --gold: #f59e0b;
-            --navbar-h: 56px;
-            --sidebar-w: 290px;
+            --sf-hdr:       #032d60;
+            --sf-nav:       #16325c;
+            --sf-blue:      #0176d3;
+            --sf-blue-lt:   #e8f4fd;
+            --sf-bg:        #f3f3f3;
+            --sf-white:     #ffffff;
+            --sf-border:    #e0e5ee;
+            --sf-text:      #181818;
+            --sf-text-2:    #706e6b;
+            --sf-text-3:    #a8a8a8;
+            --sf-green:     #2e844a;
+            --sf-green-bg:  #eef6ee;
+            --sf-red:       #ba0517;
+            --sf-red-bg:    #fef1ee;
+            --sf-orange:    #a07800;
+            --sf-orange-bg: #fef3e2;
+            --sf-purple:    #5c2e91;
+            --sf-purple-bg: #f3e8ff;
+            --sidebar-w:    280px;
+            --hdr-h:        48px;
+            --nav-h:        44px;
         }
-
         * { box-sizing: border-box; }
-
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: var(--sf-bg);
+            color: var(--sf-text);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             font-size: 13px;
             margin: 0;
             overflow-x: hidden;
         }
 
-        /* ─── NAVBAR ─────────────────────────────────── */
-        .top-navbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: var(--navbar-h);
-            background: #0a0f1e;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1000;
+        /* HEADER */
+        .sf-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--hdr-h);
+            background: var(--sf-hdr);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 14px; z-index: 1000; gap: 12px;
+        }
+        .sf-header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .sf-logo {
+            width: 34px; height: 34px; background: var(--sf-blue);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+        }
+        .sf-logo i { color: white; font-size: 16px; }
+        .sf-appname { color: white; font-size: 14px; font-weight: 700; white-space: nowrap; }
+        .sf-appname span { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.55); margin-left: 4px; }
+        .sf-ticker {
+            display: flex; align-items: center; gap: 8px; flex: 1; justify-content: center;
+        }
+        .sf-ticker-badge {
+            display: flex; align-items: center; gap: 7px;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 5px; padding: 4px 12px;
+        }
+        .sf-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #4bca81; animation: pulse 1.5s infinite; }
+        .sf-ticker-pair { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 600; }
+        .sf-ticker-rate { font-size: 14px; font-weight: 800; color: white; font-variant-numeric: tabular-nums; }
+        .sf-ticker-up   { color: #4bca81; font-size: 11px; font-weight: 600; }
+        .sf-ticker-down { color: #fe5e4f; font-size: 11px; font-weight: 600; }
+        .sf-header-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        .sf-hdr-icon { color: rgba(255,255,255,0.65); font-size: 15px; cursor: pointer; transition: color 0.15s; }
+        .sf-hdr-icon:hover { color: white; }
+        .sf-user { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .sf-user-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--sf-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; flex-shrink: 0;
+        }
+        .sf-user-name { color: rgba(255,255,255,0.85); font-size: 12px; white-space: nowrap; }
+        .sf-user-role { color: rgba(255,255,255,0.45); font-size: 10px; }
+
+        /* NAVBAR */
+        .sf-navbar {
+            position: fixed; top: var(--hdr-h); left: 0; right: 0;
+            height: var(--nav-h); background: var(--sf-nav);
+            display: flex; align-items: center; padding: 0 12px;
+            z-index: 999; gap: 2px;
+        }
+        .sf-nav-tab {
+            height: 44px; padding: 0 15px;
+            display: flex; align-items: center; gap: 7px;
+            color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500;
+            cursor: pointer; border: none; background: transparent;
+            border-bottom: 3px solid transparent; transition: all 0.15s; white-space: nowrap;
+        }
+        .sf-nav-tab:hover { color: white; background: rgba(255,255,255,0.07); }
+        .sf-nav-tab.active { color: white; border-bottom: 3px solid white; background: rgba(255,255,255,0.1); }
+        .sf-nav-count {
+            background: var(--sf-red); color: white;
+            border-radius: 10px; font-size: 10px; padding: 1px 6px; font-weight: 700;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--blue) 0%, #7b6cf6 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .ticker-strip {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .ticker-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 5px 14px;
-        }
-
-        .ticker-pair { font-weight: 600; color: var(--text-secondary); font-size: 11px; }
-        .ticker-rate { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
-        .ticker-change { font-size: 11px; }
-        .tick-up { color: var(--green); }
-        .tick-down { color: var(--red); }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--green);
-            font-weight: 600;
-            font-size: 11px;
-        }
-
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* ─── LAYOUT ──────────────────────────────────── */
+        /* LAYOUT */
         .app-layout {
             display: flex;
-            margin-top: var(--navbar-h);
-            min-height: calc(100vh - var(--navbar-h));
+            margin-top: calc(var(--hdr-h) + var(--nav-h));
+            min-height: calc(100vh - var(--hdr-h) - var(--nav-h));
         }
 
-        /* ─── SIDEBAR ─────────────────────────────────── */
-        .sidebar {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
-            position: fixed;
-            top: var(--navbar-h);
-            bottom: 0;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
+        /* SIDEBAR */
+        .sf-sidebar {
+            width: var(--sidebar-w); min-width: var(--sidebar-w);
+            background: var(--sf-white); border-right: 1px solid var(--sf-border);
+            position: fixed; top: calc(var(--hdr-h) + var(--nav-h)); bottom: 0;
+            overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .sf-list-header { padding: 12px 14px 10px; border-bottom: 1px solid var(--sf-border); }
+        .sf-list-title {
+            font-size: 13px; font-weight: 700; color: var(--sf-text);
+            display: flex; align-items: center; gap: 8px; margin-bottom: 9px;
+        }
+        .sf-list-count {
+            font-size: 11px; color: var(--sf-text-2);
+            background: var(--sf-bg); border: 1px solid var(--sf-border);
+            border-radius: 10px; padding: 1px 7px; margin-left: auto;
+        }
+        .sf-search { position: relative; }
+        .sf-search input {
+            width: 100%; border: 1px solid var(--sf-border); border-radius: 4px;
+            color: var(--sf-text); padding: 6px 10px 6px 28px;
+            font-size: 12px; outline: none; background: var(--sf-white);
+        }
+        .sf-search input:focus { border-color: var(--sf-blue); box-shadow: 0 0 0 1px var(--sf-blue); }
+        .sf-search input::placeholder { color: var(--sf-text-3); }
+        .sf-search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--sf-text-3); font-size: 11px; }
+        .sf-account-item {
+            padding: 10px 14px; border-bottom: 1px solid var(--sf-border);
+            cursor: pointer; transition: background 0.1s; border-left: 3px solid transparent;
+        }
+        .sf-account-item:hover { background: var(--sf-blue-lt); }
+        .sf-account-item.active { background: var(--sf-blue-lt); border-left-color: var(--sf-blue); }
+        .sf-ai-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .sf-ai-avatar {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: white; flex-shrink: 0;
+        }
+        .sf-ai-name { font-weight: 600; font-size: 13px; color: var(--sf-blue); flex: 1; }
+        .sf-ai-badge { font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 600; }
+        .badge-standard    { background: #e8f4fd; color: #0176d3; border: 1px solid #c9e0f5; }
+        .badge-professional{ background: var(--sf-purple-bg); color: var(--sf-purple); border: 1px solid #d8b8f5; }
+        .badge-vip         { background: var(--sf-orange-bg); color: var(--sf-orange); border: 1px solid #f5dfa0; }
+        .sf-ai-meta  { font-size: 11px; color: var(--sf-text-2); margin: 2px 0; }
+        .sf-ai-fins  { display: flex; justify-content: space-between; align-items: center; }
+        .sf-ai-bal   { font-size: 12px; font-weight: 700; color: var(--sf-text); }
+        .sf-ai-pnl   { font-size: 11px; font-weight: 600; }
+        .pnl-pos { color: var(--sf-green); }
+        .pnl-neg { color: var(--sf-red); }
+        .pnl-zero{ color: var(--sf-text-3); }
+        .sf-sidebar-footer {
+            padding: 10px 14px; margin-top: auto;
+            border-top: 1px solid var(--sf-border); color: var(--sf-text-3); font-size: 11px;
         }
 
-        .sidebar-header {
-            padding: 16px 18px 10px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
+        /* MAIN */
+        .sf-main {
+            margin-left: var(--sidebar-w); flex: 1;
+            min-height: calc(100vh - var(--hdr-h) - var(--nav-h));
+            background: var(--sf-bg);
         }
 
-        .sidebar-search {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .sidebar-search input {
-            width: 100%;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            padding: 6px 10px 6px 30px;
-            font-size: 12px;
-            outline: none;
-        }
-
-        .sidebar-search input:focus { border-color: var(--blue); }
-        .sidebar-search input::placeholder { color: var(--text-muted); }
-
-        .search-icon {
-            position: absolute;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 11px;
-        }
-
-        .account-card {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .account-card:hover { background: var(--bg-card-hover); }
-        .account-card.active { background: var(--blue-dim); border-left: 3px solid var(--blue); }
-
-        .ac-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
-
-        .ac-name {
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-primary);
-        }
-
-        .ac-badge {
-            font-size: 10px;
-            padding: 2px 7px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .badge-standard { background: rgba(64, 128, 255, 0.15); color: var(--blue); }
-        .badge-professional { background: rgba(124, 77, 255, 0.15); color: #9b6bff; }
-        .badge-vip { background: rgba(245, 158, 11, 0.15); color: var(--gold); }
-
-        .ac-number {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .ac-financials {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .ac-balance {
-            font-size: 14px;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .ac-pnl {
-            font-size: 12px;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .ac-positions {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* ─── MAIN CONTENT ───────────────────────────── */
-        .main-content {
-            margin-left: var(--sidebar-w);
-            flex: 1;
-            padding: 20px 24px;
-            min-height: calc(100vh - var(--navbar-h));
-        }
-
-        /* ─── WELCOME SCREEN ─────────────────────────── */
+        /* WELCOME */
         .welcome-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: calc(100vh - var(--navbar-h) - 40px);
-            color: var(--text-muted);
-            text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: calc(100vh - var(--hdr-h) - var(--nav-h));
+            color: var(--sf-text-3); text-align: center; padding: 40px;
+        }
+        .welcome-screen i { font-size: 56px; margin-bottom: 18px; color: #c9d1d9; }
+        .welcome-screen h4 { color: var(--sf-text-2); font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+        .welcome-screen p  { color: var(--sf-text-3); max-width: 380px; line-height: 1.6; }
+
+        /* RECORD HEADER */
+        .sf-record-header {
+            background: var(--sf-white); border-bottom: 1px solid var(--sf-border);
+            padding: 14px 20px 0;
+        }
+        .sf-breadcrumb {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 12px; color: var(--sf-text-2); margin-bottom: 10px;
+        }
+        .sf-breadcrumb-btn {
+            background: none; border: none; padding: 0; cursor: pointer;
+            color: var(--sf-blue); text-decoration: none; font-size: 12px;
+        }
+        .sf-breadcrumb-btn:hover { text-decoration: underline; }
+        .sf-breadcrumb-sep { font-size: 9px; color: var(--sf-text-3); }
+        .sf-rh-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+        .sf-rh-left { display: flex; align-items: center; gap: 14px; }
+        .sf-entity-icon {
+            width: 48px; height: 48px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--sf-blue) 0%, #5a9bdf 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; color: white; flex-shrink: 0;
+        }
+        .sf-rh-title { font-size: 20px; font-weight: 700; color: var(--sf-text); margin-bottom: 4px; }
+        .sf-rh-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--sf-text-2); flex-wrap: wrap; }
+        .sf-rh-meta .dot { color: var(--sf-border); }
+        .sf-status-active { display: flex; align-items: center; gap: 4px; color: var(--sf-green); font-size: 12px; font-weight: 600; }
+        .sf-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sf-green); }
+        .sf-rh-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 2px; }
+        .sf-btn {
+            border-radius: 4px; padding: 6px 14px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.15s; border: 1px solid;
+            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .sf-btn-primary { background: var(--sf-blue); color: white; border-color: var(--sf-blue); }
+        .sf-btn-primary:hover { background: #014d9f; border-color: #014d9f; }
+        .sf-btn-neutral { background: white; color: var(--sf-text-2); border-color: var(--sf-border); }
+        .sf-btn-neutral:hover { background: var(--sf-bg); }
+        .sf-rh-highlights {
+            display: flex; gap: 0; padding: 12px 0 0; flex-wrap: wrap;
+            border-top: 1px solid var(--sf-border); margin-top: 12px;
+        }
+        .sf-hl-field { padding: 4px 20px 4px 0; min-width: 110px; border-right: 1px solid var(--sf-border); margin-right: 20px; margin-bottom: 8px; }
+        .sf-hl-field:last-child { border-right: none; }
+        .sf-hl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--sf-text-2); margin-bottom: 3px; }
+        .sf-hl-value { font-size: 13px; font-weight: 700; color: var(--sf-text); font-variant-numeric: tabular-nums; }
+        .sf-hl-value.positive { color: var(--sf-green); }
+        .sf-hl-value.negative { color: var(--sf-red); }
+
+        /* SUBTABS */
+        .sf-subtabs {
+            background: var(--sf-white); border-bottom: 1px solid var(--sf-border);
+            padding: 0 20px; display: flex; gap: 0; margin-top: 6px;
+        }
+        .sf-subtab {
+            padding: 10px 16px; font-size: 13px; font-weight: 500;
+            color: var(--sf-text-2); cursor: pointer; border: none; background: transparent;
+            border-bottom: 3px solid transparent; transition: all 0.15s; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .sf-subtab:hover { color: var(--sf-text); background: rgba(1,118,211,0.04); }
+        .sf-subtab.active { color: var(--sf-blue); font-weight: 600; border-bottom: 3px solid var(--sf-blue); }
+        .sf-subtab-count {
+            background: var(--sf-blue-lt); color: var(--sf-blue); border: 1px solid #c9e0f5;
+            border-radius: 10px; font-size: 10px; padding: 1px 6px; font-weight: 700;
         }
 
-        .welcome-screen i { font-size: 48px; margin-bottom: 16px; color: var(--border); }
-        .welcome-screen h4 { color: var(--text-secondary); margin-bottom: 8px; }
+        /* TAB CONTENT */
+        .sf-tab-content { padding: 20px; }
 
-        /* ─── ACCOUNT HEADER ─────────────────────────── */
-        .account-header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+        /* SF CARD */
+        .sf-card {
+            background: var(--sf-white); border: 1px solid var(--sf-border);
+            border-radius: 4px; margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.07);
         }
-
-        .ah-left { display: flex; align-items: center; gap: 14px; }
-
-        .ah-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--blue) 0%, #7b6cf6 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
-            font-weight: 700;
-            color: #fff;
+        .sf-card-header {
+            padding: 11px 16px; border-bottom: 1px solid var(--sf-border);
+            display: flex; align-items: center; justify-content: space-between;
         }
+        .sf-card-title { font-size: 13px; font-weight: 700; color: var(--sf-text); display: flex; align-items: center; gap: 7px; }
+        .sf-card-title i { color: var(--sf-blue); }
 
-        .ah-name { font-size: 18px; font-weight: 700; }
-
-        .ah-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 3px;
-            color: var(--text-secondary);
-            font-size: 12px;
+        /* STAT TILES */
+        .sf-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .sf-stat-tile {
+            background: var(--sf-white); border: 1px solid var(--sf-border);
+            border-radius: 4px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-
-        .status-active {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--green);
-            font-size: 11px;
-            font-weight: 600;
+        .sf-stat-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--sf-text-2); margin-bottom: 8px;
+            display: flex; align-items: center; gap: 5px;
         }
+        .sf-stat-label i { color: var(--sf-blue); }
+        .sf-stat-value { font-size: 22px; font-weight: 700; color: var(--sf-text); font-variant-numeric: tabular-nums; }
+        .sf-stat-sub { font-size: 11px; color: var(--sf-text-2); margin-top: 4px; }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green);
+        /* DETAIL GRID */
+        .sf-detail-grid { display: grid; grid-template-columns: 1fr 1fr; }
+        .sf-detail-field { padding: 10px 16px; border-bottom: 1px solid var(--sf-border); }
+        .sf-detail-field:nth-child(even) { border-left: 1px solid var(--sf-border); }
+        .sf-detail-field.full { grid-column: 1 / -1; }
+        .sf-detail-label { font-size: 11px; font-weight: 600; color: var(--sf-text-2); margin-bottom: 3px; }
+        .sf-detail-value { font-size: 13px; color: var(--sf-text); font-weight: 500; }
+
+        /* TABLES */
+        .sf-table-wrapper {
+            background: var(--sf-white); border: 1px solid var(--sf-border);
+            border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-
-        /* ─── BALANCE CARDS ──────────────────────────── */
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px 18px;
+        .sf-table-header {
+            padding: 10px 16px; border-bottom: 1px solid var(--sf-border);
+            display: flex; align-items: center; justify-content: space-between;
         }
-
-        .stat-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 8px;
+        .sf-table-title { font-size: 13px; font-weight: 700; color: var(--sf-text); display: flex; align-items: center; gap: 8px; }
+        .sf-table-title i { color: var(--sf-blue); }
+        table.sf-table { width: 100%; border-collapse: collapse; }
+        table.sf-table thead th {
+            background: var(--sf-bg); color: var(--sf-text-2);
+            font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+            padding: 9px 12px; border-bottom: 1px solid var(--sf-border); white-space: nowrap;
         }
+        table.sf-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
+        table.sf-table tbody tr:hover { background: var(--sf-blue-lt); }
+        table.sf-table tbody td { padding: 10px 12px; vertical-align: middle; font-variant-numeric: tabular-nums; }
+        .sf-table-empty td { text-align: center; color: var(--sf-text-3); padding: 30px !important; font-style: italic; }
 
-        .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            color: var(--text-primary);
+        /* TYPE / PNL */
+        .type-buy     { color: var(--sf-green); font-weight: 700; }
+        .type-sell    { color: var(--sf-red);   font-weight: 700; }
+        .type-close   { color: var(--sf-text-2); }
+        .type-deposit { color: var(--sf-orange); font-weight: 600; }
+
+        /* CLOSE POS */
+        .sf-btn-close-pos {
+            background: var(--sf-red-bg); border: 1px solid #f5c6c6; color: var(--sf-red);
+            border-radius: 4px; padding: 4px 10px; font-size: 11px; font-weight: 600;
+            cursor: pointer; white-space: nowrap; transition: all 0.15s;
         }
+        .sf-btn-close-pos:hover { background: #fcd5d0; }
 
-        .stat-sub {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+        /* TRADE PANEL */
+        .sf-trade-panel {
+            background: var(--sf-white); border: 1px solid var(--sf-border);
+            border-radius: 4px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-
-        /* ─── SECTION HEADERS ────────────────────────── */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 22px 0 12px;
+        .sf-trade-title {
+            font-size: 13px; font-weight: 700; color: var(--sf-text);
+            margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--sf-border);
+            display: flex; align-items: center; gap: 7px;
         }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .sf-trade-title i { color: var(--sf-blue); }
+        .sf-rate-display { display: flex; gap: 8px; margin-bottom: 14px; }
+        .sf-rate-side { flex: 1; padding: 10px; border-radius: 4px; text-align: center; }
+        .sf-rate-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 3px; }
+        .sf-rate-value { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .sell-side { background: #fef1ee; border: 1px solid #f5c6c6; }
+        .sell-side .sf-rate-label { color: var(--sf-red); }
+        .sell-side .sf-rate-value { color: var(--sf-red); }
+        .buy-side  { background: var(--sf-green-bg); border: 1px solid #b8dfc4; }
+        .buy-side .sf-rate-label { color: var(--sf-green); }
+        .buy-side .sf-rate-value { color: var(--sf-green); }
+        .sf-form-label { font-size: 11px; font-weight: 600; color: var(--sf-text-2); margin-bottom: 4px; }
+        .sf-input {
+            width: 100%; border: 1px solid var(--sf-border); border-radius: 4px;
+            padding: 8px 10px; font-size: 14px; font-weight: 600; outline: none;
+            text-align: center; font-variant-numeric: tabular-nums; color: var(--sf-text);
         }
-
-        .section-title i { color: var(--blue); }
-
-        /* ─── TABLES ─────────────────────────────────── */
-        .fx-table {
-            width: 100%;
-            border-collapse: collapse;
+        .sf-input:focus { border-color: var(--sf-blue); box-shadow: 0 0 0 1px var(--sf-blue); }
+        .sf-lot-btns { display: flex; gap: 4px; margin: 7px 0 12px; }
+        .sf-lot-btn {
+            flex: 1; border: 1px solid var(--sf-border); background: var(--sf-bg);
+            color: var(--sf-text-2); padding: 5px 2px; border-radius: 3px;
+            font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s;
         }
-
-        .fx-table thead th {
-            background: var(--bg-secondary);
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            padding: 9px 12px;
-            border-bottom: 1px solid var(--border);
+        .sf-lot-btn:hover { background: var(--sf-blue-lt); border-color: var(--sf-blue); color: var(--sf-blue); }
+        .sf-btn-buy {
+            background: var(--sf-green); color: white; border: 1px solid var(--sf-green);
+            border-radius: 4px; padding: 10px; font-size: 14px; font-weight: 700;
+            cursor: pointer; width: 100%; margin-bottom: 7px; transition: opacity 0.15s;
         }
-
-        .fx-table tbody tr {
-            border-bottom: 1px solid rgba(42, 54, 85, 0.4);
-            transition: background 0.1s;
+        .sf-btn-buy:hover { opacity: 0.88; }
+        .sf-btn-sell {
+            background: var(--sf-red); color: white; border: 1px solid var(--sf-red);
+            border-radius: 4px; padding: 10px; font-size: 14px; font-weight: 700;
+            cursor: pointer; width: 100%; transition: opacity 0.15s;
         }
+        .sf-btn-sell:hover { opacity: 0.88; }
+        .sf-btn-buy:disabled, .sf-btn-sell:disabled { opacity: 0.4; cursor: not-allowed; }
+        .sf-margin-info { font-size: 11px; color: var(--sf-text-3); text-align: center; margin-top: 9px; }
 
-        .fx-table tbody tr:hover { background: var(--bg-card-hover); }
-
-        .fx-table tbody td {
-            padding: 10px 12px;
-            vertical-align: middle;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .fx-table-wrapper {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .empty-row td {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 30px !important;
-            font-style: italic;
-        }
-
-        /* ─── TRADE PANEL ─────────────────────────────── */
-        .trade-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 18px;
-        }
-
-        .trade-panel-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .trade-panel-title i { color: var(--blue); }
-
-        .trade-rate-display {
-            text-align: center;
-            padding: 14px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            margin-bottom: 14px;
-            border: 1px solid var(--border);
-        }
-
-        .trade-rate-pair {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .trade-rate-value {
-            font-size: 26px;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .trade-rate-spread {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .buy-sell-rates {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .rate-side {
-            flex: 1;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .rate-side-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; }
-        .rate-side-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
-
-        .sell-side { background: rgba(255, 71, 87, 0.12); border: 1px solid rgba(255, 71, 87, 0.3); }
-        .sell-side .rate-side-label { color: var(--red); }
-        .sell-side .rate-side-value { color: var(--red); }
-
-        .buy-side { background: rgba(0, 200, 83, 0.12); border: 1px solid rgba(0, 200, 83, 0.3); }
-        .buy-side .rate-side-label { color: var(--green); }
-        .buy-side .rate-side-value { color: var(--green); }
-
-        .form-label-sm {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .fx-input {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            width: 100%;
-            outline: none;
-            text-align: center;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .fx-input:focus { border-color: var(--blue); }
-
-        .lot-buttons {
-            display: flex;
-            gap: 5px;
-            margin: 8px 0 14px;
-        }
-
-        .lot-btn {
-            flex: 1;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 4px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .lot-btn:hover { background: var(--bg-card-hover); border-color: var(--blue); color: var(--blue); }
-
-        .btn-buy {
-            background: linear-gradient(135deg, #00c853, #00a846);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-            transition: opacity 0.15s;
-        }
-
-        .btn-sell {
-            background: linear-gradient(135deg, #ff4757, #e63946);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            letter-spacing: 0.5px;
-            transition: opacity 0.15s;
-        }
-
-        .btn-buy:hover, .btn-sell:hover { opacity: 0.88; }
-        .btn-buy:disabled, .btn-sell:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .trade-margin-info {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        /* ─── TRADE RESULT TOAST ──────────────────────── */
+        /* TOAST */
         .trade-toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            z-index: 9999;
-            max-width: 340px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 13px 18px; border-radius: 4px; font-size: 13px; font-weight: 600;
+            z-index: 9999; max-width: 360px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
             animation: slideUp 0.3s ease;
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast-success { background: var(--sf-green-bg); border: 1px solid #b8dfc4; color: var(--sf-green); }
+        .toast-error   { background: var(--sf-red-bg);   border: 1px solid #f5c6c6; color: var(--sf-red);   }
 
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        /* LEADS */
+        .sf-leads-panel { padding: 20px; }
+        .sf-leads-stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
 
-        .toast-success { background: var(--green-dim); border: 1px solid var(--green); color: var(--green); }
-        .toast-error { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); }
-
-        /* ─── TYPE BADGES ─────────────────────────────── */
-        .type-buy { color: var(--green); font-weight: 700; }
-        .type-sell { color: var(--red); font-weight: 700; }
-        .type-close-buy { color: #7c8db5; }
-        .type-close-sell { color: #7c8db5; }
-        .type-deposit { color: var(--gold); }
-
-        .pnl-pos { color: var(--green); font-weight: 600; }
-        .pnl-neg { color: var(--red); font-weight: 600; }
-        .pnl-zero { color: var(--text-muted); }
-
-        /* ─── CLOSE POSITION BTN ─────────────────────── */
-        .btn-close-pos {
-            background: rgba(255, 71, 87, 0.12);
-            border: 1px solid rgba(255, 71, 87, 0.3);
-            color: var(--red);
-            border-radius: 5px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.15s;
-        }
-
-        .btn-close-pos:hover { background: rgba(255, 71, 87, 0.25); }
-
-        /* ─── DIVIDER ─────────────────────────────────── */
-        .divider { height: 1px; background: var(--border); margin: 6px 0; }
-
-        /* ─── SCROLLBAR ───────────────────────────────── */
+        /* MISC */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-        /* ─── LEADS NAV BTN ───────────────────────────── */
-        .nav-tab-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 5px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .nav-tab-btn:hover, .nav-tab-btn.active {
-            background: var(--blue-dim);
-            border-color: var(--blue);
-            color: var(--blue);
-        }
-        .leads-count-badge {
-            background: var(--red);
-            color: #fff;
-            border-radius: 10px;
-            font-size: 10px;
-            padding: 1px 6px;
-            font-weight: 700;
-        }
-
-        /* ─── LEADS PANEL ─────────────────────────────── */
-        .leads-panel {
-            padding: 0 4px;
-        }
-        .leads-stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .lead-row-email { color: var(--blue); font-size: 12px; }
-        .lead-badge-new {
-            background: rgba(0, 200, 83, 0.15);
-            color: var(--green);
-            border: 1px solid rgba(0, 200, 83, 0.3);
-            border-radius: 4px;
-            font-size: 10px;
-            padding: 2px 7px;
-            font-weight: 600;
-        }
-        .lead-time-spent {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-        .btn-send-broker {
-            background: var(--blue-dim);
-            border: 1px solid var(--blue);
-            color: var(--blue);
-            border-radius: 5px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.15s;
-        }
-        .btn-send-broker:hover { background: rgba(64,128,255,0.25); }
+        ::-webkit-scrollbar-thumb { background: var(--sf-border); border-radius: 4px; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
     </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════
-     TOP NAVBAR
-════════════════════════════════════════════ -->
-<nav class="top-navbar">
-    <a class="brand" href="#">
-        <div class="brand-icon"><i class="fa-solid fa-chart-line"></i></div>
-        FX Prime
-        <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:4px;">Broker Backoffice</span>
-    </a>
-
-    <div class="ticker-strip">
-        <div class="ticker-item">
-            <span class="ticker-pair">AUD/USD</span>
-            <span class="ticker-rate" id="navRate">—</span>
-            <span class="ticker-change" id="navChange"></span>
+<!-- SF HEADER -->
+<header class="sf-header">
+    <div class="sf-header-left">
+        <div class="sf-logo"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="sf-appname">FX Prime <span>Broker Backoffice</span></div>
+    </div>
+    <div class="sf-ticker">
+        <div class="sf-ticker-badge">
+            <div class="sf-live-dot"></div>
+            <span class="sf-ticker-pair">AUD/USD</span>
+            <span class="sf-ticker-rate" id="navRate">&#8212;</span>
+            <span id="navChange"></span>
         </div>
     </div>
-
-    <div class="nav-right">
-        <button class="nav-tab-btn" id="navLeadsBtn" onclick="showLeadsPanel()">
-            <i class="fa-solid fa-user-plus"></i> Leads
-            <span class="leads-count-badge" id="leadsCountBadge" style="display:none;">0</span>
-        </button>
-        <div class="live-badge"><div class="live-dot"></div> LIVE</div>
-        <span style="color:var(--border)">|</span>
-        <i class="fa-solid fa-user-tie" style="font-size:14px;color:var(--blue);"></i>
-        <span>Marcus Webb</span>
-        <span style="font-size:10px;color:var(--text-muted);margin-left:2px;">Senior Broker</span>
+    <div class="sf-header-right">
+        <i class="fa-solid fa-magnifying-glass sf-hdr-icon"></i>
+        <i class="fa-regular fa-bell sf-hdr-icon"></i>
+        <i class="fa-regular fa-star sf-hdr-icon"></i>
+        <div class="sf-user">
+            <div class="sf-user-avatar">MW</div>
+            <div>
+                <div class="sf-user-name">Marcus Webb</div>
+                <div class="sf-user-role">Senior Broker</div>
+            </div>
+        </div>
     </div>
+</header>
+
+<!-- SF NAVBAR -->
+<nav class="sf-navbar">
+    <button class="sf-nav-tab active" id="navAccountsBtn" onclick="showAccountsNav()">
+        <i class="fa-solid fa-users"></i> Accounts
+    </button>
+    <button class="sf-nav-tab" id="navLeadsBtn" onclick="showLeadsPanel()">
+        <i class="fa-solid fa-user-plus"></i> Leads
+        <span class="sf-nav-count" id="leadsCountBadge" style="display:none;">0</span>
+    </button>
 </nav>
 
-<!-- ════════════════════════════════════════════
-     APP LAYOUT
-════════════════════════════════════════════ -->
+<!-- APP LAYOUT -->
 <div class="app-layout">
 
-    <!-- ── SIDEBAR ── -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-users" style="margin-right:6px;"></i>Client Accounts
+    <!-- SIDEBAR -->
+    <aside class="sf-sidebar">
+        <div class="sf-list-header">
+            <div class="sf-list-title">
+                <i class="fa-solid fa-users" style="color:var(--sf-blue);"></i>
+                Client Accounts
+                <span class="sf-list-count" id="accountsCount">0</span>
+            </div>
+            <div class="sf-search">
+                <i class="fa-solid fa-magnifying-glass sf-search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search accounts..." oninput="filterAccounts()">
+            </div>
         </div>
-        <div style="position:relative;" class="sidebar-search">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Search accounts…" oninput="filterAccounts()">
-        </div>
-        <div id="accountList">
-            <!-- populated by JS -->
-        </div>
-        <div style="padding:14px 18px;margin-top:auto;border-top:1px solid var(--border);color:var(--text-muted);font-size:11px;">
-            <i class="fa-solid fa-shield-halved" style="margin-right:5px;"></i>FX Prime Brokerage System v2.4
+        <div id="accountList"></div>
+        <div class="sf-sidebar-footer">
+            <i class="fa-solid fa-shield-halved" style="margin-right:5px;color:var(--sf-blue);"></i>FX Prime Brokerage System v2.4
         </div>
     </aside>
 
-    <!-- ── MAIN CONTENT ── -->
-    <main class="main-content">
+    <!-- MAIN -->
+    <main class="sf-main">
 
-        <!-- Welcome Screen -->
+        <!-- Welcome -->
         <div class="welcome-screen" id="welcomeScreen">
-            <i class="fa-regular fa-chart-bar"></i>
+            <i class="fa-regular fa-address-card"></i>
             <h4>Select a client account</h4>
-            <p>Choose an account from the sidebar to view the balance sheet, open positions, and manage trades.</p>
+            <p>Choose an account from the list to view the balance sheet, account history, trading portfolios, and preferences.</p>
         </div>
 
-        <!-- Account Dashboard -->
+        <!-- Account Record Page -->
         <div id="accountDashboard" style="display:none;">
 
-            <!-- Account Header -->
-            <div class="account-header-bar">
-                <div class="ah-left">
-                    <div class="ah-avatar" id="ahAvatar">JW</div>
-                    <div>
-                        <div class="ah-name" id="ahName">James Wilson</div>
-                        <div class="ah-meta">
-                            <span id="ahNumber" style="font-weight:600;">FX10001</span>
-                            <span style="color:var(--border)">•</span>
-                            <span id="ahCountry">Australia</span>
-                            <span style="color:var(--border)">•</span>
-                            <span id="ahTypeBadge" class="ac-badge badge-standard">Standard</span>
-                            <span style="color:var(--border)">•</span>
-                            <div class="status-active"><div class="status-dot"></div>Active</div>
-                        </div>
-                    </div>
+            <!-- Record Header -->
+            <div class="sf-record-header">
+                <div class="sf-breadcrumb">
+                    <button class="sf-breadcrumb-btn" onclick="showAccountsNav()">Accounts</button>
+                    <i class="fa-solid fa-chevron-right sf-breadcrumb-sep"></i>
+                    <span id="breadcrumbName">&#8212;</span>
                 </div>
-                <div style="text-align:right;font-size:11px;color:var(--text-muted);">
-                    <div>Leverage: <span id="ahLeverage" style="color:var(--text-secondary);font-weight:600;">1:100</span></div>
-                    <div style="margin-top:3px;">Member since: <span id="ahSince" style="color:var(--text-secondary);">—</span></div>
-                </div>
-            </div>
-
-            <!-- Balance Sheet Cards -->
-            <div class="row g-3" id="balanceCards">
-                <div class="col-6 col-xl-3">
-                    <div class="stat-card">
-                        <div class="stat-label"><i class="fa-solid fa-wallet" style="margin-right:4px;"></i>Balance</div>
-                        <div class="stat-value" id="cardBalance">—</div>
-                        <div class="stat-sub">Settled funds</div>
-                    </div>
-                </div>
-                <div class="col-6 col-xl-3">
-                    <div class="stat-card">
-                        <div class="stat-label"><i class="fa-solid fa-scale-balanced" style="margin-right:4px;"></i>Equity</div>
-                        <div class="stat-value" id="cardEquity">—</div>
-                        <div class="stat-sub">Balance + Open P&amp;L</div>
-                    </div>
-                </div>
-                <div class="col-6 col-xl-3">
-                    <div class="stat-card">
-                        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="margin-right:4px;"></i>Open P&amp;L</div>
-                        <div class="stat-value" id="cardPnl">—</div>
-                        <div class="stat-sub" id="cardMarginLevel">Margin level: —</div>
-                    </div>
-                </div>
-                <div class="col-6 col-xl-3">
-                    <div class="stat-card">
-                        <div class="stat-label"><i class="fa-solid fa-shield" style="margin-right:4px;"></i>Free Margin</div>
-                        <div class="stat-value" id="cardFreeMargin">—</div>
-                        <div class="stat-sub" id="cardUsedMargin">Used: —</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Positions + Trade Panel -->
-            <div class="row g-3 mt-1">
-
-                <!-- Open Positions -->
-                <div class="col-lg-8">
-                    <div class="section-header">
-                        <div class="section-title">
-                            <i class="fa-solid fa-bolt"></i>
-                            Open Positions
-                            <span id="posCount" style="background:var(--blue-dim);color:var(--blue);font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px;">0</span>
-                        </div>
-                    </div>
-                    <div class="fx-table-wrapper">
-                        <table class="fx-table">
-                            <thead>
-                                <tr>
-                                    <th>Position ID</th>
-                                    <th>Pair</th>
-                                    <th>Type</th>
-                                    <th>Lots</th>
-                                    <th>Open Rate</th>
-                                    <th>Current</th>
-                                    <th>P&amp;L (USD)</th>
-                                    <th>Margin</th>
-                                    <th>Opened</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="positionsTable">
-                                <tr class="empty-row"><td colspan="10">No open positions</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Trade Panel -->
-                <div class="col-lg-4">
-                    <div class="section-header">
-                        <div class="section-title">
-                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                            Execute Trade
-                        </div>
-                    </div>
-                    <div class="trade-panel">
-                        <div class="buy-sell-rates">
-                            <div class="rate-side sell-side">
-                                <div class="rate-side-label">SELL</div>
-                                <div class="rate-side-value" id="tradeSellRate">—</div>
-                            </div>
-                            <div class="rate-side buy-side">
-                                <div class="rate-side-label">BUY</div>
-                                <div class="rate-side-value" id="tradeBuyRate">—</div>
+                <div class="sf-rh-main">
+                    <div class="sf-rh-left">
+                        <div class="sf-entity-icon" id="rhAvatar">&#8212;</div>
+                        <div>
+                            <div class="sf-rh-title" id="rhName">&#8212;</div>
+                            <div class="sf-rh-meta">
+                                <span id="rhNumber" style="font-weight:600;">&#8212;</span>
+                                <span class="dot">&#8226;</span>
+                                <span id="rhCountry">&#8212;</span>
+                                <span class="dot">&#8226;</span>
+                                <span id="rhTypeBadge" class="sf-ai-badge badge-standard">Standard</span>
+                                <span class="dot">&#8226;</span>
+                                <div class="sf-status-active"><div class="sf-status-dot"></div>Active</div>
                             </div>
                         </div>
-
-                        <div class="mb-1">
-                            <div class="form-label-sm">Currency Pair</div>
-                            <div class="fx-input" style="cursor:default;color:var(--text-secondary);">AUD / USD</div>
-                        </div>
-
-                        <div class="mt-3 mb-1">
-                            <div class="form-label-sm">Volume (Lots)</div>
-                            <input type="number" class="fx-input" id="tradeLotsInput" value="0.10" min="0.01" max="100" step="0.01">
-                        </div>
-
-                        <div class="lot-buttons">
-                            <button class="lot-btn" onclick="setLots(0.01)">0.01</button>
-                            <button class="lot-btn" onclick="setLots(0.1)">0.10</button>
-                            <button class="lot-btn" onclick="setLots(0.5)">0.50</button>
-                            <button class="lot-btn" onclick="setLots(1)">1.00</button>
-                            <button class="lot-btn" onclick="setLots(5)">5.00</button>
-                        </div>
-
-                        <button class="btn-buy" onclick="executeTrade('buy')">
-                            <i class="fa-solid fa-arrow-trend-up"></i>&nbsp; BUY AUD/USD
-                        </button>
-                        <button class="btn-sell" onclick="executeTrade('sell')">
-                            <i class="fa-solid fa-arrow-trend-down"></i>&nbsp; SELL AUD/USD
-                        </button>
-
-                        <div class="trade-margin-info" id="tradeMarginEstimate">
-                            Est. margin: — &nbsp;|&nbsp; Free margin: —
-                        </div>
                     </div>
+                    <div class="sf-rh-actions">
+                        <button class="sf-btn sf-btn-neutral" onclick="switchTab('portfolios')">
+                            <i class="fa-solid fa-arrow-right-arrow-left"></i> Trade
+                        </button>
+                    </div>
+                </div>
+                <!-- Highlight Fields -->
+                <div class="sf-rh-highlights">
+                    <div class="sf-hl-field">
+                        <div class="sf-hl-label">Balance</div>
+                        <div class="sf-hl-value" id="hlBalance">&#8212;</div>
+                    </div>
+                    <div class="sf-hl-field">
+                        <div class="sf-hl-label">Equity</div>
+                        <div class="sf-hl-value" id="hlEquity">&#8212;</div>
+                    </div>
+                    <div class="sf-hl-field">
+                        <div class="sf-hl-label">Open P&amp;L</div>
+                        <div class="sf-hl-value" id="hlPnl">&#8212;</div>
+                    </div>
+                    <div class="sf-hl-field">
+                        <div class="sf-hl-label">Free Margin</div>
+                        <div class="sf-hl-value" id="hlFreeMargin">&#8212;</div>
+                    </div>
+                    <div class="sf-hl-field">
+                        <div class="sf-hl-label">Leverage</div>
+                        <div class="sf-hl-value" id="hlLeverage">&#8212;</div>
+                    </div>
+                    <div class="sf-hl-field">
+                        <div class="sf-hl-label">Member Since</div>
+                        <div class="sf-hl-value" id="hlSince">&#8212;</div>
+                    </div>
+                </div>
+                <!-- Subtabs -->
+                <div class="sf-subtabs">
+                    <button class="sf-subtab active" id="subtab-balance" onclick="switchTab('balance')">
+                        <i class="fa-solid fa-wallet"></i> Customer Balance
+                    </button>
+                    <button class="sf-subtab" id="subtab-history" onclick="switchTab('history')">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Account History
+                    </button>
+                    <button class="sf-subtab" id="subtab-portfolios" onclick="switchTab('portfolios')">
+                        <i class="fa-solid fa-briefcase"></i> Trading Portfolios
+                        <span class="sf-subtab-count" id="posCountBadge">0</span>
+                    </button>
+                    <button class="sf-subtab" id="subtab-preference" onclick="switchTab('preference')">
+                        <i class="fa-solid fa-sliders"></i> Preference
+                    </button>
                 </div>
             </div>
 
-            <!-- Transaction History -->
-            <div class="row g-3 mt-1 mb-4">
-                <div class="col-12">
-                    <div class="section-header">
-                        <div class="section-title">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            Transaction History
-                            <span style="color:var(--text-muted);font-weight:400;font-size:11px;">(Last 10)</span>
+            <!-- Tab Content -->
+            <div class="sf-tab-content">
+
+                <!-- TAB: Customer Balance -->
+                <div id="tab-balance">
+                    <div class="sf-stats-grid">
+                        <div class="sf-stat-tile">
+                            <div class="sf-stat-label"><i class="fa-solid fa-wallet"></i> Balance</div>
+                            <div class="sf-stat-value" id="cardBalance">&#8212;</div>
+                            <div class="sf-stat-sub">Settled funds</div>
+                        </div>
+                        <div class="sf-stat-tile">
+                            <div class="sf-stat-label"><i class="fa-solid fa-scale-balanced"></i> Equity</div>
+                            <div class="sf-stat-value" id="cardEquity">&#8212;</div>
+                            <div class="sf-stat-sub">Balance + Open P&amp;L</div>
+                        </div>
+                        <div class="sf-stat-tile">
+                            <div class="sf-stat-label"><i class="fa-solid fa-chart-simple"></i> Open P&amp;L</div>
+                            <div class="sf-stat-value" id="cardPnl">&#8212;</div>
+                            <div class="sf-stat-sub" id="cardMarginLevel">Margin level: &#8212;</div>
+                        </div>
+                        <div class="sf-stat-tile">
+                            <div class="sf-stat-label"><i class="fa-solid fa-shield"></i> Free Margin</div>
+                            <div class="sf-stat-value" id="cardFreeMargin">&#8212;</div>
+                            <div class="sf-stat-sub" id="cardUsedMargin">Used: &#8212;</div>
                         </div>
                     </div>
-                    <div class="fx-table-wrapper">
-                        <table class="fx-table">
+                    <div class="sf-card">
+                        <div class="sf-card-header">
+                            <div class="sf-card-title"><i class="fa-solid fa-circle-info"></i> Account Details</div>
+                        </div>
+                        <div class="sf-detail-grid">
+                            <div class="sf-detail-field">
+                                <div class="sf-detail-label">Account Number</div>
+                                <div class="sf-detail-value" id="detailAccNumber">&#8212;</div>
+                            </div>
+                            <div class="sf-detail-field">
+                                <div class="sf-detail-label">Account Type</div>
+                                <div class="sf-detail-value" id="detailAccType">&#8212;</div>
+                            </div>
+                            <div class="sf-detail-field">
+                                <div class="sf-detail-label">Margin Used</div>
+                                <div class="sf-detail-value" id="detailMarginUsed">&#8212;</div>
+                            </div>
+                            <div class="sf-detail-field">
+                                <div class="sf-detail-label">Margin Level</div>
+                                <div class="sf-detail-value" id="detailMarginLevel">&#8212;</div>
+                            </div>
+                            <div class="sf-detail-field">
+                                <div class="sf-detail-label">Open Positions</div>
+                                <div class="sf-detail-value" id="detailOpenPos">&#8212;</div>
+                            </div>
+                            <div class="sf-detail-field">
+                                <div class="sf-detail-label">Status</div>
+                                <div class="sf-detail-value"><span style="color:var(--sf-green);font-weight:600;">&#9679; Active</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Account History -->
+                <div id="tab-history" style="display:none;">
+                    <div class="sf-table-wrapper">
+                        <div class="sf-table-header">
+                            <div class="sf-table-title">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Transaction History
+                            </div>
+                            <span style="font-size:11px;color:var(--sf-text-2);">Last 10 transactions</span>
+                        </div>
+                        <table class="sf-table">
                             <thead>
                                 <tr>
-                                    <th>Time</th>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Pair</th>
-                                    <th>Lots</th>
-                                    <th>Rate</th>
-                                    <th>P&amp;L</th>
-                                    <th>Balance After</th>
+                                    <th>Time</th><th>ID</th><th>Type</th><th>Pair</th>
+                                    <th>Lots</th><th>Rate</th><th>P&amp;L</th><th>Balance After</th>
                                 </tr>
                             </thead>
                             <tbody id="historyTable">
-                                <tr class="empty-row"><td colspan="8">No transactions yet</td></tr>
+                                <tr class="sf-table-empty"><td colspan="8">No transactions yet</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
 
-        </div><!-- /accountDashboard -->
-
-        <!-- Leads Panel -->
-        <div id="leadsDashboard" style="display:none;" class="leads-panel">
-
-            <div class="account-header-bar" style="margin-bottom:20px;">
-                <div class="ah-left">
-                    <div class="ah-avatar" style="background:linear-gradient(135deg,#00c853,#009624);">
-                        <i class="fa-solid fa-user-plus" style="font-size:16px;"></i>
-                    </div>
-                    <div>
-                        <div class="ah-name">Leads Inbox</div>
-                        <div class="ah-meta">Research Analytics — Prospect leads captured from article readership</div>
+                <!-- TAB: Trading Portfolios -->
+                <div id="tab-portfolios" style="display:none;">
+                    <div class="row g-3">
+                        <div class="col-lg-8">
+                            <div class="sf-table-wrapper">
+                                <div class="sf-table-header">
+                                    <div class="sf-table-title">
+                                        <i class="fa-solid fa-bolt"></i> Open Positions
+                                        <span class="sf-subtab-count" id="posCount">0</span>
+                                    </div>
+                                </div>
+                                <table class="sf-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Position ID</th><th>Pair</th><th>Type</th><th>Lots</th>
+                                            <th>Open Rate</th><th>Current</th><th>P&amp;L (USD)</th>
+                                            <th>Margin</th><th>Opened</th><th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="positionsTable">
+                                        <tr class="sf-table-empty"><td colspan="10">No open positions</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="sf-trade-panel">
+                                <div class="sf-trade-title">
+                                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Execute Trade
+                                </div>
+                                <div class="sf-rate-display">
+                                    <div class="sf-rate-side sell-side">
+                                        <div class="sf-rate-label">SELL</div>
+                                        <div class="sf-rate-value" id="tradeSellRate">&#8212;</div>
+                                    </div>
+                                    <div class="sf-rate-side buy-side">
+                                        <div class="sf-rate-label">BUY</div>
+                                        <div class="sf-rate-value" id="tradeBuyRate">&#8212;</div>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="sf-form-label">Currency Pair</div>
+                                    <div class="sf-input" style="cursor:default;color:var(--sf-text-2);display:flex;align-items:center;justify-content:center;height:36px;">AUD / USD</div>
+                                </div>
+                                <div class="mt-3 mb-1">
+                                    <div class="sf-form-label">Volume (Lots)</div>
+                                    <input type="number" class="sf-input" id="tradeLotsInput" value="0.10" min="0.01" max="100" step="0.01">
+                                </div>
+                                <div class="sf-lot-btns">
+                                    <button class="sf-lot-btn" onclick="setLots(0.01)">0.01</button>
+                                    <button class="sf-lot-btn" onclick="setLots(0.1)">0.10</button>
+                                    <button class="sf-lot-btn" onclick="setLots(0.5)">0.50</button>
+                                    <button class="sf-lot-btn" onclick="setLots(1)">1.00</button>
+                                    <button class="sf-lot-btn" onclick="setLots(5)">5.00</button>
+                                </div>
+                                <button class="sf-btn-buy" onclick="executeTrade('buy')">
+                                    <i class="fa-solid fa-arrow-trend-up"></i>&nbsp; BUY AUD/USD
+                                </button>
+                                <button class="sf-btn-sell" onclick="executeTrade('sell')">
+                                    <i class="fa-solid fa-arrow-trend-down"></i>&nbsp; SELL AUD/USD
+                                </button>
+                                <div class="sf-margin-info" id="tradeMarginEstimate">Est. margin: &#8212; &nbsp;|&nbsp; Free margin: &#8212;</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn-close-pos" onclick="refreshLeads()" style="padding:6px 14px;font-size:12px;">
+
+                <!-- TAB: Preference -->
+                <div id="tab-preference" style="display:none;">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="sf-card">
+                                <div class="sf-card-header">
+                                    <div class="sf-card-title"><i class="fa-solid fa-id-card"></i> Account Information</div>
+                                </div>
+                                <div class="sf-detail-grid">
+                                    <div class="sf-detail-field full">
+                                        <div class="sf-detail-label">Customer Name</div>
+                                        <div class="sf-detail-value" id="prefName">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Account Number</div>
+                                        <div class="sf-detail-value" id="prefAccNumber">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Account Type</div>
+                                        <div class="sf-detail-value" id="prefAccType">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Country</div>
+                                        <div class="sf-detail-value" id="prefCountry">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Member Since</div>
+                                        <div class="sf-detail-value" id="prefSince">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Status</div>
+                                        <div class="sf-detail-value"><span style="color:var(--sf-green);font-weight:600;">&#9679; Active</span></div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Base Currency</div>
+                                        <div class="sf-detail-value">USD</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Time Zone</div>
+                                        <div class="sf-detail-value" id="prefTimezone">&#8212;</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="sf-card">
+                                <div class="sf-card-header">
+                                    <div class="sf-card-title"><i class="fa-solid fa-sliders"></i> Trading Preferences</div>
+                                </div>
+                                <div class="sf-detail-grid">
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Leverage</div>
+                                        <div class="sf-detail-value" id="prefLeverage">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Risk Profile</div>
+                                        <div class="sf-detail-value" id="prefRisk">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Default Pair</div>
+                                        <div class="sf-detail-value">AUD/USD</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Default Lot Size</div>
+                                        <div class="sf-detail-value" id="prefLotSize">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Notifications</div>
+                                        <div class="sf-detail-value">Email &amp; SMS</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Auto-Close on Margin Call</div>
+                                        <div class="sf-detail-value">Enabled</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Max Lot Size</div>
+                                        <div class="sf-detail-value" id="prefMaxLot">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Stop-Out Level</div>
+                                        <div class="sf-detail-value">50%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /sf-tab-content -->
+        </div><!-- /accountDashboard -->
+
+        <!-- LEADS PANEL -->
+        <div id="leadsDashboard" style="display:none;" class="sf-leads-panel">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--sf-green),#1a6b35);display:flex;align-items:center;justify-content:center;">
+                        <i class="fa-solid fa-user-plus" style="font-size:20px;color:white;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:20px;font-weight:700;color:var(--sf-text);">Leads Inbox</div>
+                        <div style="font-size:12px;color:var(--sf-text-2);">Research Analytics &#8212; Prospect leads captured from article readership</div>
+                    </div>
+                </div>
+                <button class="sf-btn sf-btn-neutral" onclick="refreshLeads()">
                     <i class="fa-solid fa-rotate"></i> Refresh
                 </button>
             </div>
-
-            <div class="leads-stats-row">
-                <div class="stat-card">
-                    <div class="stat-label"><i class="fa-solid fa-users" style="margin-right:4px;"></i>Total Leads</div>
-                    <div class="stat-value" id="leadsTotal">—</div>
-                    <div class="stat-sub">From research portal</div>
+            <div class="sf-leads-stats-grid">
+                <div class="sf-stat-tile">
+                    <div class="sf-stat-label"><i class="fa-solid fa-users"></i> Total Leads</div>
+                    <div class="sf-stat-value" id="leadsTotal">&#8212;</div>
+                    <div class="sf-stat-sub">From research portal</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label"><i class="fa-solid fa-clock" style="margin-right:4px;"></i>Avg. Engagement</div>
-                    <div class="stat-value" id="leadsAvgTime">—</div>
-                    <div class="stat-sub">Avg. time on article</div>
+                <div class="sf-stat-tile">
+                    <div class="sf-stat-label"><i class="fa-solid fa-clock"></i> Avg. Engagement</div>
+                    <div class="sf-stat-value" id="leadsAvgTime">&#8212;</div>
+                    <div class="sf-stat-sub">Avg. time on article</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label"><i class="fa-solid fa-building" style="margin-right:4px;"></i>Organisations</div>
-                    <div class="stat-value" id="leadsOrgs">—</div>
-                    <div class="stat-sub">Unique companies</div>
-                </div>
-            </div>
-
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fa-solid fa-inbox"></i>
-                    Prospect Leads
+                <div class="sf-stat-tile">
+                    <div class="sf-stat-label"><i class="fa-solid fa-building"></i> Organisations</div>
+                    <div class="sf-stat-value" id="leadsOrgs">&#8212;</div>
+                    <div class="sf-stat-sub">Unique companies</div>
                 </div>
             </div>
-
-            <div class="fx-table-wrapper mb-4">
-                <table class="fx-table">
+            <div class="sf-table-wrapper">
+                <div class="sf-table-header">
+                    <div class="sf-table-title"><i class="fa-solid fa-inbox"></i> Prospect Leads</div>
+                </div>
+                <table class="sf-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Company / Fund</th>
-                            <th>Article Read</th>
-                            <th>Engagement</th>
-                            <th>Received</th>
+                            <th>Name</th><th>Email</th><th>Company / Fund</th>
+                            <th>Article Read</th><th>Engagement</th><th>Received</th>
                         </tr>
                     </thead>
                     <tbody id="leadsTable">
-                        <tr class="empty-row"><td colspan="6">Loading leads…</td></tr>
+                        <tr class="sf-table-empty"><td colspan="6">Loading leads...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1013,30 +847,42 @@
     let currentRate = 0;
     let prevRate = 0;
     let currentBalanceSheet = null;
+    let currentTab = 'balance';
 
-    // ── TICKER ──────────────────────────────────────────
     async function updateTicker() {
         try {
             const res = await fetch('/api/fx/rate');
             const data = await res.json();
             prevRate = currentRate;
             currentRate = parseFloat(data.rate);
-
             document.getElementById('navRate').textContent = currentRate.toFixed(4);
             const change = currentRate - prevRate;
             const changeEl = document.getElementById('navChange');
-            if (change > 0) { changeEl.textContent = '▲ +' + change.toFixed(4); changeEl.className = 'ticker-change tick-up'; }
-            else if (change < 0) { changeEl.textContent = '▼ ' + change.toFixed(4); changeEl.className = 'ticker-change tick-down'; }
-            else { changeEl.textContent = ''; }
-
-            // Update trade panel rates
+            if (change > 0) {
+                changeEl.textContent = '\u25b2 +' + change.toFixed(4);
+                changeEl.className = 'sf-ticker-up';
+            } else if (change < 0) {
+                changeEl.textContent = '\u25bc ' + change.toFixed(4);
+                changeEl.className = 'sf-ticker-down';
+            } else {
+                changeEl.textContent = '';
+                changeEl.className = '';
+            }
             document.getElementById('tradeSellRate').textContent = currentRate.toFixed(4);
-            document.getElementById('tradeBuyRate').textContent = (currentRate + 0.0002).toFixed(4);
+            document.getElementById('tradeBuyRate').textContent  = (currentRate + 0.0002).toFixed(4);
             updateMarginEstimate();
-        } catch (e) { /* ignore */ }
+        } catch (e) {}
     }
 
-    // ── ACCOUNTS LIST ────────────────────────────────────
+    function switchTab(tab) {
+        ['balance','history','portfolios','preference'].forEach(t => {
+            document.getElementById('tab-' + t).style.display = (t === tab) ? '' : 'none';
+            const btn = document.getElementById('subtab-' + t);
+            if (btn) btn.classList.toggle('active', t === tab);
+        });
+        currentTab = tab;
+    }
+
     async function loadAccounts() {
         try {
             const res = await fetch('/api/accounts');
@@ -1044,40 +890,42 @@
             renderAccountList(allAccounts);
         } catch (e) {
             document.getElementById('accountList').innerHTML =
-                '<div style="padding:20px;color:var(--red);font-size:12px;"><i class="fa-solid fa-triangle-exclamation"></i> Failed to load accounts</div>';
+                '<div style="padding:20px;color:var(--sf-red);font-size:12px;"><i class="fa-solid fa-triangle-exclamation"></i> Failed to load accounts</div>';
         }
     }
 
+    const avatarColors = ['#0176d3','#5c2e91','#a07800','#2e844a','#ba0517','#00396b'];
+    function avatarColor(id) { return avatarColors[id % avatarColors.length]; }
+
     function renderAccountList(accounts) {
         const container = document.getElementById('accountList');
+        document.getElementById('accountsCount').textContent = accounts.length;
         if (!accounts.length) {
-            container.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:12px;">No accounts found</div>';
+            container.innerHTML = '<div style="padding:20px;color:var(--sf-text-3);font-size:12px;">No accounts found</div>';
             return;
         }
         container.innerHTML = accounts.map(a => {
             const initials = a.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
             const pnlClass = a.openPnL > 0 ? 'pnl-pos' : a.openPnL < 0 ? 'pnl-neg' : 'pnl-zero';
-            const pnlSign = a.openPnL >= 0 ? '+' : '';
+            const pnlSign  = a.openPnL >= 0 ? '+' : '';
             const typeBadgeClass = a.accountType === 'VIP' ? 'badge-vip' : a.accountType === 'Professional' ? 'badge-professional' : 'badge-standard';
             const isActive = a.id === selectedAccountId;
             return `
-            <div class="account-card ${isActive ? 'active' : ''}" onclick="selectAccount(${a.id})" id="ac-${a.id}">
-                <div class="ac-header">
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--blue),#7b6cf6);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${initials}</div>
-                        <span class="ac-name">${a.customerName}</span>
-                    </div>
-                    <span class="ac-badge ${typeBadgeClass}">${a.accountType}</span>
+            <div class="sf-account-item${isActive ? ' active' : ''}" onclick="selectAccount(${a.id})" id="ac-${a.id}">
+                <div class="sf-ai-row">
+                    <div class="sf-ai-avatar" style="background:${avatarColor(a.id)}">${initials}</div>
+                    <span class="sf-ai-name">${a.customerName}</span>
+                    <span class="sf-ai-badge ${typeBadgeClass}">${a.accountType}</span>
                 </div>
-                <div class="ac-number">${a.accountNumber} &nbsp;·&nbsp; ${a.country}</div>
-                <div class="ac-financials">
-                    <span class="ac-balance">${fmtUSD(a.balance)}</span>
-                    <span class="ac-pnl ${pnlClass}">${pnlSign}${fmtUSD(a.openPnL)}</span>
+                <div class="sf-ai-meta">${a.accountNumber} &nbsp;&middot;&nbsp; ${a.country}</div>
+                <div class="sf-ai-fins">
+                    <span class="sf-ai-bal">${fmtUSD(a.balance)}</span>
+                    <span class="sf-ai-pnl ${pnlClass}">${pnlSign}${fmtUSD(a.openPnL)}</span>
                 </div>
-                <div class="ac-positions">
-                    <i class="fa-solid fa-circle-dot" style="font-size:8px;margin-right:3px;"></i>
+                <div style="font-size:10px;color:var(--sf-text-3);margin-top:3px;">
+                    <i class="fa-solid fa-circle-dot" style="font-size:8px;margin-right:3px;color:var(--sf-blue);"></i>
                     ${a.openPositionsCount} open position${a.openPositionsCount !== 1 ? 's' : ''}
-                    &nbsp;·&nbsp; Equity: ${fmtUSD(a.equity)}
+                    &nbsp;&middot;&nbsp; Equity: ${fmtUSD(a.equity)}
                 </div>
             </div>`;
         }).join('');
@@ -1093,15 +941,15 @@
         renderAccountList(filtered);
     }
 
-    // ── SELECT ACCOUNT ───────────────────────────────────
     async function selectAccount(id) {
         selectedAccountId = id;
-        renderAccountList(allAccounts); // refresh active state
-        // Hide leads panel if open
-        document.getElementById('leadsDashboard').style.display = 'none';
+        renderAccountList(allAccounts);
+        document.getElementById('leadsDashboard').style.display  = 'none';
         document.getElementById('navLeadsBtn').classList.remove('active');
-        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('navAccountsBtn').classList.add('active');
+        document.getElementById('welcomeScreen').style.display   = 'none';
         document.getElementById('accountDashboard').style.display = 'block';
+        switchTab('balance');
         await loadBalanceSheet();
     }
 
@@ -1113,53 +961,68 @@
             const data = await res.json();
             currentBalanceSheet = data;
             renderDashboard(data);
-        } catch (e) { /* ignore */ }
+        } catch (e) {}
     }
 
     function renderDashboard(data) {
-        // Header
         const initials = data.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        document.getElementById('ahAvatar').textContent = initials;
-        document.getElementById('ahName').textContent = data.customerName;
-        document.getElementById('ahNumber').textContent = data.accountNumber;
+        const account  = allAccounts.find(a => a.id === data.accountId);
 
-        const account = allAccounts.find(a => a.id === data.accountId);
+        document.getElementById('rhAvatar').textContent       = initials;
+        document.getElementById('rhName').textContent         = data.customerName;
+        document.getElementById('rhNumber').textContent       = data.accountNumber;
+        document.getElementById('breadcrumbName').textContent = data.customerName;
+
         if (account) {
-            document.getElementById('ahCountry').textContent = account.country;
-            document.getElementById('ahLeverage').textContent = '1:' + account.leverage;
-            document.getElementById('ahSince').textContent = new Date(account.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' });
+            document.getElementById('rhCountry').textContent  = account.country;
+            document.getElementById('hlLeverage').textContent = '1:' + account.leverage;
+            document.getElementById('hlSince').textContent    = new Date(account.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' });
         }
 
         const typeBadgeMap = { 'VIP': 'badge-vip', 'Professional': 'badge-professional', 'Standard': 'badge-standard' };
-        const badgeEl = document.getElementById('ahTypeBadge');
+        const badgeEl = document.getElementById('rhTypeBadge');
         badgeEl.textContent = data.accountType;
-        badgeEl.className = 'ac-badge ' + (typeBadgeMap[data.accountType] || 'badge-standard');
+        badgeEl.className   = 'sf-ai-badge ' + (typeBadgeMap[data.accountType] || 'badge-standard');
 
-        // Balance cards
-        document.getElementById('cardBalance').textContent = fmtUSD(data.balance);
-        document.getElementById('cardEquity').textContent = fmtUSD(data.equity);
+        // Highlight fields
+        document.getElementById('hlBalance').textContent    = fmtUSD(data.balance);
+        document.getElementById('hlEquity').textContent     = fmtUSD(data.equity);
+        const hlPnl = document.getElementById('hlPnl');
+        hlPnl.textContent = (data.openPnL >= 0 ? '+' : '') + fmtUSD(data.openPnL);
+        hlPnl.className   = 'sf-hl-value ' + (data.openPnL > 0 ? 'positive' : data.openPnL < 0 ? 'negative' : '');
+        document.getElementById('hlFreeMargin').textContent = fmtUSD(data.freeMargin);
 
+        // Balance tab
+        document.getElementById('cardBalance').textContent    = fmtUSD(data.balance);
+        document.getElementById('cardEquity').textContent     = fmtUSD(data.equity);
         const pnlEl = document.getElementById('cardPnl');
         pnlEl.textContent = (data.openPnL >= 0 ? '+' : '') + fmtUSD(data.openPnL);
-        pnlEl.className = 'stat-value ' + (data.openPnL > 0 ? 'pnl-pos' : data.openPnL < 0 ? 'pnl-neg' : '');
+        pnlEl.className   = 'sf-stat-value ' + (data.openPnL > 0 ? 'pnl-pos' : data.openPnL < 0 ? 'pnl-neg' : '');
         document.getElementById('cardMarginLevel').textContent = data.margin > 0 ? `Margin level: ${data.marginLevel.toFixed(0)}%` : 'No open positions';
-
         document.getElementById('cardFreeMargin').textContent = fmtUSD(data.freeMargin);
         document.getElementById('cardUsedMargin').textContent = `Used: ${fmtUSD(data.margin)}`;
 
-        // Positions
-        document.getElementById('posCount').textContent = data.openPositions.length;
+        document.getElementById('detailAccNumber').textContent  = data.accountNumber;
+        document.getElementById('detailAccType').textContent    = data.accountType;
+        document.getElementById('detailMarginUsed').textContent = fmtUSD(data.margin);
+        document.getElementById('detailMarginLevel').textContent= data.margin > 0 ? data.marginLevel.toFixed(1) + '%' : '\u2014';
+        document.getElementById('detailOpenPos').textContent    = data.openPositions.length;
+
+        // Portfolios tab
+        const posCount = data.openPositions.length;
+        document.getElementById('posCount').textContent      = posCount;
+        document.getElementById('posCountBadge').textContent = posCount;
         const posBody = document.getElementById('positionsTable');
-        if (!data.openPositions.length) {
-            posBody.innerHTML = '<tr class="empty-row"><td colspan="10">No open positions</td></tr>';
+        if (!posCount) {
+            posBody.innerHTML = '<tr class="sf-table-empty"><td colspan="10">No open positions</td></tr>';
         } else {
             posBody.innerHTML = data.openPositions.map(p => {
-                const pnlClass = p.pnL > 0 ? 'pnl-pos' : p.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
+                const pnlClass  = p.pnL > 0 ? 'pnl-pos' : p.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
                 const typeClass = p.type === 'Buy' ? 'type-buy' : 'type-sell';
-                const pnlSign = p.pnL >= 0 ? '+' : '';
+                const pnlSign   = p.pnL >= 0 ? '+' : '';
                 return `
                 <tr>
-                    <td style="font-size:11px;color:var(--text-muted);">${p.positionId}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${p.positionId}</td>
                     <td style="font-weight:600;">${p.currencyPair}</td>
                     <td class="${typeClass}"><i class="fa-solid ${p.type === 'Buy' ? 'fa-arrow-up' : 'fa-arrow-down'}" style="font-size:10px;margin-right:3px;"></i>${p.type.toUpperCase()}</td>
                     <td>${p.lots.toFixed(2)}</td>
@@ -1167,48 +1030,61 @@
                     <td>${p.currentRate.toFixed(4)}</td>
                     <td class="${pnlClass}">${pnlSign}$${Math.abs(p.pnL).toFixed(2)}</td>
                     <td>$${p.margin.toFixed(2)}</td>
-                    <td style="font-size:11px;color:var(--text-muted);">${timeAgo(p.openTime)}</td>
-                    <td><button class="btn-close-pos" onclick="closePosition('${p.positionId}')"><i class="fa-solid fa-xmark" style="margin-right:3px;"></i>Close</button></td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${timeAgo(p.openTime)}</td>
+                    <td><button class="sf-btn-close-pos" onclick="closePosition('${p.positionId}')"><i class="fa-solid fa-xmark" style="margin-right:3px;"></i>Close</button></td>
                 </tr>`;
             }).join('');
         }
 
-        // History
+        // History tab
         const histBody = document.getElementById('historyTable');
         if (!data.recentTransactions.length) {
-            histBody.innerHTML = '<tr class="empty-row"><td colspan="8">No transactions yet</td></tr>';
+            histBody.innerHTML = '<tr class="sf-table-empty"><td colspan="8">No transactions yet</td></tr>';
         } else {
             histBody.innerHTML = data.recentTransactions.map(t => {
-                const typeClass = t.type === 'Buy' ? 'type-buy' : t.type === 'Sell' ? 'type-sell' : t.type === 'Deposit' ? 'type-deposit' : t.type.startsWith('Close') ? (t.type === 'Close Buy' ? 'type-close-buy' : 'type-close-sell') : '';
-                const pnlClass = t.pnL > 0 ? 'pnl-pos' : t.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
-                const pnlStr = t.pnL !== 0 ? (t.pnL > 0 ? '+$' : '-$') + Math.abs(t.pnL).toFixed(2) : t.type === 'Deposit' ? '+$' + Math.abs(t.balanceAfter).toFixed(2) : '—';
+                const typeClass = t.type === 'Buy' ? 'type-buy' : t.type === 'Sell' ? 'type-sell' : t.type === 'Deposit' ? 'type-deposit' : 'type-close';
+                const pnlStr = t.pnL !== 0 ? (t.pnL > 0 ? '+$' : '-$') + Math.abs(t.pnL).toFixed(2) : t.type === 'Deposit' ? '+$' + Math.abs(t.balanceAfter).toFixed(2) : '\u2014';
                 const pnlCls = t.pnL > 0 || t.type === 'Deposit' ? 'pnl-pos' : t.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
                 return `
                 <tr>
-                    <td style="font-size:11px;color:var(--text-muted);">${new Date(t.timestamp).toLocaleString()}</td>
-                    <td style="font-size:11px;color:var(--text-muted);">${t.transactionId}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${new Date(t.timestamp).toLocaleString()}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${t.transactionId}</td>
                     <td class="${typeClass}" style="font-weight:600;">${t.type}</td>
                     <td>${t.currencyPair}</td>
-                    <td>${t.lots > 0 ? t.lots.toFixed(2) : '—'}</td>
-                    <td>${t.rate > 0 ? t.rate.toFixed(4) : '—'}</td>
+                    <td>${t.lots > 0 ? t.lots.toFixed(2) : '\u2014'}</td>
+                    <td>${t.rate > 0 ? t.rate.toFixed(4) : '\u2014'}</td>
                     <td class="${pnlCls}">${pnlStr}</td>
                     <td style="font-weight:600;">${fmtUSD(t.balanceAfter)}</td>
                 </tr>`;
             }).join('');
         }
 
+        // Preference tab
+        document.getElementById('prefName').textContent      = data.customerName;
+        document.getElementById('prefAccNumber').textContent = data.accountNumber;
+        document.getElementById('prefAccType').textContent   = data.accountType;
+        if (account) {
+            document.getElementById('prefCountry').textContent  = account.country;
+            document.getElementById('prefSince').textContent    = new Date(account.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('prefLeverage').textContent = '1:' + account.leverage;
+            const riskMap = { 'Standard': 'Moderate', 'Professional': 'Aggressive', 'VIP': 'Custom / High' };
+            document.getElementById('prefRisk').textContent = riskMap[account.accountType] || 'Moderate';
+            const lotMap = { 100: '0.10', 200: '0.20', 500: '0.50' };
+            document.getElementById('prefLotSize').textContent = lotMap[account.leverage] || '0.10';
+            document.getElementById('prefMaxLot').textContent  = account.leverage >= 200 ? '50.00' : '10.00';
+            const tzMap = { 'Australia': 'AEDT (UTC+11)', 'Singapore': 'SGT (UTC+8)', 'Hong Kong': 'HKT (UTC+8)', 'United States': 'EST (UTC-5)', 'United Kingdom': 'GMT (UTC+0)' };
+            document.getElementById('prefTimezone').textContent = tzMap[account.country] || 'UTC';
+        }
+
         updateMarginEstimate();
     }
 
-    // ── EXECUTE TRADE ─────────────────────────────────────
     async function executeTrade(type) {
         if (!selectedAccountId) return showToast('Please select an account first.', false);
         const lots = parseFloat(document.getElementById('tradeLotsInput').value);
         if (isNaN(lots) || lots <= 0) return showToast('Enter a valid lot size.', false);
-
-        const btns = document.querySelectorAll('.btn-buy, .btn-sell');
+        const btns = document.querySelectorAll('.sf-btn-buy, .sf-btn-sell');
         btns.forEach(b => b.disabled = true);
-
         try {
             const res = await fetch(`/api/accounts/${selectedAccountId}/${type}`, {
                 method: 'POST',
@@ -1216,13 +1092,12 @@
                 body: JSON.stringify({ currencyPair: 'AUD/USD', lots: lots })
             });
             const result = await res.json();
-
             if (result.success) {
-                showToast(`✓ ${result.message}`, true);
+                showToast('\u2713 ' + result.message, true);
                 await loadBalanceSheet();
                 await loadAccounts();
             } else {
-                showToast(`✗ ${result.message}`, false);
+                showToast('\u2717 ' + result.message, false);
             }
         } catch (e) {
             showToast('Request failed. Please try again.', false);
@@ -1231,25 +1106,23 @@
         }
     }
 
-    // ── CLOSE POSITION ────────────────────────────────────
     async function closePosition(positionId) {
         if (!selectedAccountId) return;
         try {
             const res = await fetch(`/api/accounts/${selectedAccountId}/close/${positionId}`, { method: 'POST' });
             const result = await res.json();
             if (result.success) {
-                showToast(`✓ ${result.message}`, true);
+                showToast('\u2713 ' + result.message, true);
                 await loadBalanceSheet();
                 await loadAccounts();
             } else {
-                showToast(`✗ ${result.message}`, false);
+                showToast('\u2717 ' + result.message, false);
             }
         } catch (e) {
             showToast('Failed to close position.', false);
         }
     }
 
-    // ── HELPERS ───────────────────────────────────────────
     function setLots(v) {
         document.getElementById('tradeLotsInput').value = v.toFixed(2);
         updateMarginEstimate();
@@ -1257,7 +1130,7 @@
 
     function updateMarginEstimate() {
         if (!currentBalanceSheet || !currentRate) return;
-        const lots = parseFloat(document.getElementById('tradeLotsInput').value) || 0;
+        const lots    = parseFloat(document.getElementById('tradeLotsInput').value) || 0;
         const account = allAccounts.find(a => a.id === selectedAccountId);
         if (!account) return;
         const margin = (lots * 100000 * currentRate) / account.leverage;
@@ -1266,16 +1139,16 @@
     }
 
     function fmtUSD(v) {
-        if (v == null) return '—';
-        const abs = Math.abs(v);
+        if (v == null) return '\u2014';
+        const abs    = Math.abs(v);
         const prefix = v < 0 ? '-$' : '$';
         return prefix + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function timeAgo(dt) {
         const diff = Math.floor((Date.now() - new Date(dt)) / 1000);
-        if (diff < 60) return diff + 's ago';
-        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+        if (diff < 60)    return diff + 's ago';
+        if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
         if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
         return Math.floor(diff / 86400) + 'd ago';
     }
@@ -1291,7 +1164,6 @@
         toastTimer = setTimeout(() => div.remove(), 4000);
     }
 
-    // ── INIT & INTERVALS ──────────────────────────────────
     async function init() {
         await updateTicker();
         await loadAccounts();
@@ -1303,8 +1175,6 @@
         await loadAccounts();
     }, 2000);
 
-
-    // ── LEADS PANEL ──────────────────────────────────────
     let leadsData = [];
 
     async function loadLeads() {
@@ -1312,87 +1182,81 @@
             const res = await fetch('/api/accounts/leads');
             leadsData = await res.json();
             renderLeads(leadsData);
-            // Update badge
             const badge = document.getElementById('leadsCountBadge');
-            if (leadsData.length > 0) {
-                badge.textContent = leadsData.length;
-                badge.style.display = 'inline';
-            } else {
-                badge.style.display = 'none';
-            }
+            if (leadsData.length > 0) { badge.textContent = leadsData.length; badge.style.display = 'inline'; }
+            else { badge.style.display = 'none'; }
         } catch (e) {
             document.getElementById('leadsTable').innerHTML =
-                '<tr class="empty-row"><td colspan="6">Failed to load leads</td></tr>';
+                '<tr class="sf-table-empty"><td colspan="6">Failed to load leads</td></tr>';
         }
     }
 
     function renderLeads(leads) {
         document.getElementById('leadsTotal').textContent = leads.length;
-        const avgTime = leads.length
-            ? Math.round(leads.reduce((s, l) => s + l.timeSpentSeconds, 0) / leads.length)
-            : 0;
-        const avgMin = Math.floor(avgTime / 60);
-        const avgSec = avgTime % 60;
-        document.getElementById('leadsAvgTime').textContent =
-            avgMin > 0 ? `${avgMin}m ${avgSec}s` : `${avgSec}s`;
+        const avgTime = leads.length ? Math.round(leads.reduce((s, l) => s + l.timeSpentSeconds, 0) / leads.length) : 0;
+        const avgMin = Math.floor(avgTime / 60), avgSec = avgTime % 60;
+        document.getElementById('leadsAvgTime').textContent = avgMin > 0 ? `${avgMin}m ${avgSec}s` : `${avgSec}s`;
         const orgs = new Set(leads.filter(l => l.userCompany).map(l => l.userCompany)).size;
         document.getElementById('leadsOrgs').textContent = orgs;
 
         const tbody = document.getElementById('leadsTable');
         if (!leads.length) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No leads yet. Leads appear when visitors subscribe on the Research Analytics portal.</td></tr>';
+            tbody.innerHTML = '<tr class="sf-table-empty"><td colspan="6">No leads yet. Leads appear when visitors subscribe on the Research Analytics portal.</td></tr>';
             return;
         }
         tbody.innerHTML = leads.map(l => {
-            const name = l.userName || '<span style="color:var(--text-muted)">Anonymous</span>';
-            const company = l.userCompany || '<span style="color:var(--text-muted)">—</span>';
+            const name    = l.userName || '<span style="color:var(--sf-text-3)">Anonymous</span>';
+            const company = l.userCompany || '<span style="color:var(--sf-text-3)">\u2014</span>';
             const article = l.articleTitle
-                ? `<span title="${l.articleTitle}">${l.articleTitle.substring(0, 32)}${l.articleTitle.length > 32 ? '…' : ''}</span>`
-                : '<span style="color:var(--text-muted)">—</span>';
-            const mins = Math.floor(l.timeSpentSeconds / 60);
-            const secs = l.timeSpentSeconds % 60;
+                ? `<span title="${l.articleTitle}">${l.articleTitle.substring(0, 32)}${l.articleTitle.length > 32 ? '\u2026' : ''}</span>`
+                : '<span style="color:var(--sf-text-3)">\u2014</span>';
+            const mins    = Math.floor(l.timeSpentSeconds / 60), secs = l.timeSpentSeconds % 60;
             const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
             const receivedRaw = l.receivedAt || l.ReceivedAt;
-            const received = receivedRaw ? new Date(receivedRaw).toLocaleString() : '—';
+            const received = receivedRaw ? new Date(receivedRaw).toLocaleString() : '\u2014';
             return `<tr>
                 <td style="font-weight:600;">${name}</td>
-                <td class="lead-row-email"><a href="mailto:${l.userEmail}" style="color:var(--blue);">${l.userEmail}</a></td>
+                <td><a href="mailto:${l.userEmail}" style="color:var(--sf-blue);">${l.userEmail}</a></td>
                 <td>${company}</td>
                 <td style="font-size:12px;">${article}</td>
-                <td class="lead-time-spent"><i class="fa-regular fa-clock" style="margin-right:4px;"></i>${timeStr}</td>
-                <td style="font-size:11px;color:var(--text-muted);">${received}</td>
+                <td style="font-size:11px;color:var(--sf-text-2);"><i class="fa-regular fa-clock" style="margin-right:4px;"></i>${timeStr}</td>
+                <td style="font-size:11px;color:var(--sf-text-2);">${received}</td>
             </tr>`;
         }).join('');
     }
 
     function showLeadsPanel() {
-        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('welcomeScreen').style.display    = 'none';
         document.getElementById('accountDashboard').style.display = 'none';
-        document.getElementById('leadsDashboard').style.display = 'block';
+        document.getElementById('leadsDashboard').style.display   = 'block';
         document.getElementById('navLeadsBtn').classList.add('active');
-        // deselect account
+        document.getElementById('navAccountsBtn').classList.remove('active');
         selectedAccountId = null;
         renderAccountList(allAccounts);
         loadLeads();
     }
 
-    function showAccountPanel() {
+    function showAccountsNav() {
         document.getElementById('leadsDashboard').style.display = 'none';
         document.getElementById('navLeadsBtn').classList.remove('active');
+        document.getElementById('navAccountsBtn').classList.add('active');
+        if (!selectedAccountId) {
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('accountDashboard').style.display = 'none';
+        }
     }
 
     async function refreshLeads() {
         document.getElementById('leadsTable').innerHTML =
-            '<tr class="empty-row"><td colspan="6">Refreshing…</td></tr>';
+            '<tr class="sf-table-empty"><td colspan="6">Refreshing...</td></tr>';
         await loadLeads();
     }
 
     document.getElementById('tradeLotsInput').addEventListener('input', updateMarginEstimate);
 
-    // Load leads count on init
     loadLeads();
     init();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
