@@ -6,6 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<NewsService>();
 builder.Services.AddHttpClient<NewsPublishService>();
+builder.Services.AddHttpClient("aggregator", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(5);
+    client.DefaultRequestHeaders.Add("User-Agent", "FxNewsAggregator/1.0");
+});
+builder.Services.AddSingleton<NewsAggregatorService>();
 
 var app = builder.Build();
 

@@ -2,6 +2,12 @@
 @model IndexModel
 @{
     ViewData["Title"] = "FX Market News";
+    var activeSource = Model.ActiveSource;
+    var sectionTitle = activeSource switch {
+        "morningstar" => "Morningstar Research",
+        "bloomberg"   => "Bloomberg Terminal",
+        _             => "Market Intelligence"
+    };
     var lead = Model.News.FirstOrDefault();
     var rest = Model.News.Skip(1).ToList();
 }
@@ -29,7 +35,7 @@
 
     <!-- Section title + filters -->
     <div class="d-flex align-items-center justify-content-between mb-4">
-        <h2 class="fxn-section-title mb-0">Market Intelligence</h2>
+        <h2 class="fxn-section-title mb-0">@sectionTitle</h2>
         <div class="d-flex gap-2">
             <span class="fxn-ts" id="fxn-clock"></span>
             <a href="/Admin" class="btn btn-sm fxn-btn-newsroom">Newsroom →</a>
@@ -53,6 +59,7 @@
                 <div class="row g-0">
                     <div class="col-lg-8 p-4 p-lg-5">
                         <div class="d-flex gap-2 mb-3">
+                            <span class="fxn-source-badge fxn-source-@(lead.Source.ToLower().Replace(" ", "-"))">@lead.Source</span>
                             <span class="fxn-category-badge">@lead.Category</span>
                             <span class="badge @(lead.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
                                 @(lead.Type == "Good" ? "▲ BULLISH" : "▼ BEARISH")
@@ -97,6 +104,7 @@
                         <div class="fxn-article-card h-100">
                             <div class="fxn-article-card-top">
                                 <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="fxn-source-badge fxn-source-@(a.Source.ToLower().Replace(" ", "-"))">@a.Source</span>
                                     <span class="fxn-category-badge">@a.Category</span>
                                     <span class="badge @(a.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
                                         @(a.Type == "Good" ? "▲" : "▼")
