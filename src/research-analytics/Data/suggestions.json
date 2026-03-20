@@ -1,0 +1,38 @@
+[
+  {
+    "Id": 1,
+    "CustomerName": "James Wilson",
+    "Phone": "+61 2 9000 1234",
+    "Email": "j.wilson@goldenstatesuper.com.au",
+    "Company": "Golden State Superannuation",
+    "CurrencyPair": "AUD/USD",
+    "Direction": "Buy",
+    "Analysis": "James manages a $450M commodity-linked equities fund. With the RBA signaling a rate pause and iron ore prices up 8% MoM, he is actively seeking AUD upside exposure. His fund's mandate allows 10% FX overlay, and he expressed interest in structured AUD/USD call options during last week's investor day.",
+    "Confidence": "High",
+    "SuggestedBy": "AI Market Intelligence"
+  },
+  {
+    "Id": 2,
+    "CustomerName": "Sarah Chen",
+    "Phone": "+61 3 8500 7788",
+    "Email": "sarah.chen@meridiantrading.com.au",
+    "Company": "Meridian Trading Group",
+    "CurrencyPair": "AUD/USD",
+    "Direction": "Sell",
+    "Analysis": "Sarah runs a macro desk at Meridian that has been short AUD since the China PMI miss last quarter. She is looking to add to existing AUD/USD short positions ahead of the next RBA decision. Our analysis indicates she read three AUD/USD bearish research notes this week (avg engagement 6 min). She recently inquired about shorting mechanisms via FX forwards.",
+    "Confidence": "High",
+    "SuggestedBy": "AI Market Intelligence"
+  },
+  {
+    "Id": 3,
+    "CustomerName": "Michael Torres",
+    "Phone": "+61 7 3200 5566",
+    "Email": "m.torres@pacificrimwealth.com",
+    "Company": "Pacific Rim Wealth Management",
+    "CurrencyPair": "AUD/USD",
+    "Direction": "Buy",
+    "Analysis": "Michael manages HNW client portfolios with significant USD-denominated holdings. With the Fed indicating a dovish pivot and AUD/USD testing key support at 0.6450, he sees an attractive entry point for currency diversification. He attended our AUD/USD webinar last month and requested a follow-up call on execution strategies for spot and forward hedges.",
+    "Confidence": "Medium",
+    "SuggestedBy": "AI Market Intelligence"
+  }
+]
