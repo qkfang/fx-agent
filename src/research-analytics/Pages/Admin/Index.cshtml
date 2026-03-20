@@ -46,6 +46,7 @@
     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-articles">📄 Research Notes</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-visitors">👁 Visitor Analytics</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-leads">🎯 Leads</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-suggestions">🤖 Suggest Customer</button></li>
 </ul>
 
 <div class="tab-content">
@@ -245,6 +246,95 @@
                     }
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- ── Tab 4: Suggest Customer ── -->
+    <div class="tab-pane fade" id="tab-suggestions">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h5 class="mb-0">AI-Suggested Customer Prospects</h5>
+                <p class="text-muted small mb-0 mt-1">Prospects submitted via the <code>POST /api/suggestions</code> API by AI or 3rd-party apps.</p>
+            </div>
+            <span class="badge bg-primary fs-6">@Model.Suggestions.Count</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Company</th>
+                        <th>Pair</th>
+                        <th>Direction</th>
+                        <th>Confidence</th>
+                        <th>Analysis</th>
+                        <th>Suggested By</th>
+                        <th>Received</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.Suggestions)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@s.CustomerName</div>
+                                <div class="text-muted small">@s.Email</div>
+                            </td>
+                            <td>@s.Company</td>
+                            <td><span class="cat-badge cat-aud-usd">@s.CurrencyPair</span></td>
+                            <td>
+                                @if (s.Direction == "Buy")
+                                {
+                                    <span class="sentiment-badge sentiment-bullish">▲ Buy</span>
+                                }
+                                else
+                                {
+                                    <span class="sentiment-badge sentiment-bearish">▼ Sell</span>
+                                }
+                            </td>
+                            <td>
+                                @if (s.Confidence == "High")
+                                {
+                                    <span class="badge bg-success">High</span>
+                                }
+                                else if (s.Confidence == "Medium")
+                                {
+                                    <span class="badge bg-warning text-dark">Medium</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Low</span>
+                                }
+                            </td>
+                            <td class="suggestion-analysis" title="@s.Analysis">
+                                @s.Analysis[..Math.Min(90, s.Analysis.Length)]…
+                            </td>
+                            <td class="text-muted small">@s.SuggestedBy</td>
+                            <td class="text-muted small">@s.ReceivedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="d-flex gap-1 flex-wrap">
+                                <a href="tel:@s.Phone" class="btn btn-xs btn-outline-success" title="Call @s.CustomerName at @s.Phone">
+                                    📞 Call
+                                </a>
+                                <form method="post" asp-page-handler="SendSuggestionToBroker" asp-route-id="@s.Id" style="display:inline">
+                                    <button class="btn btn-xs btn-outline-primary" type="submit"
+                                            title="Push this prospect to Broker Backoffice">
+                                        ⚡ Action
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Suggestions.Any())
+                    {
+                        <tr><td colspan="9" class="text-center text-muted">No suggestions yet. POST to <code>/api/suggestions</code> to submit a customer prospect.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4 p-3 bg-light rounded border small text-muted">
+            <strong>API Usage:</strong> POST <code>/api/suggestions</code> with JSON body:
+            <pre class="mt-2 mb-0" style="font-size:0.78rem">{"customerName":"Jane Doe","phone":"+61 2 9000 0000","email":"jane@example.com","company":"Example Ltd","currencyPair":"AUD/USD","direction":"Buy","analysis":"Reason this customer is interested...","confidence":"High","suggestedBy":"MyApp"}</pre>
         </div>
     </div>
 

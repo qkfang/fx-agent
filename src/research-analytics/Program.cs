@@ -14,6 +14,7 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddSingleton<ArticleService>();
 builder.Services.AddSingleton<TrackingService>();
+builder.Services.AddSingleton<SuggestionService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -114,6 +115,31 @@ app.MapPost("/api/articles/receive", (NewsIntakeRequest req, ArticleService arti
 
 app.MapRazorPages();
 
+// API: Receive a customer suggestion from a 3rd-party app
+app.MapPost("/api/suggestions", (CustomerSuggestionRequest req, SuggestionService suggestions) =>
+{
+    var suggestion = new CustomerSuggestion
+    {
+        CustomerName = req.CustomerName ?? string.Empty,
+        Phone = req.Phone ?? string.Empty,
+        Email = req.Email ?? string.Empty,
+        Company = req.Company ?? string.Empty,
+        CurrencyPair = req.CurrencyPair ?? "AUD/USD",
+        Direction = req.Direction ?? string.Empty,
+        Analysis = req.Analysis ?? string.Empty,
+        Confidence = req.Confidence ?? "Medium",
+        SuggestedBy = req.SuggestedBy ?? "External App"
+    };
+    var created = suggestions.Add(suggestion);
+    return Results.Ok(new { received = true, suggestionId = created.Id, customerName = created.CustomerName });
+});
+
+// API: List all customer suggestions
+app.MapGet("/api/suggestions", (SuggestionService suggestions) =>
+{
+    return Results.Ok(suggestions.GetAll());
+});
+
 app.Run();
 
 // ── Minimal model for incoming news articles ─────────────────────────────────
@@ -128,4 +154,17 @@ public record NewsIntakeRequest(
     string Category,
     string Author,
     DateTime? PublishedAt
+);
+
+/// <summary>Payload sent by a 3rd-party app to suggest a customer prospect.</summary>
+public record CustomerSuggestionRequest(
+    string? CustomerName,
+    string? Phone,
+    string? Email,
+    string? Company,
+    string? CurrencyPair,
+    string? Direction,
+    string? Analysis,
+    string? Confidence,
+    string? SuggestedBy
 );
