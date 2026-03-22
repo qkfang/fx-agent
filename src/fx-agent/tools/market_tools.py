@@ -17,7 +17,7 @@ async def get_fx_rate() -> str:
     """Return the current AUD/USD FX rate from the broker back-office service."""
     try:
         async with httpx.AsyncClient(timeout=5) as client:
-            resp = await client.get(f"{settings.broker_backoffice_url}/api/fx/rate")
+            resp = await client.get(f"{settings.broker_crm_url}/api/fx/rate")
             resp.raise_for_status()
             data = resp.json()
             return json.dumps(

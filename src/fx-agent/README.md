@@ -66,7 +66,7 @@ Executes approved trades:
 ## Prerequisites
 
 - Python 3.11+
-- The existing .NET services running (broker-backoffice on port 5001, etc.)
+- The existing .NET services running (broker-crm on port 5001, etc.)
 - *(Optional)* Azure AI Foundry project for live LLM-powered agents
 
 ## Quick Start

@@ -33,7 +33,7 @@ cd src/research-analytics
 dotnet run --launch-profile http
 
 # Terminal 3 – Broker Back-Office (port 5269)
-cd src/broker-backoffice
+cd src/broker-crm
 dotnet run --launch-profile http
 
 # Terminal 4 – Trading Platform (port 5249)
@@ -255,5 +255,5 @@ The FX Agent (port 8000) can run the full scenario autonomously using AI:
 |-------|-----------|
 | Research note not created after publish | Check `NewsPublish:EndpointUrl` in `news-feed/appsettings.Development.json` points to `http://localhost:5003/api/articles/receive` |
 | Broker lead not received | Check `BrokerNotification:EndpointUrl` in `research-analytics/appsettings.json` points to `http://localhost:5269/api/accounts/leads` |
-| Trade not appearing on Trading Platform | Check `TradingPlatformUrl` in `broker-backoffice/appsettings.json` points to `http://localhost:5249` |
+| Trade not appearing on Trading Platform | Check `TradingPlatformUrl` in `broker-crm/appsettings.json` points to `http://localhost:5249` |
 | FX Agent workflow fails | Ensure all .NET services are running; AI features require `AZURE_AI_CONNECTION_STRING` in `src/fx-agent/.env` |

@@ -210,7 +210,34 @@ namespace FxWebApi.Models
         public decimal Amount { get; set; }
         public decimal Rate { get; set; }
         public decimal Total { get; set; }
-        public string Source { get; set; } = "BrokerBackOffice";
+        public string Source { get; set; } = "BrokerCRM";
         public DateTime DateTime { get; set; }
+    }
+
+    /// <summary>Trade request submitted through the Orora trading popup in Research Analytics.</summary>
+    public class OroraTradeRequest
+    {
+        /// <summary>Trade direction: "Buy" or "Sell".</summary>
+        public string Direction { get; set; } = string.Empty;
+        /// <summary>Currency pair (e.g. AUD/USD).</summary>
+        public string CurrencyPair { get; set; } = "AUD/USD";
+        /// <summary>Volume in lots.</summary>
+        public decimal Lots { get; set; }
+        /// <summary>CRM account ID to record the trade against.</summary>
+        public int AccountId { get; set; }
+        /// <summary>Customer name for the CRM note (optional).</summary>
+        public string CustomerName { get; set; } = string.Empty;
+    }
+
+    /// <summary>Result returned by the Orora trade endpoint.</summary>
+    public class OroraTradeResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string Direction { get; set; } = string.Empty;
+        public string CurrencyPair { get; set; } = string.Empty;
+        public decimal Lots { get; set; }
+        public decimal Rate { get; set; }
+        public string TransactionId { get; set; } = string.Empty;
     }
 }

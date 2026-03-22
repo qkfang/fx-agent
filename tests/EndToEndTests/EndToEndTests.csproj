@@ -29,7 +29,7 @@
     (not Program) so no extern-alias machinery is needed.
   -->
   <ItemGroup>
-    <ProjectReference Include="..\..\src\broker-backoffice\FxWebApi.csproj" />
+    <ProjectReference Include="..\..\src\broker-crm\FxWebApi.csproj" />
     <ProjectReference Include="..\..\src\research-analytics\FxWebPortal.csproj" />
     <ProjectReference Include="..\..\src\trading-platform\FxWebUI.csproj" />
     <ProjectReference Include="..\..\src\news-feed\FxWebNews.csproj" />

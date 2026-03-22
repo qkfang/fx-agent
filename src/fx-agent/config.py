@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     azure_ai_model: str = "gpt-4o"
 
     # Backend service base URLs (the existing .NET services)
-    broker_backoffice_url: str = "http://localhost:5001"
+    broker_crm_url: str = "http://localhost:5001"
     trading_platform_url: str = "http://localhost:5000"
     news_feed_url: str = "http://localhost:5002"
 
