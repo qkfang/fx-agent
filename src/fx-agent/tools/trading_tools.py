@@ -25,7 +25,7 @@ async def execute_buy(amount: float, currency_pair: str = "AUD/USD") -> str:
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             resp = await client.post(
-                f"{settings.broker_backoffice_url}/mcp/fx",
+                f"{settings.broker_crm_url}/mcp/fx",
                 json={"action": "buy", "amount": amount},
             )
             resp.raise_for_status()
@@ -65,7 +65,7 @@ async def execute_sell(amount: float, currency_pair: str = "AUD/USD") -> str:
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             resp = await client.post(
-                f"{settings.broker_backoffice_url}/mcp/fx",
+                f"{settings.broker_crm_url}/mcp/fx",
                 json={"action": "sell", "amount": amount},
             )
             resp.raise_for_status()
@@ -131,7 +131,7 @@ async def get_mcp_status() -> str:
     """Check the status of the broker back-office MCP service."""
     try:
         async with httpx.AsyncClient(timeout=5) as client:
-            resp = await client.get(f"{settings.broker_backoffice_url}/mcp/status")
+            resp = await client.get(f"{settings.broker_crm_url}/mcp/status")
             resp.raise_for_status()
             data = resp.json()
             return json.dumps({"status": "online", "detail": data})

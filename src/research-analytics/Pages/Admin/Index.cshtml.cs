@@ -123,7 +123,7 @@ public class IndexModel : PageModel
             }
             catch (Exception ex)
             {
-                Message = $"Failed to reach broker backoffice: {ex.Message}. Check the BrokerNotification:EndpointUrl configuration.";
+                Message = $"Failed to reach broker CRM: {ex.Message}. Check the BrokerNotification:EndpointUrl configuration.";
             }
         }
         else
@@ -176,7 +176,7 @@ public class IndexModel : PageModel
             }
             catch (Exception ex)
             {
-                Message = $"Failed to reach broker backoffice: {ex.Message}";
+                Message = $"Failed to reach broker CRM: {ex.Message}";
             }
         }
         else

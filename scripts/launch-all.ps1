@@ -40,7 +40,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $apps = @(
     @{ Name = "news-feed";           Path = "$repoRoot\src\news-feed";           Url = "http://localhost:5142" },
     @{ Name = "research-analytics";  Path = "$repoRoot\src\research-analytics";  Url = "http://localhost:5003" },
-    @{ Name = "broker-backoffice";   Path = "$repoRoot\src\broker-backoffice";   Url = "http://localhost:5269" },
+    @{ Name = "broker-crm";   Path = "$repoRoot\src\broker-crm";   Url = "http://localhost:5269" },
     @{ Name = "trading-platform";    Path = "$repoRoot\src\trading-platform";    Url = "http://localhost:5249" }
 )
 

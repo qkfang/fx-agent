@@ -29,6 +29,8 @@ public class IndexModel : PageModel
     public string DisplayName { get; set; } = string.Empty;
     public List<string> Interests { get; set; } = new();
     public string Message { get; set; } = string.Empty;
+    public string OroraApiUrl { get; set; } = string.Empty;
+    public string OroraQuoteUrl { get; set; } = string.Empty;
 
     private IActionResult? RequireUser()
     {
@@ -86,7 +88,7 @@ public class IndexModel : PageModel
             }
             catch (Exception ex)
             {
-                Message = $"Failed to reach broker backoffice: {ex.Message}";
+                Message = $"Failed to reach broker CRM: {ex.Message}";
             }
         }
         else
@@ -107,6 +109,9 @@ public class IndexModel : PageModel
         Interests = interestsRaw
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .ToList();
+
+        OroraApiUrl   = _configuration["Orora:ApiUrl"]   ?? "http://localhost:5269/api/orora";
+        OroraQuoteUrl = _configuration["Orora:QuoteUrl"] ?? "http://localhost:5269/api/fx/quote";
 
         // Market Insights: published articles filtered by user interests
         var allPublished = _articles.GetPublished();
