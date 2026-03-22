@@ -471,7 +471,7 @@ function switchView(view) {
                 markers = trades.map(function (t) {
                     var type = t.type || t.Type || '';
                     var dt   = new Date(t.dateTime || t.DateTime || '');
-                    return { time: Math.floor(dt.getTime() / 1000), type: type, label: 'E' };
+                    return { time: Math.floor(dt.getTime() / 1000), type: type, label: type === 'Buy' ? 'B' : 'S' };
                 }).filter(function (m) { return !isNaN(m.time) && m.time > 0; });
                 drawChart();
             })
@@ -480,10 +480,17 @@ function switchView(view) {
 
     function advTick() {
         if (candles.length === 0) return;
-        var last  = candles[candles.length - 1];
-        var sigma = 0.00010 * Math.sqrt(tfMinutes);
-        var chg   = (Math.random() + Math.random() - 1) * sigma * 0.5;
-        last.close = parseFloat((last.close + chg).toFixed(5));
+        var last = candles[candles.length - 1];
+        // Sync close price with the simple-view tick (which already applies buy/sell
+        // pressure) so both tabs always show the same live price.
+        var livePriceEl = document.getElementById('livePrice');
+        var syncedPrice = livePriceEl ? parseFloat(livePriceEl.textContent) : NaN;
+        if (isNaN(syncedPrice) || syncedPrice <= 0) {
+            // Fallback: apply independent drift when livePrice is unavailable
+            var sigma = 0.00010 * Math.sqrt(tfMinutes);
+            syncedPrice = parseFloat((last.close + (Math.random() + Math.random() - 1) * sigma * 0.5).toFixed(5));
+        }
+        last.close = syncedPrice;
         if (last.close > last.high) last.high = last.close;
         if (last.close < last.low)  last.low  = last.close;
         drawChart();
