@@ -211,6 +211,7 @@ body {
 #advancedView {
   display: flex;
   flex-direction: column;
+  /* 110px accounts for: navbar (~42px) + price-ticker (~42px) + view-tabs (~26px) */
   height: calc(100vh - 110px);
   min-height: 400px;
   background: #fff;
