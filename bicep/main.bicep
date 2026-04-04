@@ -4,7 +4,7 @@ param baseName string = 'fxag'
 @description('Azure region for all resources')
 param location string = 'centralus'
 
-param azureAIFoundryEndpoint string = 'https://fsi-foundry.openai.azure.com'
+param azureAIFoundryEndpoint string = 'https://fxag-foundry.openai.azure.com'
 param azureAIFoundryDeployment string = 'gpt-4.1'
 param azureAIFoundryTenantId string = '9d2116ce-afe6-4ce8-8bc3-c7c7b69856c2'
 
