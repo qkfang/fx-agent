@@ -1,0 +1,60 @@
+name: 40 Deploy Logic App
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/logic/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        working-directory: src/logic
+        run: dotnet restore
+
+      - name: Build
+        working-directory: src/logic
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        working-directory: src/logic
+        run: dotnet publish --configuration Release --no-build --output ./publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logic-dist
+          path: src/logic/publish
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: logic-dist
+          path: dist
+
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Logic App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: melt-logic
+          resource-group-name: rg-melt
+          package: dist

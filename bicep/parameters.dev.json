@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "baseName": {
+      "value": "fx"
+    },
+    "location": {
+      "value": "eastus3"
+    },
+    "principals": {
+      "value": [
+        { "id": "4b74544b-02c6-4e4f-b936-732c9c3fff65", "principalType": "User" },
+        { "id": "a6efe236-83c5-472b-a068-65006e369ad7", "principalType": "ServicePrincipal" }
+      ]
+    }
+  }
+}

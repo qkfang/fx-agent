@@ -1,3 +1,4 @@
+using Azure.Identity;
 using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Producer;
 using FxWebNews.Models;
@@ -19,17 +20,17 @@ namespace FxWebNews.Services
 
         public async Task<(bool Success, string Message, int SentCount)> PublishBatchAsync(List<NewsArticle> articles)
         {
-            var connectionString = _config["EventHub:ConnectionString"];
+            var fullyQualifiedNamespace = _config["EventHub:FullyQualifiedNamespace"];
             var eventHubName = _config["EventHub:EventHubName"];
 
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(fullyQualifiedNamespace))
             {
-                return (false, "EventHub:ConnectionString is not configured.", 0);
+                return (false, "EventHub:FullyQualifiedNamespace is not configured.", 0);
             }
 
             try
             {
-                await using var producerClient = new EventHubProducerClient(connectionString, eventHubName);
+                await using var producerClient = new EventHubProducerClient(fullyQualifiedNamespace, eventHubName, new DefaultAzureCredential());
 
                 using EventDataBatch eventBatch = await producerClient.CreateBatchAsync();
 
