@@ -28,17 +28,19 @@ DBCC CHECKIDENT ('ResearchPatterns', RESEED, 0);
 -------------------------------------------------------
 -- Customers (10 records)
 -------------------------------------------------------
-INSERT INTO Customers (Name, Email, Phone, Company, CreatedAt) VALUES
-('Alice Johnson',   'alice.johnson@example.com',   '+1-555-0101', 'Global Trading Co',      '2025-09-15T08:30:00'),
-('Bob Smith',       'bob.smith@example.com',       '+1-555-0102', 'Pacific Investments',     '2025-10-02T14:20:00'),
-('Carlos Rivera',   'carlos.rivera@example.com',   '+44-20-7946-0201', 'Euro Capital Ltd',   '2025-10-18T09:00:00'),
-('Diana Chen',      'diana.chen@example.com',      '+852-3456-7890', 'Asia Macro Fund',      '2025-11-05T11:45:00'),
-('Erik Lindberg',   'erik.lindberg@example.com',   '+46-8-123-4567', 'Nordic FX Partners',   '2025-11-20T07:15:00'),
-('Fatima Al-Rashid','fatima.alrashid@example.com', '+971-4-555-6789', 'Gulf Finance Group',  '2025-12-01T10:30:00'),
-('Grace Park',      'grace.park@example.com',      '+82-2-555-3456', 'Seoul Wealth Mgmt',    '2026-01-10T13:00:00'),
-('Hugo Martinez',   'hugo.martinez@example.com',   '+52-55-5555-7890', 'LatAm FX Advisors', '2026-01-25T16:45:00'),
-('Isla Thompson',   'isla.thompson@example.com',   '+61-2-5555-1234', 'Oceania Partners',   '2026-02-14T08:00:00'),
-('James Okafor',    'james.okafor@example.com',    '+234-1-555-9012', 'Frontier Markets Inc','2026-03-01T12:30:00');
+SET IDENTITY_INSERT Customers ON;
+INSERT INTO Customers (Id, Name, Email, Phone, Company, CreatedAt) VALUES
+(0, 'Alice Johnson',   'alice.johnson@example.com',   '+1-555-0101', 'Global Trading Co',      '2025-09-15T08:30:00'),
+(1, 'Bob Smith',       'bob.smith@example.com',       '+1-555-0102', 'Pacific Investments',     '2025-10-02T14:20:00'),
+(2, 'Carlos Rivera',   'carlos.rivera@example.com',   '+44-20-7946-0201', 'Euro Capital Ltd',   '2025-10-18T09:00:00'),
+(3, 'Diana Chen',      'diana.chen@example.com',      '+852-3456-7890', 'Asia Macro Fund',      '2025-11-05T11:45:00'),
+(4, 'Erik Lindberg',   'erik.lindberg@example.com',   '+46-8-123-4567', 'Nordic FX Partners',   '2025-11-20T07:15:00'),
+(5, 'Fatima Al-Rashid','fatima.alrashid@example.com', '+971-4-555-6789', 'Gulf Finance Group',  '2025-12-01T10:30:00'),
+(6, 'Grace Park',      'grace.park@example.com',      '+82-2-555-3456', 'Seoul Wealth Mgmt',    '2026-01-10T13:00:00'),
+(7, 'Hugo Martinez',   'hugo.martinez@example.com',   '+52-55-5555-7890', 'LatAm FX Advisors', '2026-01-25T16:45:00'),
+(8, 'Isla Thompson',   'isla.thompson@example.com',   '+61-2-5555-1234', 'Oceania Partners',   '2026-02-14T08:00:00'),
+(9, 'James Okafor',    'james.okafor@example.com',    '+234-1-555-9012', 'Frontier Markets Inc','2026-03-01T12:30:00');
+SET IDENTITY_INSERT Customers OFF;
 
 -------------------------------------------------------
 -- CustomerPreferences (10 records)
@@ -225,15 +227,17 @@ INSERT INTO CustomerHistories (CustomerId, CurrencyPair, Direction, Amount, Entr
 -------------------------------------------------------
 -- Traders (8 records)
 -------------------------------------------------------
-INSERT INTO Traders (Name, Email, Desk, Specialization, Region, IsActive, JoinedAt) VALUES
-('Sarah Mitchell',   'sarah.mitchell@example.com',   'G10 Spot',        'USD,EUR,GBP',          'North America', 1, '2020-03-15T09:00:00'),
-('Marco Rossi',      'marco.rossi@example.com',      'G10 Options',     'EUR/USD,GBP/JPY',      'Europe',        1, '2019-06-01T08:00:00'),
-('Kenji Tanaka',     'kenji.tanaka@example.com',      'Asia FX',         'JPY,CNH,KRW',          'Asia Pacific',  1, '2021-01-10T07:00:00'),
-('Emily Carter',     'emily.carter@example.com',      'Macro Strategy',  'G10 Macro,Forecasting', 'Europe',       1, '2018-09-20T08:30:00'),
-('Liam O''Brien',    'liam.obrien@example.com',       'EM Trading',      'BRL,MXN,ZAR',          'North America', 1, '2022-04-05T09:00:00'),
-('Erik Svensson',    'erik.svensson@example.com',     'Scandinavian FX', 'NOK,SEK,DKK',          'Europe',        1, '2021-07-15T08:00:00'),
-('Hugo Santos',      'hugo.santos@example.com',       'EM Research',     'EM Weekly,BRL,TRY',    'Latin America', 1, '2023-02-01T10:00:00'),
-('Aisha Patel',      'aisha.patel@example.com',       'G10 Spot',        'AUD,NZD,CAD',          'Asia Pacific',  0, '2020-11-10T07:30:00');
+SET IDENTITY_INSERT Traders ON;
+INSERT INTO Traders (Id, Name, Email, Desk, Specialization, Region, IsActive, JoinedAt) VALUES
+(0, 'Sarah Mitchell',   'sarah.mitchell@example.com',   'G10 Spot',        'USD,EUR,GBP',          'North America', 1, '2020-03-15T09:00:00'),
+(1, 'Marco Rossi',      'marco.rossi@example.com',      'G10 Options',     'EUR/USD,GBP/JPY',      'Europe',        1, '2019-06-01T08:00:00'),
+(2, 'Kenji Tanaka',     'kenji.tanaka@example.com',      'Asia FX',         'JPY,CNH,KRW',          'Asia Pacific',  1, '2021-01-10T07:00:00'),
+(3, 'Emily Carter',     'emily.carter@example.com',      'Macro Strategy',  'G10 Macro,Forecasting', 'Europe',       1, '2018-09-20T08:30:00'),
+(4, 'Liam O''Brien',    'liam.obrien@example.com',       'EM Trading',      'BRL,MXN,ZAR',          'North America', 1, '2022-04-05T09:00:00'),
+(5, 'Erik Svensson',    'erik.svensson@example.com',     'Scandinavian FX', 'NOK,SEK,DKK',          'Europe',        1, '2021-07-15T08:00:00'),
+(6, 'Hugo Santos',      'hugo.santos@example.com',       'EM Research',     'EM Weekly,BRL,TRY',    'Latin America', 1, '2023-02-01T10:00:00'),
+(7, 'Aisha Patel',      'aisha.patel@example.com',       'G10 Spot',        'AUD,NZD,CAD',          'Asia Pacific',  0, '2020-11-10T07:30:00');
+SET IDENTITY_INSERT Traders OFF;
 
 -------------------------------------------------------
 -- TraderRecommendations (15 records)
