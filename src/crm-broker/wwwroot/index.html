@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FX Prime — Broker CRM</title>
+    <title>FX CRM — Broker CRM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -64,7 +64,7 @@
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
             border-radius: 5px; padding: 4px 12px;
         }
-        .sf-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #4bca81; animation: pulse 1.5s infinite; }
+        .sf-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #4bca81; }
         .sf-ticker-pair { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 600; }
         .sf-ticker-rate { font-size: 14px; font-weight: 800; color: white; font-variant-numeric: tabular-nums; }
         .sf-ticker-up   { color: #4bca81; font-size: 11px; font-weight: 600; }
@@ -380,9 +380,7 @@
             position: fixed; bottom: 20px; right: 20px;
             padding: 13px 18px; border-radius: 4px; font-size: 13px; font-weight: 600;
             z-index: 9999; max-width: 360px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            animation: slideUp 0.3s ease;
         }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .toast-success { background: var(--sf-green-bg); border: 1px solid #b8dfc4; color: var(--sf-green); }
         .toast-error   { background: var(--sf-red-bg);   border: 1px solid #f5c6c6; color: var(--sf-red);   }
 
@@ -394,7 +392,6 @@
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--sf-border); border-radius: 4px; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
     </style>
 </head>
 <body>
@@ -403,14 +400,11 @@
 <header class="sf-header">
     <div class="sf-header-left">
         <div class="sf-logo"><i class="fa-solid fa-chart-line"></i></div>
-        <div class="sf-appname">FX Prime <span>Broker CRM</span></div>
+        <div class="sf-appname">FX CRM <span>Broker CRM</span></div>
     </div>
     <div class="sf-ticker">
         <div class="sf-ticker-badge">
-            <div class="sf-live-dot"></div>
-            <span class="sf-ticker-pair">AUD/USD</span>
-            <span class="sf-ticker-rate" id="navRate">&#8212;</span>
-            <span id="navChange"></span>
+            <span class="sf-ticker-pair">Customer Relationship Management</span>
         </div>
     </div>
     <div class="sf-header-right">
@@ -446,7 +440,7 @@
         <div class="sf-list-header">
             <div class="sf-list-title">
                 <i class="fa-solid fa-users" style="color:var(--sf-blue);"></i>
-                Client Accounts
+                Customers
                 <span class="sf-list-count" id="accountsCount">0</span>
             </div>
             <div class="sf-search">
@@ -456,7 +450,7 @@
         </div>
         <div id="accountList"></div>
         <div class="sf-sidebar-footer">
-            <i class="fa-solid fa-shield-halved" style="margin-right:5px;color:var(--sf-blue);"></i>FX Prime Brokerage System v2.4
+            <i class="fa-solid fa-shield-halved" style="margin-right:5px;color:var(--sf-blue);"></i>FX CRM Brokerage System v2.4
         </div>
     </aside>
 
@@ -466,8 +460,8 @@
         <!-- Welcome -->
         <div class="welcome-screen" id="welcomeScreen">
             <i class="fa-regular fa-address-card"></i>
-            <h4>Select a client account</h4>
-            <p>Choose an account from the list to view the balance sheet, account history, trading portfolios, and preferences.</p>
+            <h4>Select a customer</h4>
+            <p>Choose a customer from the list to view their profile, trade history, portfolios, and preferences.</p>
         </div>
 
         <!-- Account Record Page -->
@@ -498,31 +492,31 @@
                     </div>
                     <div class="sf-rh-actions">
                         <button class="sf-btn sf-btn-neutral" onclick="switchTab('portfolios')">
-                            <i class="fa-solid fa-arrow-right-arrow-left"></i> Trade
+                            <i class="fa-solid fa-briefcase"></i> Portfolios
                         </button>
                     </div>
                 </div>
                 <!-- Highlight Fields -->
                 <div class="sf-rh-highlights">
                     <div class="sf-hl-field">
-                        <div class="sf-hl-label">Balance</div>
-                        <div class="sf-hl-value" id="hlBalance">&#8212;</div>
+                        <div class="sf-hl-label">Company</div>
+                        <div class="sf-hl-value" id="hlCompany">&#8212;</div>
                     </div>
                     <div class="sf-hl-field">
-                        <div class="sf-hl-label">Equity</div>
-                        <div class="sf-hl-value" id="hlEquity">&#8212;</div>
+                        <div class="sf-hl-label">Email</div>
+                        <div class="sf-hl-value" id="hlEmail">&#8212;</div>
                     </div>
                     <div class="sf-hl-field">
-                        <div class="sf-hl-label">Open P&amp;L</div>
-                        <div class="sf-hl-value" id="hlPnl">&#8212;</div>
+                        <div class="sf-hl-label">Phone</div>
+                        <div class="sf-hl-value" id="hlPhone">&#8212;</div>
                     </div>
                     <div class="sf-hl-field">
-                        <div class="sf-hl-label">Free Margin</div>
-                        <div class="sf-hl-value" id="hlFreeMargin">&#8212;</div>
+                        <div class="sf-hl-label">Active Portfolios</div>
+                        <div class="sf-hl-value" id="hlActivePortfolios">&#8212;</div>
                     </div>
                     <div class="sf-hl-field">
-                        <div class="sf-hl-label">Leverage</div>
-                        <div class="sf-hl-value" id="hlLeverage">&#8212;</div>
+                        <div class="sf-hl-label">Total Trades</div>
+                        <div class="sf-hl-value" id="hlTotalTrades">&#8212;</div>
                     </div>
                     <div class="sf-hl-field">
                         <div class="sf-hl-label">Member Since</div>
@@ -532,10 +526,10 @@
                 <!-- Subtabs -->
                 <div class="sf-subtabs">
                     <button class="sf-subtab active" id="subtab-balance" onclick="switchTab('balance')">
-                        <i class="fa-solid fa-wallet"></i> Customer Balance
+                        <i class="fa-solid fa-user"></i> Customer Info
                     </button>
                     <button class="sf-subtab" id="subtab-history" onclick="switchTab('history')">
-                        <i class="fa-solid fa-clock-rotate-left"></i> Account History
+                        <i class="fa-solid fa-clock-rotate-left"></i> Trade History
                     </button>
                     <button class="sf-subtab" id="subtab-portfolios" onclick="switchTab('portfolios')">
                         <i class="fa-solid fa-briefcase"></i> Trading Portfolios
@@ -554,50 +548,50 @@
                 <div id="tab-balance">
                     <div class="sf-stats-grid">
                         <div class="sf-stat-tile">
-                            <div class="sf-stat-label"><i class="fa-solid fa-wallet"></i> Balance</div>
-                            <div class="sf-stat-value" id="cardBalance">&#8212;</div>
-                            <div class="sf-stat-sub">Settled funds</div>
+                            <div class="sf-stat-label"><i class="fa-solid fa-briefcase"></i> Open Portfolios</div>
+                            <div class="sf-stat-value" id="cardOpenPortfolios">&#8212;</div>
+                            <div class="sf-stat-sub">Active positions</div>
                         </div>
                         <div class="sf-stat-tile">
-                            <div class="sf-stat-label"><i class="fa-solid fa-scale-balanced"></i> Equity</div>
-                            <div class="sf-stat-value" id="cardEquity">&#8212;</div>
-                            <div class="sf-stat-sub">Balance + Open P&amp;L</div>
+                            <div class="sf-stat-label"><i class="fa-solid fa-clock-rotate-left"></i> Closed Trades</div>
+                            <div class="sf-stat-value" id="cardClosedTrades">&#8212;</div>
+                            <div class="sf-stat-sub">Trade history</div>
                         </div>
                         <div class="sf-stat-tile">
-                            <div class="sf-stat-label"><i class="fa-solid fa-chart-simple"></i> Open P&amp;L</div>
-                            <div class="sf-stat-value" id="cardPnl">&#8212;</div>
-                            <div class="sf-stat-sub" id="cardMarginLevel">Margin level: &#8212;</div>
+                            <div class="sf-stat-label"><i class="fa-solid fa-chart-simple"></i> Total P&amp;L</div>
+                            <div class="sf-stat-value" id="cardTotalPnl">&#8212;</div>
+                            <div class="sf-stat-sub">From closed trades</div>
                         </div>
                         <div class="sf-stat-tile">
-                            <div class="sf-stat-label"><i class="fa-solid fa-shield"></i> Free Margin</div>
-                            <div class="sf-stat-value" id="cardFreeMargin">&#8212;</div>
-                            <div class="sf-stat-sub" id="cardUsedMargin">Used: &#8212;</div>
+                            <div class="sf-stat-label"><i class="fa-solid fa-calendar"></i> Member Since</div>
+                            <div class="sf-stat-value" id="cardMemberSince">&#8212;</div>
+                            <div class="sf-stat-sub" id="cardMemberDays">&#8212;</div>
                         </div>
                     </div>
                     <div class="sf-card">
                         <div class="sf-card-header">
-                            <div class="sf-card-title"><i class="fa-solid fa-circle-info"></i> Account Details</div>
+                            <div class="sf-card-title"><i class="fa-solid fa-circle-info"></i> Customer Details</div>
                         </div>
                         <div class="sf-detail-grid">
                             <div class="sf-detail-field">
-                                <div class="sf-detail-label">Account Number</div>
-                                <div class="sf-detail-value" id="detailAccNumber">&#8212;</div>
+                                <div class="sf-detail-label">Full Name</div>
+                                <div class="sf-detail-value" id="detailName">&#8212;</div>
                             </div>
                             <div class="sf-detail-field">
-                                <div class="sf-detail-label">Account Type</div>
-                                <div class="sf-detail-value" id="detailAccType">&#8212;</div>
+                                <div class="sf-detail-label">Email</div>
+                                <div class="sf-detail-value" id="detailEmail">&#8212;</div>
                             </div>
                             <div class="sf-detail-field">
-                                <div class="sf-detail-label">Margin Used</div>
-                                <div class="sf-detail-value" id="detailMarginUsed">&#8212;</div>
+                                <div class="sf-detail-label">Phone</div>
+                                <div class="sf-detail-value" id="detailPhone">&#8212;</div>
                             </div>
                             <div class="sf-detail-field">
-                                <div class="sf-detail-label">Margin Level</div>
-                                <div class="sf-detail-value" id="detailMarginLevel">&#8212;</div>
+                                <div class="sf-detail-label">Company</div>
+                                <div class="sf-detail-value" id="detailCompany">&#8212;</div>
                             </div>
                             <div class="sf-detail-field">
-                                <div class="sf-detail-label">Open Positions</div>
-                                <div class="sf-detail-value" id="detailOpenPos">&#8212;</div>
+                                <div class="sf-detail-label">Active Portfolios</div>
+                                <div class="sf-detail-value" id="detailActivePortfolios">&#8212;</div>
                             </div>
                             <div class="sf-detail-field">
                                 <div class="sf-detail-label">Status</div>
@@ -612,19 +606,20 @@
                     <div class="sf-table-wrapper">
                         <div class="sf-table-header">
                             <div class="sf-table-title">
-                                <i class="fa-solid fa-clock-rotate-left"></i> Transaction History
+                                <i class="fa-solid fa-clock-rotate-left"></i> Trade History
                             </div>
-                            <span style="font-size:11px;color:var(--sf-text-2);">Last 10 transactions</span>
+                            <span style="font-size:11px;color:var(--sf-text-2);">Closed trades</span>
                         </div>
                         <table class="sf-table">
                             <thead>
                                 <tr>
-                                    <th>Time</th><th>ID</th><th>Type</th><th>Pair</th>
-                                    <th>Lots</th><th>Rate</th><th>P&amp;L</th><th>Balance After</th>
+                                    <th>Pair</th><th>Direction</th><th>Amount</th>
+                                    <th>Entry Rate</th><th>Exit Rate</th><th>P&amp;L</th>
+                                    <th>Opened</th><th>Closed</th><th>Notes</th>
                                 </tr>
                             </thead>
                             <tbody id="historyTable">
-                                <tr class="sf-table-empty"><td colspan="8">No transactions yet</td></tr>
+                                <tr class="sf-table-empty"><td colspan="9">No trade history</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -632,68 +627,24 @@
 
                 <!-- TAB: Trading Portfolios -->
                 <div id="tab-portfolios" style="display:none;">
-                    <div class="row g-3">
-                        <div class="col-lg-8">
-                            <div class="sf-table-wrapper">
-                                <div class="sf-table-header">
-                                    <div class="sf-table-title">
-                                        <i class="fa-solid fa-bolt"></i> Open Positions
-                                        <span class="sf-subtab-count" id="posCount">0</span>
-                                    </div>
-                                </div>
-                                <table class="sf-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Position ID</th><th>Pair</th><th>Type</th><th>Lots</th>
-                                            <th>Open Rate</th><th>Current</th><th>P&amp;L (USD)</th>
-                                            <th>Margin</th><th>Opened</th><th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="positionsTable">
-                                        <tr class="sf-table-empty"><td colspan="10">No open positions</td></tr>
-                                    </tbody>
-                                </table>
+                    <div class="sf-table-wrapper">
+                        <div class="sf-table-header">
+                            <div class="sf-table-title">
+                                <i class="fa-solid fa-briefcase"></i> Customer Portfolios
+                                <span class="sf-subtab-count" id="posCount">0</span>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="sf-trade-panel">
-                                <div class="sf-trade-title">
-                                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Execute Trade
-                                </div>
-                                <div class="sf-rate-display">
-                                    <div class="sf-rate-side sell-side">
-                                        <div class="sf-rate-label">SELL</div>
-                                        <div class="sf-rate-value" id="tradeSellRate">&#8212;</div>
-                                    </div>
-                                    <div class="sf-rate-side buy-side">
-                                        <div class="sf-rate-label">BUY</div>
-                                        <div class="sf-rate-value" id="tradeBuyRate">&#8212;</div>
-                                    </div>
-                                </div>
-                                <div class="mb-2">
-                                    <div class="sf-form-label">Currency Pair</div>
-                                    <div class="sf-input" style="cursor:default;color:var(--sf-text-2);display:flex;align-items:center;justify-content:center;height:36px;">AUD / USD</div>
-                                </div>
-                                <div class="mt-3 mb-1">
-                                    <div class="sf-form-label">Volume (Lots)</div>
-                                    <input type="number" class="sf-input" id="tradeLotsInput" value="0.10" min="0.01" max="100" step="0.01">
-                                </div>
-                                <div class="sf-lot-btns">
-                                    <button class="sf-lot-btn" onclick="setLots(0.01)">0.01</button>
-                                    <button class="sf-lot-btn" onclick="setLots(0.1)">0.10</button>
-                                    <button class="sf-lot-btn" onclick="setLots(0.5)">0.50</button>
-                                    <button class="sf-lot-btn" onclick="setLots(1)">1.00</button>
-                                    <button class="sf-lot-btn" onclick="setLots(5)">5.00</button>
-                                </div>
-                                <button class="sf-btn-buy" onclick="executeTrade('buy')">
-                                    <i class="fa-solid fa-arrow-trend-up"></i>&nbsp; BUY AUD/USD
-                                </button>
-                                <button class="sf-btn-sell" onclick="executeTrade('sell')">
-                                    <i class="fa-solid fa-arrow-trend-down"></i>&nbsp; SELL AUD/USD
-                                </button>
-                                <div class="sf-margin-info" id="tradeMarginEstimate">Est. margin: &#8212; &nbsp;|&nbsp; Free margin: &#8212;</div>
-                            </div>
-                        </div>
+                        <table class="sf-table">
+                            <thead>
+                                <tr>
+                                    <th>Currency Pair</th><th>Direction</th><th>Amount</th>
+                                    <th>Entry Rate</th><th>Opened</th><th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="positionsTable">
+                                <tr class="sf-table-empty"><td colspan="6">No portfolios</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -703,40 +654,28 @@
                         <div class="col-md-6">
                             <div class="sf-card">
                                 <div class="sf-card-header">
-                                    <div class="sf-card-title"><i class="fa-solid fa-id-card"></i> Account Information</div>
+                                    <div class="sf-card-title"><i class="fa-solid fa-id-card"></i> Customer Information</div>
                                 </div>
                                 <div class="sf-detail-grid">
                                     <div class="sf-detail-field full">
                                         <div class="sf-detail-label">Customer Name</div>
-                                        <div class="sf-detail-value" id="prefName">&#8212;</div>
+                                        <div class="sf-detail-value" id="prefCustName">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Account Number</div>
-                                        <div class="sf-detail-value" id="prefAccNumber">&#8212;</div>
+                                        <div class="sf-detail-label">Email</div>
+                                        <div class="sf-detail-value" id="prefCustEmail">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Account Type</div>
-                                        <div class="sf-detail-value" id="prefAccType">&#8212;</div>
+                                        <div class="sf-detail-label">Phone</div>
+                                        <div class="sf-detail-value" id="prefCustPhone">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Country</div>
-                                        <div class="sf-detail-value" id="prefCountry">&#8212;</div>
+                                        <div class="sf-detail-label">Company</div>
+                                        <div class="sf-detail-value" id="prefCustCompany">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
                                         <div class="sf-detail-label">Member Since</div>
-                                        <div class="sf-detail-value" id="prefSince">&#8212;</div>
-                                    </div>
-                                    <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Status</div>
-                                        <div class="sf-detail-value"><span style="color:var(--sf-green);font-weight:600;">&#9679; Active</span></div>
-                                    </div>
-                                    <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Base Currency</div>
-                                        <div class="sf-detail-value">USD</div>
-                                    </div>
-                                    <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Time Zone</div>
-                                        <div class="sf-detail-value" id="prefTimezone">&#8212;</div>
+                                        <div class="sf-detail-value" id="prefCustSince">&#8212;</div>
                                     </div>
                                 </div>
                             </div>
@@ -747,37 +686,41 @@
                                     <div class="sf-card-title"><i class="fa-solid fa-sliders"></i> Trading Preferences</div>
                                 </div>
                                 <div class="sf-detail-grid">
-                                    <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Leverage</div>
-                                        <div class="sf-detail-value" id="prefLeverage">&#8212;</div>
+                                    <div class="sf-detail-field full">
+                                        <div class="sf-detail-label">Preferred Currency Pairs</div>
+                                        <div class="sf-detail-value" id="prefPairs">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Risk Profile</div>
-                                        <div class="sf-detail-value" id="prefRisk">&#8212;</div>
+                                        <div class="sf-detail-label">Risk Tolerance</div>
+                                        <div class="sf-detail-value" id="prefRiskTolerance">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Default Pair</div>
-                                        <div class="sf-detail-value">AUD/USD</div>
+                                        <div class="sf-detail-label">Trading Style</div>
+                                        <div class="sf-detail-value" id="prefTradingStyle">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Default Lot Size</div>
-                                        <div class="sf-detail-value" id="prefLotSize">&#8212;</div>
+                                        <div class="sf-detail-label">Max Position Size</div>
+                                        <div class="sf-detail-value" id="prefMaxPosition">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Stop Loss %</div>
+                                        <div class="sf-detail-value" id="prefStopLoss">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Take Profit %</div>
+                                        <div class="sf-detail-value" id="prefTakeProfit">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
                                         <div class="sf-detail-label">Notifications</div>
-                                        <div class="sf-detail-value">Email &amp; SMS</div>
+                                        <div class="sf-detail-value" id="prefNotifications">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Auto-Close on Margin Call</div>
-                                        <div class="sf-detail-value">Enabled</div>
+                                        <div class="sf-detail-label">Notification Channels</div>
+                                        <div class="sf-detail-value" id="prefChannels">&#8212;</div>
                                     </div>
-                                    <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Max Lot Size</div>
-                                        <div class="sf-detail-value" id="prefMaxLot">&#8212;</div>
-                                    </div>
-                                    <div class="sf-detail-field">
-                                        <div class="sf-detail-label">Stop-Out Level</div>
-                                        <div class="sf-detail-value">50%</div>
+                                    <div class="sf-detail-field full">
+                                        <div class="sf-detail-label">Last Updated</div>
+                                        <div class="sf-detail-value" id="prefUpdatedAt">&#8212;</div>
                                     </div>
                                 </div>
                             </div>
@@ -843,36 +786,29 @@
 </div>
 
 <script>
-    let selectedAccountId = null;
-    let allAccounts = [];
-    let currentRate = 0;
-    let prevRate = 0;
-    let currentBalanceSheet = null;
+    let selectedCustomerId = null;
+    let allCustomers = [];
+    let currentProfile = null;
     let currentTab = 'balance';
 
-    async function updateTicker() {
-        try {
-            const res = await fetch('/api/fx/rate');
-            const data = await res.json();
-            prevRate = currentRate;
-            currentRate = parseFloat(data.rate);
-            document.getElementById('navRate').textContent = currentRate.toFixed(4);
-            const change = currentRate - prevRate;
-            const changeEl = document.getElementById('navChange');
-            if (change > 0) {
-                changeEl.textContent = '\u25b2 +' + change.toFixed(4);
-                changeEl.className = 'sf-ticker-up';
-            } else if (change < 0) {
-                changeEl.textContent = '\u25bc ' + change.toFixed(4);
-                changeEl.className = 'sf-ticker-down';
-            } else {
-                changeEl.textContent = '';
-                changeEl.className = '';
-            }
-            document.getElementById('tradeSellRate').textContent = currentRate.toFixed(4);
-            document.getElementById('tradeBuyRate').textContent  = (currentRate + 0.0002).toFixed(4);
-            updateMarginEstimate();
-        } catch (e) {}
+    const avatarColors = ['#0176d3','#5c2e91','#a07800','#2e844a','#ba0517','#00396b'];
+    function avatarColor(id) { return avatarColors[id % avatarColors.length]; }
+
+    function fmtUSD(v) {
+        if (v == null) return '\u2014';
+        const abs = Math.abs(v);
+        const prefix = v < 0 ? '-$' : '$';
+        return prefix + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtNum(v) {
+        if (v == null) return '\u2014';
+        return v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    }
+
+    function fmtRate(r) {
+        if (r == null) return '\u2014';
+        return r.toFixed(4);
     }
 
     function switchTab(tab) {
@@ -884,49 +820,42 @@
         currentTab = tab;
     }
 
-    async function loadAccounts() {
+    async function loadCustomers() {
         try {
-            const res = await fetch('/api/accounts');
-            allAccounts = await res.json();
-            renderAccountList(allAccounts);
+            const res = await fetch('/api/customers');
+            allCustomers = await res.json();
+            renderCustomerList(allCustomers);
         } catch (e) {
             document.getElementById('accountList').innerHTML =
-                '<div style="padding:20px;color:var(--sf-red);font-size:12px;"><i class="fa-solid fa-triangle-exclamation"></i> Failed to load accounts</div>';
+                '<div style="padding:20px;color:var(--sf-red);font-size:12px;"><i class="fa-solid fa-triangle-exclamation"></i> Failed to load customers</div>';
         }
     }
 
-    const avatarColors = ['#0176d3','#5c2e91','#a07800','#2e844a','#ba0517','#00396b'];
-    function avatarColor(id) { return avatarColors[id % avatarColors.length]; }
-
-    function renderAccountList(accounts) {
+    function renderCustomerList(customers) {
         const container = document.getElementById('accountList');
-        document.getElementById('accountsCount').textContent = accounts.length;
-        if (!accounts.length) {
-            container.innerHTML = '<div style="padding:20px;color:var(--sf-text-3);font-size:12px;">No accounts found</div>';
+        document.getElementById('accountsCount').textContent = customers.length;
+        if (!customers.length) {
+            container.innerHTML = '<div style="padding:20px;color:var(--sf-text-3);font-size:12px;">No customers found</div>';
             return;
         }
-        container.innerHTML = accounts.map(a => {
-            const initials = a.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            const pnlClass = a.openPnL > 0 ? 'pnl-pos' : a.openPnL < 0 ? 'pnl-neg' : 'pnl-zero';
-            const pnlSign  = a.openPnL >= 0 ? '+' : '';
-            const typeBadgeClass = a.accountType === 'VIP' ? 'badge-vip' : a.accountType === 'Professional' ? 'badge-professional' : 'badge-standard';
-            const isActive = a.id === selectedAccountId;
+        container.innerHTML = customers.map(c => {
+            const initials = c.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const openCount = (c.portfolios || []).filter(p => p.status === 'Open').length;
+            const isActive = c.id === selectedCustomerId;
             return `
-            <div class="sf-account-item${isActive ? ' active' : ''}" onclick="selectAccount(${a.id})" id="ac-${a.id}">
+            <div class="sf-account-item${isActive ? ' active' : ''}" onclick="selectCustomer(${c.id})" id="ac-${c.id}">
                 <div class="sf-ai-row">
-                    <div class="sf-ai-avatar" style="background:${avatarColor(a.id)}">${initials}</div>
-                    <span class="sf-ai-name">${a.customerName}</span>
-                    <span class="sf-ai-badge ${typeBadgeClass}">${a.accountType}</span>
+                    <div class="sf-ai-avatar" style="background:${avatarColor(c.id)}">${initials}</div>
+                    <span class="sf-ai-name">${c.name}</span>
                 </div>
-                <div class="sf-ai-meta">${a.accountNumber} &nbsp;&middot;&nbsp; ${a.country}</div>
+                <div class="sf-ai-meta">${c.company}</div>
                 <div class="sf-ai-fins">
-                    <span class="sf-ai-bal">${fmtUSD(a.balance)}</span>
-                    <span class="sf-ai-pnl ${pnlClass}">${pnlSign}${fmtUSD(a.openPnL)}</span>
+                    <span class="sf-ai-bal" style="font-size:11px;color:var(--sf-text-2);">${c.email}</span>
                 </div>
                 <div style="font-size:10px;color:var(--sf-text-3);margin-top:3px;">
-                    <i class="fa-solid fa-circle-dot" style="font-size:8px;margin-right:3px;color:var(--sf-blue);"></i>
-                    ${a.openPositionsCount} open position${a.openPositionsCount !== 1 ? 's' : ''}
-                    &nbsp;&middot;&nbsp; Equity: ${fmtUSD(a.equity)}
+                    <i class="fa-solid fa-briefcase" style="font-size:8px;margin-right:3px;color:var(--sf-blue);"></i>
+                    ${openCount} open portfolio${openCount !== 1 ? 's' : ''}
+                    &nbsp;&middot;&nbsp; Since ${new Date(c.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}
                 </div>
             </div>`;
         }).join('');
@@ -934,224 +863,150 @@
 
     function filterAccounts() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = allAccounts.filter(a =>
-            a.customerName.toLowerCase().includes(q) ||
-            a.accountNumber.toLowerCase().includes(q) ||
-            a.country.toLowerCase().includes(q)
+        const filtered = allCustomers.filter(c =>
+            c.name.toLowerCase().includes(q) ||
+            c.email.toLowerCase().includes(q) ||
+            c.company.toLowerCase().includes(q)
         );
-        renderAccountList(filtered);
+        renderCustomerList(filtered);
     }
 
-    async function selectAccount(id) {
-        selectedAccountId = id;
-        renderAccountList(allAccounts);
-        document.getElementById('leadsDashboard').style.display  = 'none';
+    async function selectCustomer(id) {
+        selectedCustomerId = id;
+        renderCustomerList(allCustomers);
+        document.getElementById('leadsDashboard').style.display = 'none';
         document.getElementById('navLeadsBtn').classList.remove('active');
         document.getElementById('navAccountsBtn').classList.add('active');
-        document.getElementById('welcomeScreen').style.display   = 'none';
+        document.getElementById('welcomeScreen').style.display = 'none';
         document.getElementById('accountDashboard').style.display = 'block';
         switchTab('balance');
-        await loadBalanceSheet();
+        await loadCustomerProfile();
     }
 
-    async function loadBalanceSheet() {
-        if (!selectedAccountId) return;
+    async function loadCustomerProfile() {
+        if (!selectedCustomerId) return;
         try {
-            const res = await fetch(`/api/accounts/${selectedAccountId}/balance`);
+            const res = await fetch(`/api/customers/${selectedCustomerId}/profile`);
             if (!res.ok) return;
-            const data = await res.json();
-            currentBalanceSheet = data;
-            renderDashboard(data);
-        } catch (e) {}
+            currentProfile = await res.json();
+            renderProfile(currentProfile);
+        } catch (e) {
+            console.error('Failed to load customer profile', e);
+        }
     }
 
-    function renderDashboard(data) {
-        const initials = data.customerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        const account  = allAccounts.find(a => a.id === data.accountId);
+    function renderProfile(profile) {
+        const c = profile.customer;
+        const histories = profile.histories || [];
+        const portfolios = profile.portfolios || [];
+        const prefs = profile.preferences;
+        const initials = c.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const openPortfolios = portfolios.filter(p => p.status === 'Open');
 
-        document.getElementById('rhAvatar').textContent       = initials;
-        document.getElementById('rhName').textContent         = data.customerName;
-        document.getElementById('rhNumber').textContent       = data.accountNumber;
-        document.getElementById('breadcrumbName').textContent = data.customerName;
-
-        if (account) {
-            document.getElementById('rhCountry').textContent  = account.country;
-            document.getElementById('hlLeverage').textContent = '1:' + account.leverage;
-            document.getElementById('hlSince').textContent    = new Date(account.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' });
-        }
-
-        const typeBadgeMap = { 'VIP': 'badge-vip', 'Professional': 'badge-professional', 'Standard': 'badge-standard' };
-        const badgeEl = document.getElementById('rhTypeBadge');
-        badgeEl.textContent = data.accountType;
-        badgeEl.className   = 'sf-ai-badge ' + (typeBadgeMap[data.accountType] || 'badge-standard');
+        // Record header
+        document.getElementById('rhAvatar').textContent = initials;
+        document.getElementById('rhAvatar').style.background = `linear-gradient(135deg, ${avatarColor(c.id)} 0%, #5a9bdf 100%)`;
+        document.getElementById('rhName').textContent = c.name;
+        document.getElementById('breadcrumbName').textContent = c.name;
+        document.getElementById('rhNumber').textContent = c.email;
+        document.getElementById('rhCountry').textContent = c.company;
+        document.getElementById('rhTypeBadge').style.display = 'none';
 
         // Highlight fields
-        document.getElementById('hlBalance').textContent    = fmtUSD(data.balance);
-        document.getElementById('hlEquity').textContent     = fmtUSD(data.equity);
-        const hlPnl = document.getElementById('hlPnl');
-        hlPnl.textContent = (data.openPnL >= 0 ? '+' : '') + fmtUSD(data.openPnL);
-        hlPnl.className   = 'sf-hl-value ' + (data.openPnL > 0 ? 'positive' : data.openPnL < 0 ? 'negative' : '');
-        document.getElementById('hlFreeMargin').textContent = fmtUSD(data.freeMargin);
+        document.getElementById('hlCompany').textContent = c.company;
+        document.getElementById('hlEmail').textContent = c.email;
+        document.getElementById('hlPhone').textContent = c.phone;
+        document.getElementById('hlActivePortfolios').textContent = openPortfolios.length;
+        document.getElementById('hlTotalTrades').textContent = histories.length;
+        document.getElementById('hlSince').textContent = new Date(c.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' });
 
-        // Balance tab
-        document.getElementById('cardBalance').textContent    = fmtUSD(data.balance);
-        document.getElementById('cardEquity').textContent     = fmtUSD(data.equity);
-        const pnlEl = document.getElementById('cardPnl');
-        pnlEl.textContent = (data.openPnL >= 0 ? '+' : '') + fmtUSD(data.openPnL);
-        pnlEl.className   = 'sf-stat-value ' + (data.openPnL > 0 ? 'pnl-pos' : data.openPnL < 0 ? 'pnl-neg' : '');
-        document.getElementById('cardMarginLevel').textContent = data.margin > 0 ? `Margin level: ${data.marginLevel.toFixed(0)}%` : 'No open positions';
-        document.getElementById('cardFreeMargin').textContent = fmtUSD(data.freeMargin);
-        document.getElementById('cardUsedMargin').textContent = `Used: ${fmtUSD(data.margin)}`;
+        // Portfolio count badge
+        document.getElementById('posCount').textContent = portfolios.length;
+        document.getElementById('posCountBadge').textContent = portfolios.length;
 
-        document.getElementById('detailAccNumber').textContent  = data.accountNumber;
-        document.getElementById('detailAccType').textContent    = data.accountType;
-        document.getElementById('detailMarginUsed').textContent = fmtUSD(data.margin);
-        document.getElementById('detailMarginLevel').textContent= data.margin > 0 ? data.marginLevel.toFixed(1) + '%' : '\u2014';
-        document.getElementById('detailOpenPos').textContent    = data.openPositions.length;
+        // Customer Info tab
+        const totalPnl = histories.reduce((s, h) => s + h.pnL, 0);
+        document.getElementById('cardOpenPortfolios').textContent = openPortfolios.length;
+        document.getElementById('cardClosedTrades').textContent = histories.length;
+        const pnlEl = document.getElementById('cardTotalPnl');
+        pnlEl.textContent = (totalPnl >= 0 ? '+' : '') + fmtUSD(totalPnl);
+        pnlEl.style.color = totalPnl > 0 ? 'var(--sf-green)' : totalPnl < 0 ? 'var(--sf-red)' : '';
+        document.getElementById('cardMemberSince').textContent = new Date(c.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' });
+        const days = Math.floor((Date.now() - new Date(c.createdAt)) / 86400000);
+        document.getElementById('cardMemberDays').textContent = days + ' days';
+
+        document.getElementById('detailName').textContent = c.name;
+        document.getElementById('detailEmail').textContent = c.email;
+        document.getElementById('detailPhone').textContent = c.phone;
+        document.getElementById('detailCompany').textContent = c.company;
+        document.getElementById('detailActivePortfolios').textContent = openPortfolios.length + ' of ' + portfolios.length + ' total';
+
+        // Trade History tab
+        const histBody = document.getElementById('historyTable');
+        if (!histories.length) {
+            histBody.innerHTML = '<tr class="sf-table-empty"><td colspan="9">No trade history</td></tr>';
+        } else {
+            histBody.innerHTML = histories.map(h => {
+                const dirClass = h.direction === 'Buy' ? 'type-buy' : 'type-sell';
+                const pnlClass = h.pnL > 0 ? 'pnl-pos' : h.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
+                const pnlSign = h.pnL >= 0 ? '+' : '';
+                return `
+                <tr>
+                    <td style="font-weight:600;">${h.currencyPair}</td>
+                    <td class="${dirClass}"><i class="fa-solid ${h.direction === 'Buy' ? 'fa-arrow-up' : 'fa-arrow-down'}" style="font-size:10px;margin-right:3px;"></i>${h.direction.toUpperCase()}</td>
+                    <td>${fmtNum(h.amount)}</td>
+                    <td>${fmtRate(h.entryRate)}</td>
+                    <td>${fmtRate(h.exitRate)}</td>
+                    <td class="${pnlClass}">${pnlSign}${fmtUSD(h.pnL)}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${new Date(h.openedAt).toLocaleDateString()}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${new Date(h.closedAt).toLocaleDateString()}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${h.notes || '\u2014'}</td>
+                </tr>`;
+            }).join('');
+        }
 
         // Portfolios tab
-        const posCount = data.openPositions.length;
-        document.getElementById('posCount').textContent      = posCount;
-        document.getElementById('posCountBadge').textContent = posCount;
         const posBody = document.getElementById('positionsTable');
-        if (!posCount) {
-            posBody.innerHTML = '<tr class="sf-table-empty"><td colspan="10">No open positions</td></tr>';
+        if (!portfolios.length) {
+            posBody.innerHTML = '<tr class="sf-table-empty"><td colspan="6">No portfolios</td></tr>';
         } else {
-            posBody.innerHTML = data.openPositions.map(p => {
-                const pnlClass  = p.pnL > 0 ? 'pnl-pos' : p.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
-                const typeClass = p.type === 'Buy' ? 'type-buy' : 'type-sell';
-                const pnlSign   = p.pnL >= 0 ? '+' : '';
+            posBody.innerHTML = portfolios.map(p => {
+                const dirClass = p.direction === 'Buy' ? 'type-buy' : 'type-sell';
+                const statusColor = p.status === 'Open' ? 'var(--sf-green)' : 'var(--sf-text-2)';
                 return `
                 <tr>
-                    <td style="font-size:11px;color:var(--sf-text-2);">${p.positionId}</td>
                     <td style="font-weight:600;">${p.currencyPair}</td>
-                    <td class="${typeClass}"><i class="fa-solid ${p.type === 'Buy' ? 'fa-arrow-up' : 'fa-arrow-down'}" style="font-size:10px;margin-right:3px;"></i>${p.type.toUpperCase()}</td>
-                    <td>${p.lots.toFixed(2)}</td>
-                    <td>${p.openRate.toFixed(4)}</td>
-                    <td>${p.currentRate.toFixed(4)}</td>
-                    <td class="${pnlClass}">${pnlSign}$${Math.abs(p.pnL).toFixed(2)}</td>
-                    <td>$${p.margin.toFixed(2)}</td>
-                    <td style="font-size:11px;color:var(--sf-text-2);">${timeAgo(p.openTime)}</td>
-                    <td><button class="sf-btn-close-pos" onclick="closePosition('${p.positionId}')"><i class="fa-solid fa-xmark" style="margin-right:3px;"></i>Close</button></td>
+                    <td class="${dirClass}"><i class="fa-solid ${p.direction === 'Buy' ? 'fa-arrow-up' : 'fa-arrow-down'}" style="font-size:10px;margin-right:3px;"></i>${p.direction.toUpperCase()}</td>
+                    <td>${fmtNum(p.amount)}</td>
+                    <td>${fmtRate(p.entryRate)}</td>
+                    <td style="font-size:11px;color:var(--sf-text-2);">${new Date(p.openedAt).toLocaleDateString()}</td>
+                    <td><span style="color:${statusColor};font-weight:600;">${p.status}</span></td>
                 </tr>`;
             }).join('');
         }
 
-        // History tab
-        const histBody = document.getElementById('historyTable');
-        if (!data.recentTransactions.length) {
-            histBody.innerHTML = '<tr class="sf-table-empty"><td colspan="8">No transactions yet</td></tr>';
+        // Preferences tab
+        if (prefs) {
+            document.getElementById('prefPairs').textContent = prefs.preferredCurrencyPairs || '\u2014';
+            document.getElementById('prefRiskTolerance').textContent = prefs.riskTolerance || '\u2014';
+            document.getElementById('prefMaxPosition').textContent = fmtNum(prefs.maxPositionSize);
+            document.getElementById('prefStopLoss').textContent = prefs.stopLossPercent + '%';
+            document.getElementById('prefTakeProfit').textContent = prefs.takeProfitPercent + '%';
+            document.getElementById('prefTradingStyle').textContent = prefs.tradingStyle || '\u2014';
+            document.getElementById('prefNotifications').textContent = prefs.enableNotifications ? 'Enabled' : 'Disabled';
+            document.getElementById('prefChannels').textContent = prefs.notificationChannels || '\u2014';
+            document.getElementById('prefUpdatedAt').textContent = new Date(prefs.updatedAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
         } else {
-            histBody.innerHTML = data.recentTransactions.map(t => {
-                const typeClass = t.type === 'Buy' ? 'type-buy' : t.type === 'Sell' ? 'type-sell' : t.type === 'Deposit' ? 'type-deposit' : 'type-close';
-                const pnlStr = t.pnL !== 0 ? (t.pnL > 0 ? '+$' : '-$') + Math.abs(t.pnL).toFixed(2) : t.type === 'Deposit' ? '+$' + Math.abs(t.balanceAfter).toFixed(2) : '\u2014';
-                const pnlCls = t.pnL > 0 || t.type === 'Deposit' ? 'pnl-pos' : t.pnL < 0 ? 'pnl-neg' : 'pnl-zero';
-                return `
-                <tr>
-                    <td style="font-size:11px;color:var(--sf-text-2);">${new Date(t.timestamp).toLocaleString()}</td>
-                    <td style="font-size:11px;color:var(--sf-text-2);">${t.transactionId}</td>
-                    <td class="${typeClass}" style="font-weight:600;">${t.type}</td>
-                    <td>${t.currencyPair}</td>
-                    <td>${t.lots > 0 ? t.lots.toFixed(2) : '\u2014'}</td>
-                    <td>${t.rate > 0 ? t.rate.toFixed(4) : '\u2014'}</td>
-                    <td class="${pnlCls}">${pnlStr}</td>
-                    <td style="font-weight:600;">${fmtUSD(t.balanceAfter)}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        // Preference tab
-        document.getElementById('prefName').textContent      = data.customerName;
-        document.getElementById('prefAccNumber').textContent = data.accountNumber;
-        document.getElementById('prefAccType').textContent   = data.accountType;
-        if (account) {
-            document.getElementById('prefCountry').textContent  = account.country;
-            document.getElementById('prefSince').textContent    = new Date(account.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('prefLeverage').textContent = '1:' + account.leverage;
-            const riskMap = { 'Standard': 'Moderate', 'Professional': 'Aggressive', 'VIP': 'Custom / High' };
-            document.getElementById('prefRisk').textContent = riskMap[account.accountType] || 'Moderate';
-            const lotMap = { 100: '0.10', 200: '0.20', 500: '0.50' };
-            document.getElementById('prefLotSize').textContent = lotMap[account.leverage] || '0.10';
-            document.getElementById('prefMaxLot').textContent  = account.leverage >= 200 ? '50.00' : '10.00';
-            const tzMap = { 'Australia': 'AEDT (UTC+11)', 'Singapore': 'SGT (UTC+8)', 'Hong Kong': 'HKT (UTC+8)', 'United States': 'EST (UTC-5)', 'United Kingdom': 'GMT (UTC+0)' };
-            document.getElementById('prefTimezone').textContent = tzMap[account.country] || 'UTC';
-        }
-
-        updateMarginEstimate();
-    }
-
-    async function executeTrade(type) {
-        if (!selectedAccountId) return showToast('Please select an account first.', false);
-        const lots = parseFloat(document.getElementById('tradeLotsInput').value);
-        if (isNaN(lots) || lots <= 0) return showToast('Enter a valid lot size.', false);
-        const btns = document.querySelectorAll('.sf-btn-buy, .sf-btn-sell');
-        btns.forEach(b => b.disabled = true);
-        try {
-            const res = await fetch(`/api/accounts/${selectedAccountId}/${type}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currencyPair: 'AUD/USD', lots: lots })
+            ['prefPairs','prefRiskTolerance','prefMaxPosition','prefStopLoss','prefTakeProfit','prefTradingStyle','prefNotifications','prefChannels','prefUpdatedAt'].forEach(id => {
+                document.getElementById(id).textContent = '\u2014';
             });
-            const result = await res.json();
-            if (result.success) {
-                showToast('\u2713 ' + result.message, true);
-                await loadBalanceSheet();
-                await loadAccounts();
-            } else {
-                showToast('\u2717 ' + result.message, false);
-            }
-        } catch (e) {
-            showToast('Request failed. Please try again.', false);
-        } finally {
-            btns.forEach(b => b.disabled = false);
         }
-    }
 
-    async function closePosition(positionId) {
-        if (!selectedAccountId) return;
-        try {
-            const res = await fetch(`/api/accounts/${selectedAccountId}/close/${positionId}`, { method: 'POST' });
-            const result = await res.json();
-            if (result.success) {
-                showToast('\u2713 ' + result.message, true);
-                await loadBalanceSheet();
-                await loadAccounts();
-            } else {
-                showToast('\u2717 ' + result.message, false);
-            }
-        } catch (e) {
-            showToast('Failed to close position.', false);
-        }
-    }
-
-    function setLots(v) {
-        document.getElementById('tradeLotsInput').value = v.toFixed(2);
-        updateMarginEstimate();
-    }
-
-    function updateMarginEstimate() {
-        if (!currentBalanceSheet || !currentRate) return;
-        const lots    = parseFloat(document.getElementById('tradeLotsInput').value) || 0;
-        const account = allAccounts.find(a => a.id === selectedAccountId);
-        if (!account) return;
-        const margin = (lots * 100000 * currentRate) / account.leverage;
-        document.getElementById('tradeMarginEstimate').textContent =
-            `Est. margin: $${margin.toFixed(2)} | Free margin: ${fmtUSD(currentBalanceSheet.freeMargin)}`;
-    }
-
-    function fmtUSD(v) {
-        if (v == null) return '\u2014';
-        const abs    = Math.abs(v);
-        const prefix = v < 0 ? '-$' : '$';
-        return prefix + abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function timeAgo(dt) {
-        const diff = Math.floor((Date.now() - new Date(dt)) / 1000);
-        if (diff < 60)    return diff + 's ago';
-        if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
-        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-        return Math.floor(diff / 86400) + 'd ago';
+        document.getElementById('prefCustName').textContent = c.name;
+        document.getElementById('prefCustEmail').textContent = c.email;
+        document.getElementById('prefCustPhone').textContent = c.phone;
+        document.getElementById('prefCustCompany').textContent = c.company;
+        document.getElementById('prefCustSince').textContent = new Date(c.createdAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
     let toastTimer = null;
@@ -1164,17 +1019,6 @@
         document.body.appendChild(div);
         toastTimer = setTimeout(() => div.remove(), 4000);
     }
-
-    async function init() {
-        await updateTicker();
-        await loadAccounts();
-    }
-
-    setInterval(async () => {
-        await updateTicker();
-        if (selectedAccountId) await loadBalanceSheet();
-        await loadAccounts();
-    }, 2000);
 
     let leadsData = [];
 
@@ -1232,8 +1076,8 @@
         document.getElementById('leadsDashboard').style.display   = 'block';
         document.getElementById('navLeadsBtn').classList.add('active');
         document.getElementById('navAccountsBtn').classList.remove('active');
-        selectedAccountId = null;
-        renderAccountList(allAccounts);
+        selectedCustomerId = null;
+        renderCustomerList(allCustomers);
         loadLeads();
     }
 
@@ -1241,7 +1085,7 @@
         document.getElementById('leadsDashboard').style.display = 'none';
         document.getElementById('navLeadsBtn').classList.remove('active');
         document.getElementById('navAccountsBtn').classList.add('active');
-        if (!selectedAccountId) {
+        if (!selectedCustomerId) {
             document.getElementById('welcomeScreen').style.display = 'block';
             document.getElementById('accountDashboard').style.display = 'none';
         }
@@ -1253,10 +1097,8 @@
         await loadLeads();
     }
 
-    document.getElementById('tradeLotsInput').addEventListener('input', updateMarginEstimate);
-
+    loadCustomers();
     loadLeads();
-    init();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

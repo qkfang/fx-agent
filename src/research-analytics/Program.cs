@@ -15,7 +15,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddHttpClient<ArticleService>();
 builder.Services.AddSingleton<TrackingService>();
-builder.Services.AddSingleton<SuggestionService>();
+builder.Services.AddHttpClient<SuggestionService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -116,23 +116,14 @@ app.MapPost("/api/articles/receive", (NewsIntakeRequest req, ArticleService arti
 
 app.MapRazorPages();
 
-// API: Receive a customer suggestion from a 3rd-party app
-app.MapPost("/api/suggestions", (CustomerSuggestionRequest req, SuggestionService suggestions) =>
+// API: Chat with Foundry research agent
+app.MapPost("/api/chat", async (ChatRequest req, ChatService chatService) =>
 {
-    var suggestion = new CustomerSuggestion
-    {
-        CustomerName = req.CustomerName ?? string.Empty,
-        Phone = req.Phone ?? string.Empty,
-        Email = req.Email ?? string.Empty,
-        Company = req.Company ?? string.Empty,
-        CurrencyPair = req.CurrencyPair ?? "AUD/USD",
-        Direction = req.Direction ?? string.Empty,
-        Analysis = req.Analysis ?? string.Empty,
-        Confidence = req.Confidence ?? "Medium",
-        SuggestedBy = req.SuggestedBy ?? "External App"
-    };
-    var created = suggestions.Add(suggestion);
-    return Results.Ok(new { received = true, suggestionId = created.Id, customerName = created.CustomerName });
+    if (string.IsNullOrWhiteSpace(req.Message))
+        return Results.BadRequest(new { error = "Message is required." });
+
+    var reply = await chatService.SendMessageAsync(req.Message, req.History);
+    return Results.Ok(new { reply });
 });
 
 // API: List all customer suggestions
@@ -157,15 +148,5 @@ public record NewsIntakeRequest(
     DateTime? PublishedAt
 );
 
-/// <summary>Payload sent by a 3rd-party app to suggest a customer prospect.</summary>
-public record CustomerSuggestionRequest(
-    string? CustomerName,
-    string? Phone,
-    string? Email,
-    string? Company,
-    string? CurrencyPair,
-    string? Direction,
-    string? Analysis,
-    string? Confidence,
-    string? SuggestedBy
-);
+public record ChatRequest(string Message, List<ChatTurn>? History);
+

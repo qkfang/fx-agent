@@ -13,6 +13,10 @@ public class TraderRecommendationsController : ControllerBase
 
     public TraderRecommendationsController(FxDbContext db) => _db = db;
 
+    [HttpGet]
+    public async Task<ActionResult<List<TraderRecommendation>>> GetAll()
+        => await _db.TraderRecommendations.Include(r => r.Trader).ToListAsync();
+
     [HttpGet("trader/{traderId}")]
     public async Task<ActionResult<List<TraderRecommendation>>> GetByTrader(int traderId)
         => await _db.TraderRecommendations.Where(r => r.TraderId == traderId).ToListAsync();
