@@ -810,5 +810,355 @@ function switchView(view) {
     }
 
 })();
+
+// ============================================================================
+//  BLOTTER / AURORA VIEW
+// ============================================================================
+(function () {
+    'use strict';
+
+    // ── Static pair definitions ──────────────────────────────────────────────
+    var PAIRS = [
+        { pair: 'EUR/USD', base: 1.1715, flag: '🇪🇺🇺🇸' },
+        { pair: 'AUD/USD', base: 0.6528, flag: '🇦🇺🇺🇸' },
+        { pair: 'USD/JPY', base: 144.37, flag: '🇺🇸🇯🇵' },
+        { pair: 'GBP/USD', base: 1.3699, flag: '🇬🇧🇺🇸' },
+        { pair: 'USD/CHF', base: 0.9025, flag: '🇺🇸🇨🇭' },
+        { pair: 'USD/CNH', base: 7.1623, flag: '🇺🇸🇨🇳' },
+        { pair: 'USD/HKD', base: 7.8498, flag: '🇺🇸🇭🇰' },
+        { pair: 'EUR/GBP', base: 0.8550, flag: '🇪🇺🇬🇧' },
+        { pair: 'AUD/NZD', base: 1.0812, flag: '🇦🇺🇳🇿' },
+        { pair: 'USD/SGD', base: 1.3540, flag: '🇺🇸🇸🇬' },
+        { pair: 'USD/ZAR', base: 17.790, flag: '🇺🇸🇿🇦' },
+        { pair: 'XAU/USD', base: 3282.5, flag: '🥇🇺🇸' }
+    ];
+
+    var pairState = {};   // { pair: { mid, spread, activeTenor } }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function rand(min, max) { return min + Math.random() * (max - min); }
+
+    function formatRate(val, base) {
+        if (base >= 100) return val.toFixed(2);
+        if (base >= 10)  return val.toFixed(3);
+        return val.toFixed(4);
+    }
+
+    function splitRate(val, base) {
+        var s     = formatRate(val, base);
+        var parts = s.split('.');
+        var whole = parts[0];
+        var dec   = parts[1] || '';
+        // prefix = whole + first 2 decimals, pips = next 2, suffix = last 1 (if any)
+        if (base >= 100) {
+            // e.g. 144.37 → prefix "144.", pips "37", suffix ""
+            return { prefix: whole + '.', pips: dec.slice(0, 2), suffix: dec.slice(2) };
+        }
+        // e.g. 1.17149 → prefix "1.", pips "17", suffix "149"→show "14" + "9" hint
+        return { prefix: whole + '.', pips: dec.slice(0, 2), suffix: dec.slice(2) };
+    }
+
+    function settleDate() {
+        var d = new Date();
+        d.setDate(d.getDate() + 2);
+        return d.toISOString().slice(0, 10);
+    }
+
+    function nowStr() {
+        var n = new Date();
+        return n.toISOString().slice(0, 10) + ' ' + n.toTimeString().slice(0, 8);
+    }
+
+    // ── Init pair state ───────────────────────────────────────────────────────
+    function initPairState() {
+        PAIRS.forEach(function (p) {
+            var sp = p.base >= 100 ? rand(0.008, 0.02) : rand(0.00015, 0.0004);
+            pairState[p.pair] = {
+                mid: p.base,
+                spread: sp,
+                activeTenor: '1M'
+            };
+        });
+    }
+
+    // ── Render tiles ─────────────────────────────────────────────────────────
+    function renderTiles() {
+        var grid = document.getElementById('fxTilesGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        PAIRS.forEach(function (p) {
+            var tile = buildTile(p);
+            grid.appendChild(tile);
+        });
+    }
+
+    function buildTile(p) {
+        var st      = pairState[p.pair];
+        var sell    = st.mid - st.spread / 2;
+        var buy     = st.mid + st.spread / 2;
+        var sellSp  = splitRate(sell, p.base);
+        var buySp   = splitRate(buy,  p.base);
+        var pipDiff = Math.round(st.spread / (p.base >= 100 ? 0.005 : 0.00005));
+        var settle  = settleDate();
+        var tenors  = ['1M', '2M', '5M', '10M'];
+
+        var div = document.createElement('div');
+        div.className = 'fx-tile';
+        div.id = 'tile-' + p.pair.replace('/', '');
+
+        div.innerHTML =
+            '<div class="fx-tile-header">' +
+                '<span style="margin-right:3px;font-size:0.75rem">' + p.flag + '</span>' +
+                '<span class="fx-tile-pair">' + p.pair + '</span>' +
+                '<span class="fx-tile-badge">SPOT</span>' +
+                '<span class="fx-tile-rfq">RFQ</span>' +
+                '<button class="fx-tile-close" onclick="removeTile(\'' + p.pair + '\')">&#x2715;</button>' +
+            '</div>' +
+            '<div class="fx-tile-rates">' +
+                '<div class="fx-rate-side fx-rate-sell" onclick="openOrder(\'' + p.pair + '\',\'SELL\')">' +
+                    '<div class="fx-rate-label">SELL ' + p.pair.split('/')[0] + '</div>' +
+                    '<div class="fx-rate-num-row">' +
+                        '<span class="fx-rate-prefix">' + sellSp.prefix + '</span>' +
+                        '<span class="fx-rate-pips" id="sell-pips-' + p.pair.replace('/', '') + '">' + sellSp.pips + '</span>' +
+                        '<span class="fx-rate-suffix">' + sellSp.suffix + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="fx-rate-spread">' +
+                    '<span>' + pipDiff + '</span>' +
+                    '<span style="font-size:0.5rem;color:#4a5568">pip</span>' +
+                '</div>' +
+                '<div class="fx-rate-side fx-rate-buy" onclick="openOrder(\'' + p.pair + '\',\'BUY\')">' +
+                    '<div class="fx-rate-label">BUY ' + p.pair.split('/')[0] + '</div>' +
+                    '<div class="fx-rate-num-row">' +
+                        '<span class="fx-rate-prefix">' + buySp.prefix + '</span>' +
+                        '<span class="fx-rate-pips" id="buy-pips-' + p.pair.replace('/', '') + '">' + buySp.pips + '</span>' +
+                        '<span class="fx-rate-suffix">' + buySp.suffix + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="fx-tile-tenors">' +
+                tenors.map(function (t) {
+                    return '<button class="fx-tenor-btn' + (t === st.activeTenor ? ' active' : '') +
+                           '" onclick="setTenor(\'' + p.pair + '\',\'' + t + '\',this)">' + t + '</button>';
+                }).join('') +
+            '</div>' +
+            '<div class="fx-tile-footer">' +
+                '<span class="fx-notional-val">1,000,000.00</span>' +
+                '<span class="fx-settle">' + p.pair.split('/')[0] + ' SP ' + settle + '</span>' +
+                '<button class="fx-order-btn" onclick="openOrder(\'' + p.pair + '\',\'BUY\')">ORDER</button>' +
+            '</div>';
+
+        return div;
+    }
+
+    // ── Tick: update pip cells only ───────────────────────────────────────────
+    function tickBlotter() {
+        PAIRS.forEach(function (p) {
+            var st = pairState[p.pair];
+            var drift = (Math.random() + Math.random() - 1) * (p.base >= 100 ? 0.008 : 0.00006);
+            st.mid = parseFloat((st.mid + drift).toFixed(p.base >= 100 ? 3 : 5));
+
+            var sell = st.mid - st.spread / 2;
+            var buy  = st.mid + st.spread / 2;
+            var key  = p.pair.replace('/', '');
+            var sellEl = document.getElementById('sell-pips-' + key);
+            var buyEl  = document.getElementById('buy-pips-'  + key);
+            if (sellEl) sellEl.textContent = splitRate(sell, p.base).pips;
+            if (buyEl)  buyEl.textContent  = splitRate(buy,  p.base).pips;
+        });
+    }
+
+    // ── Tenor selection ───────────────────────────────────────────────────────
+    window.setTenor = function (pair, tenor, btn) {
+        pairState[pair].activeTenor = tenor;
+        var tile = document.getElementById('tile-' + pair.replace('/', ''));
+        if (!tile) return;
+        tile.querySelectorAll('.fx-tenor-btn').forEach(function (b) {
+            b.classList.toggle('active', b.textContent === tenor);
+        });
+    };
+
+    // ── Remove tile ───────────────────────────────────────────────────────────
+    window.removeTile = function (pair) {
+        var key = 'tile-' + pair.replace('/', '');
+        var el  = document.getElementById(key);
+        if (el) el.remove();
+        PAIRS = PAIRS.filter(function (p) { return p.pair !== pair; });
+    };
+
+    window.addCcyPrompt = function () {
+        var pair = prompt('Enter currency pair (e.g. USD/MXN):');
+        if (!pair) return;
+        pair = pair.toUpperCase().trim();
+        if (PAIRS.some(function (p) { return p.pair === pair; })) return;
+        var base = parseFloat(prompt('Enter mid rate for ' + pair + ':') || '1');
+        if (isNaN(base) || base <= 0) return;
+        PAIRS.push({ pair: pair, base: base, flag: '🌐' });
+        var sp = base >= 100 ? rand(0.008, 0.02) : rand(0.00015, 0.0004);
+        pairState[pair] = { mid: base, spread: sp, activeTenor: '1M' };
+        var grid = document.getElementById('fxTilesGrid');
+        if (grid) grid.appendChild(buildTile(PAIRS[PAIRS.length - 1]));
+    };
+
+    // ── Order ticket ──────────────────────────────────────────────────────────
+    var activePair = '';
+
+    window.openOrder = function (pair, direction) {
+        activePair = pair;
+        var st  = pairState[pair];
+        var mid = st ? st.mid : 0;
+        var base = (PAIRS.find(function (p) { return p.pair === pair; }) || {}).base || 1;
+
+        document.getElementById('otPairLabel').textContent = pair;
+        document.getElementById('otMktPrice').textContent  = formatRate(mid, base);
+        document.getElementById('otLimitPrice').value      = formatRate(mid, base);
+        document.getElementById('otMktPips').textContent   = '';
+
+        var parts = pair.split('/');
+        document.getElementById('otCcyToggle').innerHTML =
+            '<button class="ot-tog active-ccy" id="otCcy0" onclick="setCcy(0)">' + parts[0] + '</button>' +
+            '<button class="ot-tog"            id="otCcy1" onclick="setCcy(1)">' + parts[1] + '</button>';
+
+        setDirection(direction);
+        document.getElementById('orderOverlay').style.display = 'flex';
+    };
+
+    window.closeOrderTicket = function () {
+        document.getElementById('orderOverlay').style.display = 'none';
+    };
+
+    window.setDirection = function (dir) {
+        document.getElementById('otBuyBtn').className  = 'ot-tog' + (dir === 'BUY'  ? ' active-buy'  : '');
+        document.getElementById('otSellBtn').className = 'ot-tog' + (dir === 'SELL' ? ' active-sell' : '');
+    };
+
+    window.setCcy = function (idx) {
+        document.getElementById('otCcy0').className = 'ot-tog' + (idx === 0 ? ' active-ccy' : '');
+        document.getElementById('otCcy1').className = 'ot-tog' + (idx === 1 ? ' active-ccy' : '');
+    };
+
+    window.stepQty = function (delta) {
+        var el  = document.getElementById('otQty');
+        var val = parseFloat((el.value || '0').replace(/,/g, '')) + delta;
+        if (val < 0) val = 0;
+        el.value = val.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    };
+
+    window.stepPrice = function (delta) {
+        var el  = document.getElementById('otLimitPrice');
+        var val = parseFloat(el.value || '0') + delta;
+        if (val < 0) val = 0;
+        el.value = val.toFixed(4);
+    };
+
+    window.resetOrderTicket = function () {
+        document.getElementById('otQty').value        = '1,000,000.00';
+        document.getElementById('otLimitPrice').value = document.getElementById('otMktPrice').textContent;
+        document.getElementById('otMktPips').textContent = '';
+        setDirection('BUY');
+    };
+
+    window.cloneOrder = function () {
+        closeOrderTicket();
+        setTimeout(function () {
+            openOrder(activePair, document.getElementById('otBuyBtn').classList.contains('active-buy') ? 'BUY' : 'SELL');
+        }, 150);
+    };
+
+    window.submitOrder = function () {
+        var dir  = document.getElementById('otBuyBtn').classList.contains('active-buy') ? 'BUY' : 'SELL';
+        var qty  = document.getElementById('otQty').value;
+        var px   = document.getElementById('otLimitPrice').value;
+        var type = document.getElementById('otOrderType').value;
+        addBlotterRow(dir, activePair, qty, px, type, 'WORKING');
+        closeOrderTicket();
+    };
+
+    // ── Blotter rows ──────────────────────────────────────────────────────────
+    var blotterRows = [];
+
+    function loadBlotterFromTransactions() {
+        fetch('/api/trades')
+            .then(function (r) { return r.json(); })
+            .then(function (trades) {
+                if (!Array.isArray(trades)) return;
+                trades.slice(0, 10).forEach(function (t) {
+                    var side  = (t.type || t.Type || 'BUY').toUpperCase();
+                    var pair  = t.currencyPair || t.CurrencyPair || 'EUR/USD';
+                    var qty   = parseFloat(t.amount || t.Amount || 1000000).toLocaleString();
+                    var px    = parseFloat(t.rate   || t.Rate   || 0).toFixed(4);
+                    var parts = pair.split('/');
+                    blotterRows.unshift({ side: side, pair: pair, qty: qty, px: px, orderType: 'RFQ',
+                        status: 'FILLED', ccy: parts[0], cumQty: qty, avgPx: px,
+                        created: (t.dateTime || t.DateTime || ''), tif: 'GTC', contra: parts[1] + ':MKT' });
+                });
+                renderBlotter();
+            })
+            .catch(function () {});
+    }
+
+    window.addBlotterRow = function (side, pair, qty, px, orderType, status) {
+        var parts = pair.split('/');
+        var now   = nowStr();
+        blotterRows.unshift({ side: side, pair: pair, qty: qty, px: px, orderType: orderType,
+            status: status, ccy: parts[0], cumQty: '0', avgPx: '—',
+            created: now, tif: 'GTC', contra: parts[1] + ':LMT' });
+        renderBlotter();
+        // Simulate fill after 2 seconds
+        setTimeout(function () {
+            if (blotterRows[0]) {
+                blotterRows[0].status = 'FILLED';
+                blotterRows[0].cumQty = blotterRows[0].qty;
+                blotterRows[0].avgPx  = blotterRows[0].px;
+                renderBlotter();
+            }
+        }, 2000);
+    };
+
+    function renderBlotter() {
+        var tbody = document.getElementById('blotterTbody');
+        if (!tbody) return;
+        var html = '';
+        blotterRows.forEach(function (r) {
+            var stCls   = r.status === 'FILLED' ? 'st-filled' : 'st-working';
+            var sideCls = r.side   === 'BUY'    ? 'side-buy'  : 'side-sell';
+            var dt = r.created ? new Date(r.created) : null;
+            var dtStr = dt && !isNaN(dt) ? dt.toISOString().slice(0, 10) + ' ' + dt.toTimeString().slice(0, 8) : r.created;
+            html +=
+                '<tr>' +
+                '<td>' + dtStr + '</td>' +
+                '<td>' + dtStr + '</td>' +
+                '<td><span class="' + stCls + '">' + r.status + '</span></td>' +
+                '<td>' + r.orderType + '</td>' +
+                '<td>PROP-01</td>' +
+                '<td>SPOT</td>' +
+                '<td>' + r.pair + '</td>' +
+                '<td class="' + sideCls + '">' + r.side + '</td>' +
+                '<td>' + r.ccy + '</td>' +
+                '<td>' + r.qty + '</td>' +
+                '<td>' + r.cumQty + '</td>' +
+                '<td>' + r.avgPx + '</td>' +
+                '<td>GTC</td>' +
+                '<td>' + r.contra + '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    // ── Initialise ────────────────────────────────────────────────────────────
+    window.initBlotterView = function () {
+        initPairState();
+        renderTiles();
+        loadBlotterFromTransactions();
+        setInterval(tickBlotter, 1200);
+    };
+
+    // Close overlay on background click
+    document.addEventListener('click', function (e) {
+        var overlay = document.getElementById('orderOverlay');
+        if (overlay && e.target === overlay) { closeOrderTicket(); }
+    });
+
+})();
 </script>
 }

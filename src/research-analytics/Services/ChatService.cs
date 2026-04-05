@@ -19,7 +19,12 @@ public class ChatService
 
     public async Task<string> SendMessageAsync(string userMessage, List<ChatTurn>? history = null)
     {
-        var payload = new { message = userMessage };
+        return await SendMessageWithOptionsAsync(userMessage, 0.7, history);
+    }
+
+    public async Task<string> SendMessageWithOptionsAsync(string userMessage, double temperature, List<ChatTurn>? history = null)
+    {
+        var payload = new { message = userMessage, temperature };
         var json = JsonSerializer.Serialize(payload);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 

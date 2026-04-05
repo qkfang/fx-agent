@@ -189,9 +189,61 @@
 
     <!-- ── Tab 3: Ask AI ── -->
     <div class="tab-pane fade" id="tab-chat">
-        <div class="d-flex gap-4" style="height: 640px;">
-            <div class="flex-fill" style="min-width: 0;">
-                <openai-chatkit id="account-chatkit" style="width:100%; height:100%; border-radius:8px; overflow:hidden;"></openai-chatkit>
+        <!-- Settings bar -->
+        <div class="d-flex align-items-center gap-3 mb-3 p-3 aichat-settings">
+            <i class="fa-solid fa-sliders text-muted"></i>
+            <div class="d-flex align-items-center gap-2">
+                <label class="form-label mb-0 small fw-semibold">Temperature</label>
+                <input type="range" class="form-range aichat-temp-slider" id="aichat-temp"
+                       min="0" max="1" step="0.05" value="0.7" style="width:120px;">
+                <span class="badge bg-secondary" id="aichat-temp-label">0.7</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 ms-3">
+                <label class="form-label mb-0 small fw-semibold">Model</label>
+                <select class="form-select form-select-sm aichat-select" id="aichat-model" style="width:auto;">
+                    <option value="fxag-insight">fxag-insight</option>
+                    <option value="fxag-research">fxag-research</option>
+                </select>
+            </div>
+            <button class="btn btn-xs btn-outline-secondary ms-auto" id="aichat-clear" title="Clear conversation">
+                <i class="fa-solid fa-trash-can me-1"></i>Clear
+            </button>
+        </div>
+
+        <!-- Two-column layout: chat | references -->
+        <div class="d-flex gap-3" style="height:600px;">
+
+            <!-- Chat panel -->
+            <div class="d-flex flex-column flex-fill aichat-panel" style="min-width:0;">
+                <div class="aichat-messages flex-fill overflow-auto p-3" id="aichat-messages">
+                    <div class="aichat-welcome">
+                        <i class="fa-solid fa-brain fa-2x mb-2"></i>
+                        <p class="mb-1 fw-semibold">Research AI Assistant</p>
+                        <p class="small text-muted">Ask about market conditions, currency pairs, or trading strategy. Relevant articles will appear on the right.</p>
+                    </div>
+                </div>
+                <div class="aichat-composer p-2">
+                    <div class="input-group">
+                        <textarea class="form-control aichat-input" id="aichat-input"
+                                  placeholder="Ask about FX research..." rows="2"
+                                  style="resize:none;"></textarea>
+                        <button class="btn btn-primary aichat-send-btn" id="aichat-send">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- References panel -->
+            <div class="aichat-refs-panel d-flex flex-column" style="width:320px;flex-shrink:0;">
+                <div class="aichat-refs-header px-3 py-2">
+                    <i class="fa-solid fa-book-open me-1"></i>
+                    <span class="fw-semibold small">References</span>
+                    <span class="badge bg-secondary ms-2" id="aichat-refs-count">0</span>
+                </div>
+                <div class="aichat-refs-list overflow-auto flex-fill p-2" id="aichat-refs-list">
+                    <div class="text-muted small text-center mt-4">References will appear here after your first query.</div>
+                </div>
             </div>
         </div>
     </div>
@@ -447,33 +499,196 @@
     }
 })();
 </script>
+<style>
+.aichat-settings {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+.aichat-panel {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+}
+.aichat-messages {
+    background: #f8f9fa;
+}
+.aichat-welcome {
+    text-align: center;
+    padding: 60px 20px 20px;
+    color: #6c757d;
+}
+.aichat-msg {
+    margin-bottom: 14px;
+}
+.aichat-msg-user .aichat-bubble {
+    background: #1a3a5c;
+    color: #fff;
+    border-radius: 12px 12px 4px 12px;
+    padding: 10px 14px;
+    max-width: 85%;
+    margin-left: auto;
+    font-size: 0.9rem;
+}
+.aichat-msg-assistant .aichat-bubble {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 12px 12px 12px 4px;
+    padding: 10px 14px;
+    max-width: 90%;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+}
+.aichat-meta {
+    font-size: 0.72rem;
+    color: #adb5bd;
+    margin-top: 3px;
+}
+.aichat-msg-user .aichat-meta { text-align: right; }
+.aichat-composer {
+    border-top: 1px solid #dee2e6;
+    background: #fff;
+}
+.aichat-input:focus { box-shadow: none; border-color: #1a3a5c; }
+.aichat-send-btn { background: #1a3a5c; border: none; }
+.aichat-send-btn:hover { background: #0f2540; }
+.aichat-refs-panel {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+}
+.aichat-refs-header {
+    background: #1a3a5c;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+}
+.aichat-ref-card {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+    transition: border-color 0.15s;
+}
+.aichat-ref-card:hover { border-color: #1a3a5c; }
+.aichat-ref-card a { color: #1a3a5c; font-weight: 600; text-decoration: none; }
+.aichat-ref-card a:hover { text-decoration: underline; }
+.aichat-typing .aichat-bubble {
+    font-style: italic;
+    color: #6c757d;
+}
+.aichat-select { font-size: 0.82rem; }
+.aichat-temp-slider { cursor: pointer; }
+</style>
 <script>
 (function () {
-    var initialized = false;
-    document.getElementById('tab-chat-btn').addEventListener('shown.bs.tab', function () {
-        if (initialized) return;
-        initialized = true;
-        customElements.whenDefined('openai-chatkit').then(function () {
-            var chatkit = document.getElementById('account-chatkit');
-            if (!chatkit) return;
-            chatkit.setOptions({
-                api: {
-                    url: '/chatkit',
-                    domainKey: 'fx-research'
-                },
-                history: { enabled: false },
-                startScreen: {
-                    greeting: 'FX Research Assistant',
-                    prompts: [
-                        { label: 'Market outlook', prompt: 'What is the current market outlook for EUR/USD?' },
-                        { label: 'Trading strategy', prompt: 'What trading strategies work best in current conditions?' },
-                        { label: 'Currency analysis', prompt: 'Provide a technical analysis for USD/JPY.' }
-                    ]
-                },
-                composer: { placeholder: 'Ask about market research...' }
+    const messagesEl = document.getElementById('aichat-messages');
+    const inputEl    = document.getElementById('aichat-input');
+    const sendBtn    = document.getElementById('aichat-send');
+    const clearBtn   = document.getElementById('aichat-clear');
+    const tempSlider = document.getElementById('aichat-temp');
+    const tempLabel  = document.getElementById('aichat-temp-label');
+    const refsEl     = document.getElementById('aichat-refs-list');
+    const refsCount  = document.getElementById('aichat-refs-count');
+
+    tempSlider.addEventListener('input', () => { tempLabel.textContent = parseFloat(tempSlider.value).toFixed(2); });
+
+    var history = [];
+
+    function appendMsg(role, text) {
+        var welcome = messagesEl.querySelector('.aichat-welcome');
+        if (welcome) welcome.remove();
+
+        var now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        var div = document.createElement('div');
+        div.className = 'aichat-msg aichat-msg-' + role;
+        div.innerHTML =
+            '<div class="aichat-bubble">' + escHtml(text) + '</div>' +
+            '<div class="aichat-meta">' + (role === 'user' ? 'You' : 'AI') + ' · ' + now + '</div>';
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return div;
+    }
+
+    function appendTyping() {
+        var div = document.createElement('div');
+        div.className = 'aichat-msg aichat-msg-assistant aichat-typing';
+        div.innerHTML = '<div class="aichat-bubble">Thinking…</div>';
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return div;
+    }
+
+    function renderRefs(refs) {
+        refsCount.textContent = refs.length;
+        if (!refs.length) {
+            refsEl.innerHTML = '<div class="text-muted small text-center mt-4">No matching articles found for this query.</div>';
+            return;
+        }
+        refsEl.innerHTML = refs.map(function (r, i) {
+            var sentClass = r.sentiment === 'Bullish' ? 'sentiment-bullish' : r.sentiment === 'Bearish' ? 'sentiment-bearish' : 'sentiment-neutral';
+            return '<div class="aichat-ref-card">' +
+                '<div class="d-flex justify-content-between align-items-start mb-1">' +
+                '<span class="cat-badge cat-' + r.category.replace(/\//g,'-').replace(/ /g,'-').toLowerCase() + '">' + escHtml(r.category) + '</span>' +
+                '<span class="sentiment-badge ' + sentClass + '">' + escHtml(r.sentiment) + '</span>' +
+                '</div>' +
+                '<a href="' + r.url + '" target="_blank">[' + (i+1) + '] ' + escHtml(r.title) + '</a>' +
+                '<p class="text-muted mb-1 mt-1" style="font-size:0.78rem;">' + escHtml(r.summary.substring(0, 90)) + '…</p>' +
+                '<div class="text-muted" style="font-size:0.72rem;">' + escHtml(r.author) + ' · ' + escHtml(r.publishedDate) + '</div>' +
+                '</div>';
+        }).join('');
+    }
+
+    async function send() {
+        var text = inputEl.value.trim();
+        if (!text) return;
+        inputEl.value = '';
+        sendBtn.disabled = true;
+
+        appendMsg('user', text);
+        var typing = appendTyping();
+
+        history.push({ role: 'user', content: text });
+
+        try {
+            var res = await fetch('/api/chat/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    temperature: parseFloat(tempSlider.value),
+                    history: history.slice(-10)
+                })
             });
-        });
+            var data = await res.json();
+            typing.remove();
+            appendMsg('assistant', data.response);
+            history.push({ role: 'assistant', content: data.response });
+            renderRefs(data.references || []);
+        } catch (e) {
+            typing.remove();
+            appendMsg('assistant', 'Request failed. Please try again.');
+        }
+        sendBtn.disabled = false;
+    }
+
+    sendBtn.addEventListener('click', send);
+    inputEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
+
+    clearBtn.addEventListener('click', function () {
+        history = [];
+        messagesEl.innerHTML = '<div class="aichat-welcome"><i class="fa-solid fa-brain fa-2x mb-2"></i><p class="mb-1 fw-semibold">Research AI Assistant</p><p class="small text-muted">Ask about market conditions, currency pairs, or trading strategy.</p></div>';
+        refsEl.innerHTML = '<div class="text-muted small text-center mt-4">References will appear here after your first query.</div>';
+        refsCount.textContent = '0';
+    });
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 })();
 </script>
 }

@@ -128,6 +128,47 @@ app.MapGet("/api/suggestions", (SuggestionService suggestions) =>
     return Results.Ok(suggestions.GetAll());
 });
 
+// API: Advanced research chat with references and temperature control
+app.MapPost("/api/chat/ask", async (HttpContext ctx, ChatService chatService, ArticleService articleService) =>
+{
+    using var reader = new StreamReader(ctx.Request.Body);
+    var body = await reader.ReadToEndAsync();
+    using var doc = JsonDocument.Parse(body);
+    var root = doc.RootElement;
+
+    var message = root.TryGetProperty("message", out var m) ? m.GetString() ?? "" : "";
+    var temperature = root.TryGetProperty("temperature", out var t) ? t.GetDouble() : 0.7;
+
+    var agentResponse = await chatService.SendMessageWithOptionsAsync(message, temperature);
+
+    var keywords = message.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Where(w => w.Length > 3)
+        .ToHashSet();
+
+    var references = articleService.GetPublished()
+        .Where(a =>
+        {
+            var searchable = $"{a.Title} {a.Summary} {a.Tags} {a.Category}".ToLowerInvariant();
+            return keywords.Any(k => searchable.Contains(k));
+        })
+        .OrderByDescending(a => a.PublishedDate)
+        .Take(5)
+        .Select(a => new
+        {
+            a.Id,
+            a.Title,
+            a.Summary,
+            a.Category,
+            a.Sentiment,
+            a.Author,
+            PublishedDate = a.PublishedDate.ToString("MMM dd, yyyy"),
+            Url = $"/Article?id={a.Id}"
+        })
+        .ToList();
+
+    return Results.Ok(new { response = agentResponse, references });
+});
+
 app.Run();
 
 // ── Minimal model for incoming news articles ─────────────────────────────────
