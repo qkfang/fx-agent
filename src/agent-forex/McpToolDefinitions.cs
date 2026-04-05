@@ -203,35 +203,26 @@ public static class McpToolDefinitions
             required = new[] { "traderId" }
         })));
 
-        yield return new FunctionToolDefinition("fx_quote", "Get the current AUD/USD bid/ask quote with spread");
-        yield return new FunctionToolDefinition("fx_buy", "Execute a market buy order for AUD/USD at the current ask price", new BinaryData(JsonSerializer.Serialize(new
-        {
-            type = "object",
-            properties = new { amount = new { type = "number", description = "Amount in AUD to buy" } },
-            required = new[] { "amount" }
-        })));
-        yield return new FunctionToolDefinition("fx_sell", "Execute a market sell order for AUD/USD at the current bid price", new BinaryData(JsonSerializer.Serialize(new
-        {
-            type = "object",
-            properties = new { amount = new { type = "number", description = "Amount in AUD to sell" } },
-            required = new[] { "amount" }
-        })));
-        yield return new FunctionToolDefinition("fx_history", "Get OHLC candlestick price history for AUD/USD", new BinaryData(JsonSerializer.Serialize(new
-        {
-            type = "object",
-            properties = new { bars = new { type = "integer", description = "Number of candles to return (default 50, max 200)" } },
-            required = Array.Empty<string>()
-        })));
-        yield return new FunctionToolDefinition("fx_market_status", "Get current market status: trend, volatility, day high/low, active session");
-        yield return new FunctionToolDefinition("fx_set_trend", "Simulate a market trend event — triggers a price move in the given direction", new BinaryData(JsonSerializer.Serialize(new
+        yield return new FunctionToolDefinition("web_search", "Search the web for current information using Bing", new BinaryData(JsonSerializer.Serialize(new
         {
             type = "object",
             properties = new
             {
-                direction = new { type = "string", description = "up, down, or neutral" },
-                strength = new { type = "integer", description = "Trend strength 0-100" }
+                query = new { type = "string", description = "Search query" },
+                count = new { type = "integer", description = "Number of results (default 10)" }
             },
-            required = new[] { "direction" }
+            required = new[] { "query" }
+        })));
+
+        yield return new FunctionToolDefinition("news_search", "Search news articles using Bing News", new BinaryData(JsonSerializer.Serialize(new
+        {
+            type = "object",
+            properties = new
+            {
+                query = new { type = "string", description = "News search query" },
+                count = new { type = "integer", description = "Number of results (default 10)" }
+            },
+            required = new[] { "query" }
         })));
     }
 
@@ -314,20 +305,10 @@ public static class McpToolDefinitions
             "get_trader_news" => await McpTools.TraderNewsFeeds.GetByTrader(arguments.GetProperty("traderId").GetInt32()),
             "get_trader_recommendations" => await McpTools.TraderRecommendations.GetByTrader(arguments.GetProperty("traderId").GetInt32()),
 
-            "fx_quote" => await McpTools.TradingMcp.GetQuote(),
-            "fx_buy" => await McpTools.TradingMcp.ExecuteBuy(arguments.GetProperty("amount").GetDecimal()),
-            "fx_sell" => await McpTools.TradingMcp.ExecuteSell(arguments.GetProperty("amount").GetDecimal()),
-            "fx_history" => await McpTools.TradingMcp.GetHistory(
-                arguments.TryGetProperty("bars", out var bars) ? bars.GetInt32() : 50),
-            "fx_market_status" => await McpTools.TradingMcp.GetMarketStatus(),
-            "fx_set_trend" => await McpTools.TradingMcp.SetTrend(
-                arguments.GetProperty("direction").GetString()!,
-                arguments.TryGetProperty("strength", out var strength) ? strength.GetInt32() : 70),
-
-            "web_search" => await McpTools.AzureSearch.SearchWeb(
+            "web_search" => await McpTools.BingSearch.SearchWeb(
                 arguments.GetProperty("query").GetString()!,
                 arguments.TryGetProperty("count", out var webCount) ? webCount.GetInt32() : 10),
-            "news_search" => await McpTools.AzureSearch.SearchNews(
+            "news_search" => await McpTools.BingSearch.SearchNews(
                 arguments.GetProperty("query").GetString()!,
                 arguments.TryGetProperty("count", out var newsCount) ? newsCount.GetInt32() : 10),
 

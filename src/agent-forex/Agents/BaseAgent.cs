@@ -10,21 +10,11 @@ public abstract class BaseAgent
     protected readonly FoundryAgent _agent;
     protected readonly AIProjectClient _aiProjectClient;
 
-    protected BaseAgent(AIProjectClient aiProjectClient, string agentId, string deploymentName, string instructions, string? bingConnectionName = null)
+    protected BaseAgent(AIProjectClient aiProjectClient, string agentId, string deploymentName, string instructions)
     {
         _aiProjectClient = aiProjectClient;
         
         var tools = McpToolDefinitions.GetAllToolDefinitions().ToList();
-        
-        if (!string.IsNullOrEmpty(bingConnectionName))
-        {
-            var bingConnection = aiProjectClient.Connections.GetConnection(bingConnectionName);
-            var bingTool = new BingGroundingTool(
-                new BingGroundingSearchToolOptions(
-                    searchConfigurations: [new BingGroundingSearchConfiguration(projectConnectionId: bingConnection.Id)]
-                ));
-            tools.Add(bingTool);
-        }
         
         var agentVersion = aiProjectClient.AgentAdministrationClient.CreateAgentVersion(
             agentId,
