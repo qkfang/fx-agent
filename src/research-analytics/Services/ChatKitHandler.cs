@@ -132,6 +132,23 @@ public static class ChatKitHandler
 
         await WriteEventAsync(ctx, new { type = "stream_options", allow_cancel = false });
 
+        if (string.IsNullOrWhiteSpace(userText))
+        {
+            await WriteEventAsync(ctx, new
+            {
+                type = "thread.item.done",
+                item = new
+                {
+                    type = "assistant_message",
+                    id = "msg_" + Guid.NewGuid().ToString("N")[..16],
+                    thread_id = thread.Id,
+                    created_at = DateTime.UtcNow,
+                    content = new[] { new { type = "output_text", text = "Please enter a message.", annotations = Array.Empty<object>() } }
+                }
+            });
+            return;
+        }
+
         var reply = await chatService.SendMessageAsync(userText, history);
 
         var assistantItem = new ChatKitItem
@@ -176,16 +193,28 @@ public static class ChatKitHandler
 
     private static string GetInputText(JsonElement paramsElem)
     {
-        if (!paramsElem.TryGetProperty("input", out var input)) return "";
-        if (!input.TryGetProperty("content", out var content)) return "";
+        // content directly as string
+        if (paramsElem.TryGetProperty("input", out var input))
+        {
+            if (input.TryGetProperty("content", out var content))
+            {
+                if (content.ValueKind == JsonValueKind.String)
+                    return content.GetString() ?? "";
 
-        if (content.ValueKind == JsonValueKind.String)
-            return content.GetString() ?? "";
+                if (content.ValueKind == JsonValueKind.Array)
+                    return string.Join("", content.EnumerateArray()
+                        .Select(c =>
+                        {
+                            if (c.ValueKind == JsonValueKind.String) return c.GetString() ?? "";
+                            if (c.TryGetProperty("text", out var t)) return t.GetString() ?? "";
+                            return "";
+                        }));
+            }
+        }
 
-        if (content.ValueKind == JsonValueKind.Array)
-            return string.Join("", content.EnumerateArray()
-                .Where(c => c.TryGetProperty("type", out var t) && t.GetString() == "text")
-                .Select(c => c.TryGetProperty("text", out var t) ? t.GetString() ?? "" : ""));
+        // top-level text shorthand
+        if (paramsElem.TryGetProperty("text", out var text))
+            return text.GetString() ?? "";
 
         return "";
     }
