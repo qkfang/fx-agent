@@ -27,32 +27,54 @@ var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"] ?? "gpt
 
 AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
-const string JokerName = "JokerAgent";
-// Create a server-side agent version using the native SDK.
-ProjectsAgentVersion agentVersion = await aiProjectClient.AgentAdministrationClient.CreateAgentVersionAsync(
-    JokerName,
-    new ProjectsAgentVersionCreationOptions(
-        new DeclarativeAgentDefinition(model: deploymentName)
-        {
-            Instructions = "You are good at telling jokes.",
-        }));
-        
-// Wrap the agent version as a FoundryAgent using the AsAIAgent extension.
-FoundryAgent agent = aiProjectClient.AsAIAgent(agentVersion);
-
-// Once you have the agent, you can invoke it like any other AIAgent.
-Console.WriteLine(await agent.RunAsync("Tell me a joke about a pirate."));
-
-app.MapPost("/chat", async (ChatRequest request) =>
+var agentDefs = new[]
 {
-    var response = await agent.RunAsync(request.Message);
+    ("fxag-research",    "You are an FX market research analyst. Analyze currency research articles, identify patterns, and summarize research findings to help traders understand market dynamics."),
+    ("fxag-suggestion",  "You are an FX trading suggestion engine. Based on market conditions, news, and portfolio data, provide actionable trading suggestions and recommendations for currency pairs."),
+    ("fxag-trader",      "You are an FX trader assistant. Help traders interpret news feeds, evaluate open positions, and support day-to-day trading decisions across currency pairs."),
+    ("fxag-insight",     "You are an FX market insight specialist. Deliver concise market insights, portfolio performance summaries, and trend analysis to support strategic investment decisions."),
+};
+
+var agentVersionTasks = agentDefs.Select(def =>
+    aiProjectClient.AgentAdministrationClient.CreateAgentVersionAsync(
+        def.Item1,
+        new ProjectsAgentVersionCreationOptions(
+            new DeclarativeAgentDefinition(model: deploymentName)
+            {
+                Instructions = def.Item2,
+            })));
+
+var agentVersions = await Task.WhenAll(agentVersionTasks);
+
+FoundryAgent researchAgent    = aiProjectClient.AsAIAgent(agentVersions[0]);
+FoundryAgent suggestionAgent  = aiProjectClient.AsAIAgent(agentVersions[1]);
+FoundryAgent traderAgent      = aiProjectClient.AsAIAgent(agentVersions[2]);
+FoundryAgent insightAgent     = aiProjectClient.AsAIAgent(agentVersions[3]);
+
+logger.LogInformation("Agents created: fxag-research, fxag-suggestion, fxag-trader, fxag-insight");
+
+app.MapPost("/research", async (ChatRequest request) =>
+{
+    var response = await researchAgent.RunAsync(request.Message);
     return Results.Ok(new { response });
 });
 
-app.Lifetime.ApplicationStopping.Register(() =>
+app.MapPost("/suggestion", async (ChatRequest request) =>
 {
-    aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(JokerName).GetAwaiter().GetResult();
-    logger.LogInformation("Agent deleted: {Name}", JokerName);
+    var response = await suggestionAgent.RunAsync(request.Message);
+    return Results.Ok(new { response });
+});
+
+app.MapPost("/trader", async (ChatRequest request) =>
+{
+    var response = await traderAgent.RunAsync(request.Message);
+    return Results.Ok(new { response });
+});
+
+app.MapPost("/insight", async (ChatRequest request) =>
+{
+    var response = await insightAgent.RunAsync(request.Message);
+    return Results.Ok(new { response });
 });
 
 await app.RunAsync();
