@@ -58,6 +58,7 @@ public class CustomerPreference
     public decimal StopLossPercent { get; set; }
     public decimal TakeProfitPercent { get; set; }
     public string TradingStyle { get; set; } = string.Empty;
+    public string TradingObjective { get; set; } = string.Empty;
     public bool EnableNotifications { get; set; } = true;
     public string NotificationChannels { get; set; } = "Email";
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -45,57 +45,32 @@ SET IDENTITY_INSERT Customers OFF;
 -------------------------------------------------------
 -- CustomerPreferences (25 records)
 -------------------------------------------------------
-INSERT INTO CustomerPreferences (CustomerId, PreferredCurrencyPairs, RiskTolerance, MaxPositionSize, StopLossPercent, TakeProfitPercent, TradingStyle, EnableNotifications, NotificationChannels, UpdatedAt) VALUES
--- Aggressive high-frequency trader, focuses on major pairs with tight stops
-(0, 'EUR/USD,GBP/USD',     'High',   200000.0000, 2.00, 4.00, 'Swing',    1, 'Email,SMS',   '2026-03-10T08:00:00'),
--- Conservative day trader, prefers liquid Asian pairs, moderate risk
-(1, 'USD/JPY,AUD/USD',     'Medium', 100000.0000, 1.50, 3.00, 'Day',      1, 'Email',       '2026-03-12T10:30:00'),
--- Long-term position trader, low risk tolerance, prefers European crosses
-(2, 'EUR/GBP,USD/CHF',     'Low',    150000.0000, 1.00, 2.00, 'Position', 1, 'Email',       '2026-03-15T09:00:00'),
--- Aggressive swing trader specializing in emerging markets, high position sizes
-(3, 'USD/CNH,AUD/NZD',     'High',   300000.0000, 2.50, 5.00, 'Swing',    0, 'Email',       '2026-03-18T04:00:00'),
--- Nordic currency specialist, day trading strategy with medium risk
-(4, 'EUR/SEK,NOK/SEK',     'Medium', 250000.0000, 1.50, 3.50, 'Day',      1, 'Email,Push',  '2026-03-20T08:45:00'),
--- Ultra-conservative institutional trader, very large positions with minimal stops
-(5, 'USD/AED,EUR/USD',     'Low',    500000.0000, 0.50, 1.50, 'Position', 1, 'Email,SMS',   '2026-03-22T10:00:00'),
--- High-frequency scalper, Asian markets focus, aggressive entry/exit
-(6, 'USD/KRW,GBP/JPY',     'High',   150000.0000, 2.00, 4.50, 'Scalp',    1, 'Push',        '2026-03-25T02:30:00'),
--- LatAm specialist, swing trader with medium risk, prefers carry trades
-(7, 'USD/MXN,EUR/USD',     'Medium', 175000.0000, 1.50, 3.00, 'Swing',    0, 'Email',       '2026-03-28T16:00:00'),
--- Oceanic pairs trader, conservative day trading, small position sizes
-(8, 'AUD/USD,NZD/USD',     'Medium', 60000.0000,  1.00, 2.50, 'Day',      1, 'Email,SMS',   '2026-04-01T01:00:00'),
--- Frontier markets specialist, very aggressive, wide stops for volatility
-(9, 'USD/ZAR,GBP/USD',     'High',   200000.0000, 3.00, 6.00, 'Position', 1, 'Email,Push',  '2026-04-02T12:00:00'),
--- Algorithmic scalper, EUR focus, extremely tight risk management
-(10, 'EUR/USD,EUR/GBP',    'High',   350000.0000, 0.80, 1.50, 'Scalp',    1, 'Push,SMS',    '2026-04-03T09:15:00'),
--- Commodity currency specialist, follows oil/gold trends, swing strategy
-(11, 'USD/CAD,AUD/USD',    'Medium', 220000.0000, 1.80, 3.50, 'Swing',    1, 'Email',       '2026-04-03T11:30:00'),
--- Safe-haven focused, buys on fear, very conservative with longer holds
-(12, 'USD/CHF,USD/JPY',    'Low',    180000.0000, 0.75, 1.80, 'Position', 1, 'Email,SMS',   '2026-04-03T14:00:00'),
--- Breakout specialist, waits for volatility then strikes aggressively
-(13, 'GBP/JPY,EUR/JPY',    'High',   280000.0000, 2.20, 5.50, 'Day',      1, 'Push',        '2026-04-04T07:00:00'),
--- Cross-currency arbitrage trader, medium risk, multiple small positions
-(14, 'EUR/NOK,GBP/SEK',    'Medium', 140000.0000, 1.20, 2.80, 'Day',      1, 'Email',       '2026-04-04T08:30:00'),
--- EM carry trade specialist, sells low yield/buys high yield, patient approach
-(15, 'USD/TRY,USD/BRL',    'Medium', 190000.0000, 2.00, 4.50, 'Position', 0, 'Email',       '2026-04-04T10:00:00'),
--- Momentum trader, follows trends aggressively, quick to cut losses
-(16, 'EUR/USD,USD/JPY',    'High',   320000.0000, 1.50, 4.00, 'Swing',    1, 'Email,Push',  '2026-04-04T11:45:00'),
--- Mean reversion specialist, counter-trend trader, very patient
-(17, 'GBP/USD,AUD/NZD',    'Low',    95000.0000,  0.90, 2.20, 'Position', 1, 'Email',       '2026-04-04T13:00:00'),
--- News-driven trader, reacts to economic releases, aggressive entries
-(18, 'EUR/USD,GBP/USD,USD/JPY', 'High', 275000.0000, 1.80, 3.80, 'Day',   1, 'Push,SMS',    '2026-04-04T14:30:00'),
--- Options hedger, uses spot for delta hedging, very conservative
-(19, 'EUR/USD,USD/CHF',    'Low',    420000.0000, 0.60, 1.40, 'Position', 1, 'Email,SMS',   '2026-04-04T16:00:00'),
--- Asian session scalper, focuses on JPY crosses during Tokyo hours
-(20, 'USD/JPY,EUR/JPY,AUD/JPY', 'High', 165000.0000, 1.00, 2.50, 'Scalp', 1, 'Push',        '2026-04-05T02:00:00'),
--- Range-bound trader, sells resistance/buys support, medium risk
-(21, 'EUR/GBP,NZD/USD',    'Medium', 130000.0000, 1.30, 2.70, 'Day',      1, 'Email',       '2026-04-05T03:30:00'),
--- Macro fundamental trader, long-term positions based on central bank policy
-(22, 'EUR/USD,USD/JPY,GBP/USD', 'Low', 550000.0000, 1.50, 3.00, 'Position', 1, 'Email',    '2026-04-05T05:00:00'),
--- Event-driven swing trader, trades political/economic events, aggressive
-(23, 'GBP/USD,EUR/GBP',    'High',   240000.0000, 2.30, 5.00, 'Swing',    1, 'Email,Push',  '2026-04-05T06:30:00'),
--- Diversified portfolio trader, multiple pairs, balanced risk approach
-(24, 'EUR/USD,GBP/JPY,AUD/NZD,USD/CAD', 'Medium', 200000.0000, 1.60, 3.20, 'Swing', 1, 'Email,SMS', '2026-04-05T08:00:00');
+INSERT INTO CustomerPreferences (CustomerId, PreferredCurrencyPairs, RiskTolerance, MaxPositionSize, StopLossPercent, TakeProfitPercent, TradingStyle, TradingObjective, EnableNotifications, NotificationChannels, UpdatedAt) VALUES
+(0, 'EUR/USD,GBP/USD',     'High',   200000.0000, 2.00, 4.00, 'Swing',    'Corporate treasury hedging with opportunistic profit-taking on G10 majors. Previous profitable swing trades on EUR/USD captured 200+ pips. Aggressive on trend confirmation, disciplined stop placement.', 1, 'Email,SMS',   '2026-03-10T08:00:00'),
+(1, 'USD/JPY,AUD/USD',     'Medium', 100000.0000, 1.50, 3.00, 'Day',      'Institutional fund diversification strategy focusing on liquid Asian session pairs. History shows consistent 50-80 pip daily captures. Prefers buying dips in uptrends, conservative position sizing.', 1, 'Email',       '2026-03-12T10:30:00'),
+(2, 'EUR/GBP,USD/CHF',     'Low',    150000.0000, 1.00, 2.00, 'Position', 'Capital preservation primary goal for pension fund allocation. Long-term fundamental positioning on European crosses. Prefers selling rallies near resistance. Very patient, holds for weeks to months.', 1, 'Email',       '2026-03-15T09:00:00'),
+(3, 'USD/CNH,AUD/NZD',     'High',   300000.0000, 2.50, 5.00, 'Swing',    'Emerging market specialist seeking high-return opportunities. Previous winning trades in APAC crosses during volatility spikes. Aggressive buyer of breakouts, comfortable with 200+ pip swings.', 0, 'Email',       '2026-03-18T04:00:00'),
+(4, 'EUR/SEK,NOK/SEK',     'Medium', 250000.0000, 1.50, 3.50, 'Day',      'Regional Nordic corporate hedging operations. Executes tactical intraday positions around economic releases. Track record of capturing 80-120 pip moves during Riksbank/Norges Bank events.', 1, 'Email,Push',  '2026-03-20T08:45:00'),
+(5, 'USD/AED,EUR/USD',     'Low',    500000.0000, 0.50, 1.50, 'Position', 'Sovereign wealth fund diversification mandate. Ultra-conservative approach prioritizing capital safety over returns. Previous positions held 3-6 months. Only sells at proven resistance zones.', 1, 'Email,SMS',   '2026-03-22T10:00:00'),
+(6, 'USD/KRW,GBP/JPY',     'High',   150000.0000, 2.00, 4.50, 'Scalp',    'Proprietary desk high-frequency strategy on Asian volatility. Executes 15-25 trades daily targeting 15-30 pips each. Aggressive entry on technical triggers during Tokyo/Seoul hours.', 1, 'Push',        '2026-03-25T02:30:00'),
+(7, 'USD/MXN,EUR/USD',     'Medium', 175000.0000, 1.50, 3.00, 'Swing',    'LatAm import/export business natural hedging program. Prefers selling USD strength on carry trade opportunities. Previous MXN positions benefited from nearshoring theme. Balanced buy/sell approach.', 0, 'Email',       '2026-03-28T16:00:00'),
+(8, 'AUD/USD,NZD/USD',     'Medium', 60000.0000,  1.00, 2.50, 'Day',      'Small commodity trading firm managing FX exposure. Conservative position sizing relative to portfolio. Buys AUD/NZD on China stimulus news. Prefers defined-risk intraday setups.', 1, 'Email,SMS',   '2026-04-01T01:00:00'),
+(9, 'USD/ZAR,GBP/USD',     'High',   200000.0000, 3.00, 6.00, 'Position', 'Frontier markets investor seeking alpha in volatile emerging currencies. Comfortable holding through 300+ pip drawdowns. Previous ZAR longs profited from political risk premium. Aggressive buyer of fear.', 1, 'Email,Push',  '2026-04-02T12:00:00'),
+(10, 'EUR/USD,EUR/GBP',    'High',   350000.0000, 0.80, 1.50, 'Scalp',    'Algorithm-driven market maker providing liquidity in EUR crosses. Executes 50-100+ micro trades daily. Extremely tight 8-15 pip stops. Aggressive on both buys and sells at technical levels.', 1, 'Push,SMS',    '2026-04-03T09:15:00'),
+(11, 'USD/CAD,AUD/USD',    'Medium', 220000.0000, 1.80, 3.50, 'Swing',    'Energy sector corporate hedging linked to oil price movements. Sells CAD strength on crude rallies. Previous profitable trades correlated with WTI trends. Balanced directional bias.', 1, 'Email',       '2026-04-03T11:30:00'),
+(12, 'USD/CHF,USD/JPY',    'Low',    180000.0000, 0.75, 1.80, 'Position', 'Risk-off defensive portfolio allocation strategy. Buys safe havens during geopolitical uncertainty. Previous CHF/JPY longs held through market stress. Very conservative, patient holder.', 1, 'Email,SMS',   '2026-04-03T14:00:00'),
+(13, 'GBP/JPY,EUR/JPY',    'High',   280000.0000, 2.20, 5.50, 'Day',      'Volatility specialist targeting range breakouts in cross pairs. Track record of capturing 150-250 pip breakout moves. Aggressive buyer above resistance, aggressive seller below support.', 1, 'Push',        '2026-04-04T07:00:00'),
+(14, 'EUR/NOK,GBP/SEK',    'Medium', 140000.0000, 1.20, 2.80, 'Day',      'Cross-currency arbitrage exploiting temporary mispricings in Nordic pairs. Multiple small positions capturing 40-60 pip inefficiencies. Balanced buy/sell based on relative value signals.', 1, 'Email',       '2026-04-04T08:30:00'),
+(15, 'USD/TRY,USD/BRL',    'Medium', 190000.0000, 2.00, 4.50, 'Position', 'Carry trade income generation strategy in high-yielding emerging markets. Sells low-yield USD to buy high-yield EM currencies. Previous BRL positions held 2-4 months for rollover income.', 0, 'Email',       '2026-04-04T10:00:00'),
+(16, 'EUR/USD,USD/JPY',    'High',   320000.0000, 1.50, 4.00, 'Swing',    'Trend-following momentum strategy on major pairs. Aggressive buyer of strength, aggressive seller of weakness. Previous winning streaks captured 200-400 pip trends. Quick to cut losing positions.', 1, 'Email,Push',  '2026-04-04T11:45:00'),
+(17, 'GBP/USD,AUD/NZD',    'Low',    95000.0000,  0.90, 2.20, 'Position', 'Mean-reversion contrarian strategy buying oversold levels. Very patient approach waiting for extremes. Previous positions held at support for weeks until reversal. Conservative with small sizes.', 1, 'Email',       '2026-04-04T13:00:00'),
+(18, 'EUR/USD,GBP/USD,USD/JPY', 'High', 275000.0000, 1.80, 3.80, 'Day',   'Event-driven trading around NFP, CPI, and central bank decisions. Aggressive entry immediately post-release. Previous trades captured 100-180 pip initial reactions. Rapid execution required.', 1, 'Push,SMS',    '2026-04-04T14:30:00'),
+(19, 'EUR/USD,USD/CHF',    'Low',    420000.0000, 0.60, 1.40, 'Position', 'Delta-neutral options portfolio hedging via spot positions. Conservative offsetting of gamma exposure. Buys and sells based on options book Greeks, not directional view. Large institutional size.', 1, 'Email,SMS',   '2026-04-04T16:00:00'),
+(20, 'USD/JPY,EUR/JPY,AUD/JPY', 'High', 165000.0000, 1.00, 2.50, 'Scalp', 'Tokyo session specialist exploiting JPY cross volatility during Asian hours. 20-40 rapid trades daily targeting 10-25 pips. Aggressive on both sides during 7pm-3am EST window.', 1, 'Push',        '2026-04-05T02:00:00'),
+(21, 'EUR/GBP,NZD/USD',    'Medium', 130000.0000, 1.30, 2.70, 'Day',      'Range-bound mean reversion in sideways markets. Sells at identified resistance, buys at support. Previous profitable trades in 100-150 pip ranges. Balanced buy/sell at extremes.', 1, 'Email',       '2026-04-05T03:30:00'),
+(22, 'EUR/USD,USD/JPY,GBP/USD', 'Low', 550000.0000, 1.50, 3.00, 'Position', 'Macro fundamental analysis based on central bank policy divergence. Long-term 3-6 month positions sized for institutional portfolio. Buys USD on Fed hawkishness, sells on dovish pivots. Very patient.', 1, 'Email',    '2026-04-05T05:00:00'),
+(23, 'GBP/USD,EUR/GBP',    'High',   240000.0000, 2.30, 5.00, 'Swing',    'Political and economic event specialist trading Brexit developments, UK budgets, elections. Aggressive positioning ahead of scheduled events. Previous trades captured 150-300 pip event moves.', 1, 'Email,Push',  '2026-04-05T06:30:00'),
+(24, 'EUR/USD,GBP/JPY,AUD/NZD,USD/CAD', 'Medium', 200000.0000, 1.60, 3.20, 'Swing', 'Diversified multi-pair portfolio strategy balancing G10 exposure. Allocates across 4-6 positions simultaneously. Previous approach yielded consistent monthly returns. Balanced buy/sell based on technical and fundamental confluence.', 1, 'Email,SMS', '2026-04-05T08:00:00');
 
 -------------------------------------------------------
 -- ResearchArticles (15 records)
