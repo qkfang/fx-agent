@@ -13,7 +13,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddSingleton<ArticleService>();
+builder.Services.AddHttpClient<ArticleService>();
 builder.Services.AddSingleton<TrackingService>();
 builder.Services.AddSingleton<SuggestionService>();
 builder.Services.AddHttpClient();

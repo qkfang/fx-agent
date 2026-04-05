@@ -16,6 +16,7 @@ public class FxDbContext : DbContext
     public DbSet<TraderNewsFeed> TraderNewsFeeds => Set<TraderNewsFeed>();
     public DbSet<ResearchDraft> ResearchDrafts => Set<ResearchDraft>();
     public DbSet<ResearchPattern> ResearchPatterns => Set<ResearchPattern>();
+    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,6 +67,23 @@ public class FxDbContext : DbContext
             entity.Property(e => e.EntryRate).HasPrecision(18, 6);
             entity.Property(e => e.ExitRate).HasPrecision(18, 6);
             entity.Property(e => e.PnL).HasPrecision(18, 4);
+            entity.HasOne(e => e.Customer)
+                  .WithMany()
+                  .HasForeignKey(e => e.CustomerId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CustomerPreference>(entity =>
+        {
+            entity.ToTable("CustomerPreferences");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PreferredCurrencyPairs).HasMaxLength(500);
+            entity.Property(e => e.RiskTolerance).HasMaxLength(20);
+            entity.Property(e => e.MaxPositionSize).HasPrecision(18, 4);
+            entity.Property(e => e.StopLossPercent).HasPrecision(5, 2);
+            entity.Property(e => e.TakeProfitPercent).HasPrecision(5, 2);
+            entity.Property(e => e.TradingStyle).HasMaxLength(50);
+            entity.Property(e => e.NotificationChannels).HasMaxLength(200);
             entity.HasOne(e => e.Customer)
                   .WithMany()
                   .HasForeignKey(e => e.CustomerId)

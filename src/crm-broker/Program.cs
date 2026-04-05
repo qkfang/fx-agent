@@ -9,6 +9,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<FxRateService>();
 builder.Services.AddSingleton<AccountService>();
+builder.Services.AddSingleton<CustomerService>();
 
 // Add CORS for local development
 builder.Services.AddCors(options =>
