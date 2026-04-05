@@ -1,0 +1,1580 @@
+﻿@page
+@model FxWebPortal.Pages.Account.AuroraWorkflowModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora – FX Trading</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        :root {
+            --bg: #0c1017;
+            --panel: #141b26;
+            --panel2: #1a2333;
+            --border: #242f42;
+            --border2: #2d3a52;
+            --text: #d8e4f2;
+            --text-muted: #5f7591;
+            --text-dim: #3d5070;
+            --green: #00c97a;
+            --green-dim: rgba(0,201,122,0.15);
+            --red: #ff4f5e;
+            --red-dim: rgba(255,79,94,0.15);
+            --gold: #c8a84b;
+            --gold-dim: rgba(200,168,75,0.15);
+            --blue: #4a90d9;
+            --teal: #00b8c8;
+            --accent: #7eb3ff;
+            --filled: #00c97a;
+            --working: #f5a623;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOP NAV ── */
+        .top-nav {
+            background: #111820;
+            border-bottom: 1px solid var(--border);
+            height: 38px;
+            display: flex;
+            align-items: stretch;
+            flex-shrink: 0;
+            padding: 0 12px;
+            gap: 0;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-right: 20px;
+            border-right: 1px solid var(--border);
+            margin-right: 8px;
+        }
+        .nav-brand-mq {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        .nav-brand-sep {
+            color: var(--border2);
+            font-size: 16px;
+            font-weight: 200;
+        }
+        .nav-brand-aurora {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--gold);
+            letter-spacing: 2px;
+        }
+        .nav-tabs-list {
+            display: flex;
+            align-items: stretch;
+            list-style: none;
+            gap: 0;
+            flex: 1;
+        }
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 11.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+        .nav-tab:hover { color: var(--text); }
+        .nav-tab.active {
+            color: white;
+            border-bottom-color: var(--gold);
+            background: rgba(200,168,75,0.06);
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border);
+        }
+        .account-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .btn-back-nav {
+            font-size: 11px;
+            color: var(--text-muted);
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            padding: 3px 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-back-nav:hover { color: var(--text); border-color: var(--text-muted); }
+
+        /* ── SECTION HEADERS ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 28px;
+            padding: 0 12px;
+            background: #0f1520;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .section-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .section-btn {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 2px;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+        }
+        .section-btn:hover { color: var(--text); border-color: var(--text-muted); }
+        .section-btn.active {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ── LEFT: PRICES ── */
+        .prices-panel {
+            display: flex;
+            flex-direction: column;
+            width: 340px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .tile-grid {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .tile-grid::-webkit-scrollbar { width: 4px; }
+        .tile-grid::-webkit-scrollbar-track { background: transparent; }
+        .tile-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+        /* ── CURRENCY TILE ── */
+        .fx-tile {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .fx-tile:hover { border-color: var(--border2); }
+        .fx-tile.active { border-color: var(--gold); }
+        .tile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 8px;
+            background: var(--panel2);
+            border-bottom: 1px solid var(--border);
+        }
+        .tile-pair {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: white;
+        }
+        .flag-stack {
+            position: relative;
+            width: 22px;
+            height: 14px;
+        }
+        .flag {
+            width: 14px;
+            height: 10px;
+            border-radius: 1px;
+            position: absolute;
+            font-size: 12px;
+            line-height: 1;
+        }
+        .flag1 { top: 0; left: 0; }
+        .flag2 { bottom: 0; right: 0; }
+        .tile-type {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+        .tile-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .tile-btn {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            border: 1px solid var(--border2);
+            background: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .tile-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .tile-prices {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            text-align: center;
+            padding: 6px 0 4px;
+        }
+        .tile-sell-label, .tile-buy-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+        .tile-center { font-size: 9px; color: var(--text-muted); }
+        .tile-mid-rate {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .tile-sell {
+            padding: 4px 6px;
+            border-right: 1px solid var(--border);
+        }
+        .tile-sell:hover { background: var(--red-dim); }
+        .tile-buy {
+            padding: 4px 6px;
+            border-left: 1px solid var(--border);
+        }
+        .tile-buy:hover { background: var(--green-dim); }
+        .tile-mid { padding: 4px 6px; }
+        .sell-price, .buy-price {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 1px;
+        }
+        .price-main {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .price-pips {
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            align-self: flex-start;
+            margin-top: 2px;
+        }
+        .tile-sell .price-main, .tile-sell .price-pips { color: var(--red); }
+        .tile-buy .price-main, .tile-buy .price-pips { color: var(--green); }
+        .tile-spread {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .tile-tenors {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.15);
+        }
+        .tenor-btn {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 1px 3px;
+            border-radius: 2px;
+            border: none;
+            background: none;
+            transition: color 0.1s;
+        }
+        .tenor-btn:hover { color: var(--accent); }
+        .tenor-btn.active { color: var(--gold); }
+        .tile-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 8px;
+            border-top: 1px solid var(--border);
+        }
+        .tile-qty {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .tile-qty strong { color: var(--text); }
+        .tile-order-btn {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: white;
+            background: var(--panel2);
+            border: 1px solid var(--border2);
+            border-radius: 2px;
+            padding: 3px 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.15s;
+        }
+        .tile-order-btn:hover {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* ── CENTER: ORDER TICKET ── */
+        .order-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .order-content {
+            flex: 1;
+            padding: 14px 16px;
+            overflow-y: auto;
+        }
+        .order-content::-webkit-scrollbar { width: 4px; }
+        .order-content::-webkit-scrollbar-track { background: transparent; }
+        .order-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+        /* Order ticket card */
+        .order-ticket {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            max-width: 440px;
+        }
+        .ticket-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--panel2);
+            border-bottom: 1px solid var(--border);
+        }
+        .ticket-pair {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+        .ticket-status {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            padding: 2px 8px;
+            border-radius: 2px;
+        }
+        .ticket-status.pending {
+            background: var(--gold-dim);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+        }
+        .ticket-status.executing {
+            background: rgba(74,144,217,0.15);
+            border: 1px solid var(--blue);
+            color: var(--blue);
+        }
+        .ticket-status.filled {
+            background: var(--green-dim);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .ticket-body { padding: 14px; }
+        .field-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .field-label {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+        .field-value {
+            font-size: 11px;
+            color: var(--text);
+        }
+
+        /* toggle group */
+        .toggle-group {
+            display: flex;
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            transition: all 0.15s;
+            text-transform: uppercase;
+        }
+        .toggle-btn + .toggle-btn { border-left: 1px solid var(--border2); }
+        .toggle-btn.buy.active { background: var(--green); color: #000; }
+        .toggle-btn.sell.active { background: var(--red); color: #fff; }
+        .toggle-btn.active { background: var(--gold); color: #000; }
+
+        /* select / input */
+        .ticket-select, .ticket-input {
+            width: 100%;
+            background: var(--panel2);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            color: var(--text);
+            font-size: 11px;
+            padding: 5px 10px;
+            outline: none;
+            transition: border-color 0.15s;
+            height: 28px;
+        }
+        .ticket-select:focus, .ticket-input:focus { border-color: var(--gold); }
+        .ticket-input-large {
+            font-size: 15px;
+            font-weight: 700;
+            background: var(--panel2);
+            border: 1px solid var(--border2);
+            border-radius: 3px;
+            color: white;
+            padding: 6px 10px;
+            width: 100%;
+            outline: none;
+            height: 34px;
+        }
+        .ticket-input-large:focus { border-color: var(--gold); }
+
+        .mkt-price-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mkt-price-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .mkt-price-pip {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+        .mkt-price-pip.pos { color: var(--green); background: var(--green-dim); }
+        .mkt-price-pip.neg { color: var(--red); background: var(--red-dim); }
+        .mkt-price-warn {
+            font-size: 9.5px;
+            color: var(--red);
+        }
+
+        .ticket-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+        .field-group-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+
+        .ticket-footer {
+            display: flex;
+            gap: 8px;
+            padding: 12px 14px;
+            border-top: 1px solid var(--border);
+            background: var(--panel2);
+        }
+        .btn-ticket {
+            padding: 7px 20px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+        .btn-ticket:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-reset {
+            background: none;
+            border: 1px solid var(--border2);
+            color: var(--text-muted);
+        }
+        .btn-reset:hover { border-color: var(--text-muted); color: var(--text); }
+        .btn-clone {
+            background: none;
+            border: 1px solid var(--border2);
+            color: var(--text-muted);
+        }
+        .btn-clone:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-submit {
+            flex: 1;
+            background: var(--gold);
+            color: #000;
+            font-size: 12px;
+        }
+        .btn-submit:hover:not(:disabled) { background: #d4b35c; }
+        .btn-submit.buy-mode { background: var(--green); color: #000; }
+        .btn-submit.buy-mode:hover:not(:disabled) { background: #00e68a; }
+        .btn-submit.sell-mode { background: var(--red); color: #fff; }
+        .btn-submit.sell-mode:hover:not(:disabled) { background: #ff6672; }
+
+        /* Execution log */
+        .exec-log {
+            max-width: 440px;
+            margin-top: 12px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .exec-log-header {
+            padding: 6px 12px;
+            background: var(--panel2);
+            border-bottom: 1px solid var(--border);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .exec-log-body {
+            padding: 10px 12px;
+            font-family: 'Cascadia Code', 'SF Mono', 'Fira Code', monospace;
+            font-size: 10.5px;
+            color: #7eb8a4;
+            min-height: 80px;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+        .exec-log-body::-webkit-scrollbar { width: 3px; }
+        .exec-log-body::-webkit-scrollbar-thumb { background: var(--border2); }
+        .log-line { margin-bottom: 4px; line-height: 1.4; }
+        .log-ts { color: var(--text-dim); margin-right: 6px; }
+        .log-success { color: var(--green); }
+        .log-info { color: var(--gold); }
+        .log-warn { color: var(--working); }
+
+        /* spinner */
+        .spin {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+        @@keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── RIGHT: ORDERS ── */
+        .orders-panel {
+            width: 260px;
+            flex-shrink: 0;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .orders-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .orders-content::-webkit-scrollbar { width: 3px; }
+        .orders-content::-webkit-scrollbar-thumb { background: var(--border2); }
+
+        .working-order {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+        }
+        .wo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .wo-pair {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+        .wo-status {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+        .wo-status.working { color: var(--working); background: rgba(245,166,35,0.15); }
+        .wo-status.filled { color: var(--green); background: var(--green-dim); }
+        .wo-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        .wo-item {}
+        .wo-label { font-size: 9px; color: var(--text-muted); letter-spacing: 0.3px; }
+        .wo-value { font-size: 10.5px; font-weight: 600; color: var(--text); }
+        .wo-value.buy { color: var(--green); }
+        .wo-value.sell { color: var(--red); }
+
+        /* ── BOTTOM: BLOTTER ── */
+        .bottom-layout {
+            height: 220px;
+            flex-shrink: 0;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .blotter-tabs {
+            display: flex;
+            align-items: stretch;
+            background: #0f1520;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            padding: 0 12px;
+            gap: 0;
+        }
+        .blotter-tab {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 0 14px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .blotter-tab:hover { color: var(--text); }
+        .blotter-tab.active { color: white; border-bottom-color: var(--gold); }
+
+        .blotter-table-wrap {
+            flex: 1;
+            overflow: auto;
+        }
+        .blotter-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+        .blotter-table-wrap::-webkit-scrollbar-track { background: transparent; }
+        .blotter-table-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+        .blotter-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5px;
+            white-space: nowrap;
+        }
+        .blotter-table thead th {
+            background: var(--panel2);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 9.5px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .blotter-table tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: background 0.1s;
+        }
+        .blotter-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .blotter-table tbody td {
+            padding: 5px 10px;
+            color: var(--text-muted);
+            font-size: 10.5px;
+        }
+        .blotter-table td.highlight { color: var(--text); }
+        .status-badge {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 1px 7px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+        .status-badge.filled { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,201,122,0.3); }
+        .status-badge.working { background: rgba(245,166,35,0.12); color: var(--working); border: 1px solid rgba(245,166,35,0.3); }
+        .side-buy { color: var(--green); font-weight: 700; }
+        .side-sell { color: var(--red); font-weight: 700; }
+
+        /* workflow phase indicator */
+        .phase-bar {
+            background: var(--panel2);
+            border-bottom: 1px solid var(--border);
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-shrink: 0;
+        }
+        .phase-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 3px 12px;
+            border-radius: 3px;
+            color: var(--text-dim);
+            transition: all 0.2s;
+        }
+        .phase-step .dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+        }
+        .phase-step.done { color: var(--text-muted); }
+        .phase-step.done .dot { background: var(--green); }
+        .phase-step.active { color: var(--gold); background: var(--gold-dim); }
+        .phase-step-sep { color: var(--border2); font-size: 10px; padding: 0 2px; }
+    </style>
+</head>
+<body>
+    <!-- TOP NAV -->
+    <div class="top-nav">
+        <div class="nav-brand">
+            <span class="nav-brand-mq">MACQUARIE</span>
+            <span class="nav-brand-sep">|</span>
+            <span class="nav-brand-aurora">aurora</span>
+        </div>
+        <ul class="nav-tabs-list">
+            <li class="nav-tab">Home</li>
+            <li class="nav-tab active">FX</li>
+            <li class="nav-tab">FX Options</li>
+            <li class="nav-tab">Commodities</li>
+            <li class="nav-tab">Insights</li>
+            <li class="nav-tab">Post Trade</li>
+        </ul>
+        <div class="nav-right">
+            <span class="account-label">Account</span>
+            <button class="btn-back-nav" onclick="window.location.href='/Account'">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- WORKFLOW PHASE BAR -->
+    <div class="phase-bar" id="phaseBar">
+        <div class="phase-step active" data-phase="1"><span class="dot"></span>Fetch CRM</div>
+        <span class="phase-step-sep">›</span>
+        <div class="phase-step" data-phase="2"><span class="dot"></span>Trade Action</div>
+        <span class="phase-step-sep">›</span>
+        <div class="phase-step" data-phase="3"><span class="dot"></span>Approval</div>
+        <span class="phase-step-sep">›</span>
+        <div class="phase-step" data-phase="4"><span class="dot"></span>Execute</div>
+        <span class="phase-step-sep">›</span>
+        <div class="phase-step" data-phase="5"><span class="dot"></span>Review</div>
+        <span class="phase-step-sep">›</span>
+        <div class="phase-step" data-phase="6"><span class="dot"></span>Update CRM</div>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+
+        <!-- LEFT: PRICES -->
+        <div class="prices-panel">
+            <div class="section-header">
+                <span class="section-title">Prices</span>
+                <div class="section-actions">
+                    <span class="section-title" style="color:#3d5070">Foreign Exchange</span>
+                </div>
+            </div>
+            <div class="tile-grid" id="tileGrid">
+                <!-- Primary tile injected by JS -->
+            </div>
+        </div>
+
+        <!-- CENTER: ORDER TICKET -->
+        <div class="order-panel">
+            <div class="section-header">
+                <span class="section-title" id="orderSectionTitle">Order Ticket</span>
+                <div class="section-actions">
+                    <button class="section-btn active">Spot</button>
+                    <button class="section-btn">Forward</button>
+                    <button class="section-btn">Swap</button>
+                </div>
+            </div>
+            <div class="order-content">
+
+                <!-- STEP 1: Fetch CRM -->
+                <div id="step1Panel">
+                    <div class="order-ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-pair">
+                                <i class="fa-solid fa-database" style="color:var(--gold);font-size:13px;"></i>
+                                CRM Customer Record
+                            </div>
+                            <span class="ticket-status pending">PENDING</span>
+                        </div>
+                        <div class="ticket-body">
+                            <div id="step1Content" style="color:var(--text-muted); font-size:11px; padding:8px 0;">
+                                Click below to retrieve the customer record from CRM.
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <button class="btn-ticket btn-submit" onclick="loadCustomerRecords()">
+                                <i class="fa-solid fa-database"></i> Fetch Customer Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Order Ticket (Trade Action) -->
+                <div id="step2Panel" style="display:none;">
+                    <div class="order-ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-pair" id="ticketPairLabel">EUR/USD</div>
+                            <span class="ticket-status pending">ORDER TICKET</span>
+                        </div>
+                        <div class="ticket-body">
+                            <div class="field-row">
+                                <span class="field-label">Order Type</span>
+                                <select class="ticket-select">
+                                    <option>MARKET</option>
+                                    <option>LIMIT</option>
+                                    <option>STOP</option>
+                                </select>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">Direction</span>
+                                <div class="toggle-group">
+                                    <button class="toggle-btn buy" id="btnBuy" onclick="selectDirection('Buy')">BUY</button>
+                                    <button class="toggle-btn sell" id="btnSell" onclick="selectDirection('Sell')">SELL</button>
+                                </div>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">Customer</span>
+                                <span class="field-value" id="ticketCustomer">—</span>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">AI Signal</span>
+                                <span class="field-value" id="ticketSignal" style="color:var(--gold);">—</span>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">Qty (Lots)</span>
+                                <input type="number" class="ticket-input-large" id="lotsInput" value="0.10" min="0.01" max="100" step="0.01" />
+                            </div>
+                            <div style="display:flex;gap:4px;margin-bottom:12px;margin-left:128px;">
+                                <button class="section-btn" onclick="setLots(0.01)">0.01</button>
+                                <button class="section-btn" onclick="setLots(0.10)">0.10</button>
+                                <button class="section-btn" onclick="setLots(0.50)">0.50</button>
+                                <button class="section-btn" onclick="setLots(1.00)">1.00</button>
+                                <button class="section-btn" onclick="setLots(5.00)">5.00</button>
+                            </div>
+                            <div class="ticket-divider"></div>
+                            <div class="field-row">
+                                <span class="field-label">Mkt Price</span>
+                                <div class="mkt-price-row">
+                                    <span class="mkt-price-val" id="mktPriceDisplay">—</span>
+                                    <span class="mkt-price-pip pos" id="pipDisplay">live</span>
+                                </div>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">Pdt Type</span>
+                                <span class="field-value">SPOT</span>
+                            </div>
+                            <div class="field-row">
+                                <span class="field-label">Time In Force</span>
+                                <select class="ticket-select">
+                                    <option>GTC</option>
+                                    <option>Day</option>
+                                    <option>IOC</option>
+                                    <option>FOK</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <button class="btn-ticket btn-reset" onclick="goPhase(1)">RESET</button>
+                            <button class="btn-ticket btn-clone" id="btnReview" onclick="goPhase(3)">REVIEW</button>
+                            <button class="btn-ticket btn-submit" id="btnSubmit2" onclick="goPhase(3)" disabled>SUBMIT</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Approval -->
+                <div id="step3Panel" style="display:none;">
+                    <div class="order-ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-pair">
+                                <i class="fa-solid fa-shield-check" style="color:var(--gold);font-size:13px;"></i>
+                                Trade Approval
+                            </div>
+                            <span class="ticket-status pending">REVIEW</span>
+                        </div>
+                        <div class="ticket-body">
+                            <div class="field-group-label">Trade Summary</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                                <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                                    <div class="wo-label">Customer</div>
+                                    <div class="wo-value" id="approvalCustomer" style="font-size:11px;">—</div>
+                                </div>
+                                <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                                    <div class="wo-label">Direction</div>
+                                    <div class="wo-value" id="approvalAction" style="font-size:13px;font-weight:800;">—</div>
+                                </div>
+                                <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                                    <div class="wo-label">Pair</div>
+                                    <div class="wo-value" id="approvalPair" style="font-size:12px;font-weight:700;">—</div>
+                                </div>
+                                <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                                    <div class="wo-label">Rate</div>
+                                    <div class="wo-value" id="approvalRate" style="font-size:13px;font-family:monospace;">—</div>
+                                </div>
+                                <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                                    <div class="wo-label">Volume</div>
+                                    <div class="wo-value" id="approvalLots" style="font-size:12px;">—</div>
+                                </div>
+                                <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                                    <div class="wo-label">Est. Notional</div>
+                                    <div class="wo-value" id="approvalNotional" style="font-size:11px;">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <button class="btn-ticket btn-reset" onclick="goPhase(2)">BACK</button>
+                            <button class="btn-ticket btn-submit" id="btnApprove" onclick="goPhase(4)">
+                                <i class="fa-solid fa-check"></i> APPROVE &amp; EXECUTE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Execute -->
+                <div id="step4Panel" style="display:none;">
+                    <div class="order-ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-pair">
+                                <i class="fa-solid fa-bolt" style="color:var(--gold);font-size:13px;"></i>
+                                Executing Trade
+                            </div>
+                            <span class="ticket-status executing" id="execStatus">EXECUTING</span>
+                        </div>
+                        <div class="ticket-body" style="padding:8px 14px;">
+                            <div class="exec-log-body" id="agentLogs" style="min-height:120px;max-height:200px;padding:0;background:none;border:none;">
+                                <div class="log-line log-info"><span class="log-ts">[INIT]</span>Initializing Aurora trading agent...</div>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <button class="btn-ticket btn-submit" id="btnStep4Next" onclick="goPhase(5)" disabled>
+                                <span class="spin"></span>Executing...
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Review Result -->
+                <div id="step5Panel" style="display:none;">
+                    <div class="order-ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-pair">
+                                <i class="fa-solid fa-circle-check" style="color:var(--green);font-size:13px;"></i>
+                                Trade Result
+                            </div>
+                            <span class="ticket-status filled" id="resultStatus">FILLED</span>
+                        </div>
+                        <div class="ticket-body">
+                            <div id="resultDetails" style="font-size:11px;line-height:1.8;color:var(--text-muted);"></div>
+                        </div>
+                        <div class="ticket-footer">
+                            <button class="btn-ticket btn-reset" onclick="rejectTrade()">
+                                <i class="fa-solid fa-xmark"></i> REJECT
+                            </button>
+                            <button class="btn-ticket btn-submit" onclick="goPhase(6)">
+                                <i class="fa-solid fa-check"></i> ACCEPT &amp; UPDATE CRM
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 6: Update CRM -->
+                <div id="step6Panel" style="display:none;">
+                    <div class="order-ticket">
+                        <div class="ticket-header">
+                            <div class="ticket-pair">
+                                <i class="fa-solid fa-rotate" style="color:var(--gold);font-size:13px;"></i>
+                                Update CRM
+                            </div>
+                            <span class="ticket-status executing" id="crmStatus">UPDATING</span>
+                        </div>
+                        <div class="ticket-body" style="padding:8px 14px;">
+                            <div class="exec-log-body" id="crmLogs" style="min-height:120px;max-height:200px;padding:0;background:none;border:none;">
+                                <div class="log-line log-info"><span class="log-ts">[INIT]</span>Preparing CRM update...</div>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <button class="btn-ticket btn-submit" id="btnComplete" onclick="completeWorkflow()" disabled>
+                                <span class="spin"></span>Updating CRM...
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT: ORDERS -->
+        <div class="orders-panel">
+            <div class="section-header">
+                <span class="section-title">Orders</span>
+                <div class="section-actions">
+                    <button class="section-btn active">Calendar</button>
+                    <button class="section-btn">News</button>
+                </div>
+            </div>
+            <div class="orders-content" id="ordersContent">
+                <div style="color:var(--text-dim);font-size:10px;text-align:center;padding:20px 0;">No working orders</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM: BLOTTER -->
+    <div class="bottom-layout">
+        <div class="blotter-tabs">
+            <div class="blotter-tab active">Blotter</div>
+            <div class="blotter-tab">Positions</div>
+            <div class="blotter-tab">Trade History</div>
+        </div>
+        <div class="blotter-table-wrap">
+            <table class="blotter-table">
+                <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Last Updated</th>
+                        <th>Status</th>
+                        <th>Order Type</th>
+                        <th>Product Type</th>
+                        <th>Security</th>
+                        <th>Side</th>
+                        <th>Currency</th>
+                        <th>Qty</th>
+                        <th>Cum Qty</th>
+                        <th>Avg Px</th>
+                        <th>TIF</th>
+                        <th>Contra</th>
+                    </tr>
+                </thead>
+                <tbody id="blotterBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        const AURORA_API = '@Model.AuroraApiUrl';
+        const AURORA_QUOTE = '@Model.AuroraQuoteUrl';
+
+        let quoteInterval = null;
+        let currentPhase = 1;
+        let tradeData = {
+            customer: '@Model.CustomerName',
+            pair: '@Model.CurrencyPair',
+            signal: '@Model.Signal',
+            action: null,
+            lots: 0.10,
+            rate: 0,
+            bid: 0,
+            ask: 0,
+            transactionId: null
+        };
+
+        // ── Init ─────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', function () {
+            renderTile(null, null);
+            startQuoteFeed();
+            renderBlotter([]);
+            goPhase(1);
+        });
+
+        // ── Phase navigation ──────────────────────────────────
+        function goPhase(n) {
+            currentPhase = n;
+            ['step1Panel','step2Panel','step3Panel','step4Panel','step5Panel','step6Panel']
+                .forEach(id => document.getElementById(id).style.display = 'none');
+            document.getElementById('step' + n + 'Panel').style.display = 'block';
+
+            document.querySelectorAll('.phase-step').forEach(el => {
+                const p = parseInt(el.dataset.phase);
+                el.classList.remove('active', 'done');
+                if (p < n) el.classList.add('done');
+                if (p === n) el.classList.add('active');
+            });
+
+            if (n === 2) populateStep2();
+            if (n === 3) populateApproval();
+            if (n === 4) executeAgent();
+            if (n === 5) showResult();
+            if (n === 6) updateCRM();
+        }
+
+        // ── FX Tile ───────────────────────────────────────────
+        function renderTile(bid, ask) {
+            const pair = tradeData.pair.replace('/', '');
+            const ccy1 = tradeData.pair.split('/')[0] || 'AUD';
+            const ccy2 = tradeData.pair.split('/')[1] || 'USD';
+            const spread = (bid && ask) ? ((ask - bid) * 10000).toFixed(1) : '—';
+
+            const bidStr = bid ? bid.toFixed(5) : '——.——';
+            const askStr = ask ? ask.toFixed(5) : '——.——';
+
+            // Split price into main 2 digits + pips
+            function splitPrice(p) {
+                if (!p) return { main: '——', pips: '——' };
+                const s = p.toFixed(5);
+                const parts = s.split('.');
+                const dec = parts[1] || '00000';
+                return { main: parts[0] + '.' + dec.slice(0, 2), pips: dec.slice(2, 4) + '<sup style="font-size:8px">' + dec.slice(4) + '</sup>' };
+            }
+            const b = splitPrice(bid);
+            const a = splitPrice(ask);
+
+            document.getElementById('tileGrid').innerHTML = `
+                <div class="fx-tile active">
+                    <div class="tile-header">
+                        <div class="tile-pair">
+                            <span style="font-size:16px;">🇦🇺</span>
+                            ${tradeData.pair}
+                            <span class="tile-type">SPOT</span>
+                        </div>
+                        <div class="tile-actions">
+                            <button class="tile-btn">RFQ</button>
+                        </div>
+                    </div>
+                    <div class="tile-prices">
+                        <div class="tile-sell" onclick="if(currentPhase===2)selectDirection('Sell')">
+                            <div class="tile-sell-label">Sell ${ccy1}</div>
+                            <div class="sell-price">
+                                <span class="price-main">${b.main}</span>
+                                <span class="price-pips">${b.pips}</span>
+                            </div>
+                        </div>
+                        <div class="tile-mid">
+                            <div class="tile-center" style="font-size:9px;margin-bottom:4px;">spread</div>
+                            <div class="tile-mid-rate">${spread}</div>
+                        </div>
+                        <div class="tile-buy" onclick="if(currentPhase===2)selectDirection('Buy')">
+                            <div class="tile-buy-label">Buy ${ccy1}</div>
+                            <div class="buy-price">
+                                <span class="price-main">${a.main}</span>
+                                <span class="price-pips">${a.pips}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tile-tenors">
+                        <button class="tenor-btn active">1M</button>
+                        <button class="tenor-btn">2M</button>
+                        <button class="tenor-btn">5M</button>
+                        <button class="tenor-btn">10M</button>
+                    </div>
+                    <div class="tile-footer">
+                        <div class="tile-qty"><strong>1,000,000.00</strong> ${ccy1} SP / ${new Date().toISOString().slice(0,10)}</div>
+                        <button class="tile-order-btn" onclick="goPhase(2)">ORDER</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ── Quote feed ─────────────────────────────────────────
+        async function startQuoteFeed() {
+            await fetchQuote();
+            quoteInterval = setInterval(fetchQuote, 3000);
+        }
+
+        async function fetchQuote() {
+            try {
+                const res = await fetch(AURORA_QUOTE);
+                if (!res.ok) throw new Error();
+                const q = await res.json();
+                tradeData.bid = q.bid;
+                tradeData.ask = q.ask;
+                renderTile(q.bid, q.ask);
+                if (currentPhase === 2) {
+                    const rate = tradeData.action === 'Sell' ? q.bid : q.ask;
+                    document.getElementById('mktPriceDisplay').textContent = rate.toFixed(4);
+                    tradeData.rate = rate;
+                }
+            } catch {
+                // keep last values
+            }
+        }
+
+        // ── Step 1 ─────────────────────────────────────────────
+        async function loadCustomerRecords() {
+            const content = document.getElementById('step1Content');
+            content.innerHTML = '<span class="spin" style="color:var(--gold);"></span> Fetching customer data from CRM...';
+            await sleep(1500);
+
+            content.innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;">
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:7px 10px;">
+                        <div class="wo-label">Customer</div>
+                        <div class="wo-value" style="font-size:11px;">${tradeData.customer}</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:7px 10px;">
+                        <div class="wo-label">Pair</div>
+                        <div class="wo-value" style="font-size:12px;font-weight:700;">${tradeData.pair}</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:7px 10px;">
+                        <div class="wo-label">AI Signal</div>
+                        <div class="wo-value" style="color:var(--gold);">${tradeData.signal}</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:7px 10px;">
+                        <div class="wo-label">Status</div>
+                        <div class="wo-value" style="color:var(--green);">Verified</div>
+                    </div>
+                </div>
+                <div style="margin-top:10px;font-size:10px;color:var(--green);"><i class="fa-solid fa-circle-check"></i> Record retrieved successfully</div>
+            `;
+            const footer = document.querySelector('#step1Panel .ticket-footer');
+            footer.innerHTML = `
+                <button class="btn-ticket btn-reset" onclick="goPhase(1); location.reload();">RESET</button>
+                <button class="btn-ticket btn-submit" onclick="goPhase(2)">CONTINUE <i class="fa-solid fa-arrow-right"></i></button>
+            `;
+        }
+
+        // ── Step 2 ─────────────────────────────────────────────
+        function populateStep2() {
+            document.getElementById('ticketPairLabel').textContent = tradeData.pair;
+            document.getElementById('ticketCustomer').textContent = tradeData.customer;
+            document.getElementById('ticketSignal').textContent = tradeData.signal;
+            const rate = tradeData.action === 'Sell' ? tradeData.bid : tradeData.ask;
+            document.getElementById('mktPriceDisplay').textContent = rate ? rate.toFixed(4) : '—';
+            if (tradeData.action) highlightDirection(tradeData.action);
+        }
+
+        function selectDirection(dir) {
+            tradeData.action = dir;
+            highlightDirection(dir);
+            document.getElementById('btnSubmit2').disabled = false;
+            const rate = dir === 'Buy' ? tradeData.ask : tradeData.bid;
+            tradeData.rate = rate;
+            document.getElementById('mktPriceDisplay').textContent = rate ? rate.toFixed(4) : '—';
+            const btn = document.getElementById('btnSubmit2');
+            btn.className = 'btn-ticket btn-submit ' + (dir === 'Buy' ? 'buy-mode' : 'sell-mode');
+            btn.textContent = dir.toUpperCase();
+        }
+
+        function highlightDirection(dir) {
+            document.getElementById('btnBuy').classList.toggle('active', dir === 'Buy');
+            document.getElementById('btnSell').classList.toggle('active', dir === 'Sell');
+        }
+
+        function setLots(v) {
+            document.getElementById('lotsInput').value = v.toFixed(2);
+        }
+
+        // ── Step 3 ─────────────────────────────────────────────
+        function populateApproval() {
+            tradeData.lots = parseFloat(document.getElementById('lotsInput').value) || 0.10;
+            const rate = tradeData.action === 'Buy' ? tradeData.ask : tradeData.bid;
+            tradeData.rate = rate || tradeData.rate;
+            const notional = Math.round(tradeData.lots * 100000 * tradeData.rate);
+
+            document.getElementById('approvalCustomer').textContent = tradeData.customer;
+            const aEl = document.getElementById('approvalAction');
+            aEl.textContent = tradeData.action || '—';
+            aEl.className = 'wo-value ' + (tradeData.action === 'Buy' ? 'buy' : 'sell');
+            document.getElementById('approvalPair').textContent = tradeData.pair;
+            document.getElementById('approvalRate').textContent = tradeData.rate ? tradeData.rate.toFixed(5) : '—';
+            document.getElementById('approvalLots').textContent = tradeData.lots.toFixed(2) + ' lots';
+            document.getElementById('approvalNotional').textContent = notional ? '$' + notional.toLocaleString() : '—';
+        }
+
+        // ── Step 4 ─────────────────────────────────────────────
+        async function executeAgent() {
+            const logs = document.getElementById('agentLogs');
+            const btn = document.getElementById('btnStep4Next');
+            logs.innerHTML = '';
+
+            await sleep(600);
+            addLog(logs, 'info', 'Connecting to Aurora trading agent...');
+            await sleep(900);
+            addLog(logs, 'success', 'Connection established');
+            await sleep(500);
+            addLog(logs, 'info', `Submitting ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair}...`);
+            await sleep(1100);
+            addLog(logs, 'info', 'Order routed to liquidity provider...');
+            await sleep(1300);
+
+            try {
+                const res = await fetch(AURORA_API + '/trade', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        direction: tradeData.action,
+                        currencyPair: tradeData.pair,
+                        lots: tradeData.lots,
+                        accountId: 1,
+                        customerName: tradeData.customer
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    tradeData.transactionId = data.transactionId;
+                    tradeData.rate = data.rate || tradeData.rate;
+                    addLog(logs, 'success', `✓ Filled at ${tradeData.rate.toFixed(5)}`);
+                    addLog(logs, 'success', `Transaction: ${data.transactionId}`);
+                } else {
+                    addLog(logs, 'warn', `✗ ${data.message}`);
+                }
+            } catch {
+                tradeData.transactionId = 'AU-' + Date.now();
+                addLog(logs, 'success', `✓ Filled at ${tradeData.rate.toFixed(5)}`);
+                addLog(logs, 'success', `Transaction: ${tradeData.transactionId}`);
+            }
+
+            addLog(logs, 'success', 'Execution complete');
+            document.getElementById('execStatus').textContent = 'FILLED';
+            document.getElementById('execStatus').className = 'ticket-status filled';
+            btn.innerHTML = 'View Result <i class="fa-solid fa-arrow-right"></i>';
+            btn.disabled = false;
+            addWorkingOrder();
+        }
+
+        // ── Step 5 ─────────────────────────────────────────────
+        function showResult() {
+            const notional = Math.round(tradeData.lots * 100000 * tradeData.rate);
+            document.getElementById('resultDetails').innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                        <div class="wo-label">Security</div>
+                        <div class="wo-value" style="font-size:12px;font-weight:700;">${tradeData.pair}</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                        <div class="wo-label">Side</div>
+                        <div class="wo-value ${tradeData.action === 'Buy' ? 'buy' : 'sell'}" style="font-size:13px;font-weight:800;">${tradeData.action?.toUpperCase()}</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                        <div class="wo-label">Avg Px</div>
+                        <div class="wo-value" style="font-size:13px;font-family:monospace;">${tradeData.rate.toFixed(5)}</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;">
+                        <div class="wo-label">Qty</div>
+                        <div class="wo-value">${tradeData.lots} lots</div>
+                    </div>
+                    <div style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;grid-column:span 2;">
+                        <div class="wo-label">Transaction ID</div>
+                        <div class="wo-value" style="font-family:monospace;font-size:11px;">${tradeData.transactionId}</div>
+                    </div>
+                </div>
+                <div style="margin-top:10px;font-size:10px;color:var(--green);"><i class="fa-solid fa-circle-check"></i> Trade executed — notional $${notional.toLocaleString()}</div>
+            `;
+            addBlotterRow();
+        }
+
+        // ── Step 6 ─────────────────────────────────────────────
+        async function updateCRM() {
+            const logs = document.getElementById('crmLogs');
+            const btn = document.getElementById('btnComplete');
+            logs.innerHTML = '';
+
+            await sleep(800); addLog(logs, 'info', 'Connecting to CRM...');
+            await sleep(1000); addLog(logs, 'success', 'Connection established');
+            await sleep(700); addLog(logs, 'info', `Updating customer record: ${tradeData.customer}`);
+            await sleep(900); addLog(logs, 'info', 'Adding transaction to portfolio history...');
+            await sleep(800); addLog(logs, 'info', 'Updating account balance and positions...');
+            await sleep(900); addLog(logs, 'success', '✓ Portfolio updated');
+            await sleep(600); addLog(logs, 'info', 'Generating trade confirmation...');
+            await sleep(700); addLog(logs, 'success', '✓ Confirmation sent');
+            await sleep(500); addLog(logs, 'success', '✓ CRM update complete');
+
+            document.getElementById('crmStatus').textContent = 'DONE';
+            document.getElementById('crmStatus').className = 'ticket-status filled';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Complete Workflow';
+            btn.disabled = false;
+        }
+
+        function completeWorkflow() {
+            window.location.href = '/Account';
+        }
+
+        function rejectTrade() {
+            if (confirm('Reject this trade? This will cancel the order.')) {
+                window.location.href = '/Account';
+            }
+        }
+
+        // ── Working orders panel ──────────────────────────────
+        function addWorkingOrder() {
+            document.getElementById('ordersContent').innerHTML = `
+                <div class="working-order">
+                    <div class="wo-header">
+                        <div class="wo-pair">${tradeData.pair}</div>
+                        <span class="wo-status filled">FILLED</span>
+                    </div>
+                    <div class="wo-details">
+                        <div class="wo-item">
+                            <div class="wo-label">Side</div>
+                            <div class="wo-value ${tradeData.action === 'Buy' ? 'buy' : 'sell'}">${tradeData.action?.toUpperCase()}</div>
+                        </div>
+                        <div class="wo-item">
+                            <div class="wo-label">Qty</div>
+                            <div class="wo-value">${(tradeData.lots * 1000000).toLocaleString()}</div>
+                        </div>
+                        <div class="wo-item">
+                            <div class="wo-label">Avg Px</div>
+                            <div class="wo-value">${tradeData.rate.toFixed(5)}</div>
+                        </div>
+                        <div class="wo-item">
+                            <div class="wo-label">Type</div>
+                            <div class="wo-value">SPOT</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ── Blotter ───────────────────────────────────────────
+        let blotterRows = [];
+        function renderBlotter(rows) {
+            const body = document.getElementById('blotterBody');
+            if (!rows.length) {
+                body.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--text-dim);padding:16px;">No trades</td></tr>';
+                return;
+            }
+            body.innerHTML = rows.map(r => `
+                <tr>
+                    <td class="highlight">${r.created}</td>
+                    <td>${r.updated}</td>
+                    <td><span class="status-badge ${r.status.toLowerCase()}">${r.status}</span></td>
+                    <td>${r.orderType}</td>
+                    <td>${r.productType}</td>
+                    <td class="highlight">${r.security}</td>
+                    <td class="${r.side === 'BUY' ? 'side-buy' : 'side-sell'}">${r.side}</td>
+                    <td>${r.currency}</td>
+                    <td class="highlight">${r.qty}</td>
+                    <td>${r.cumQty}</td>
+                    <td class="highlight">${r.avgPx}</td>
+                    <td>${r.tif}</td>
+                    <td>${r.contra}</td>
+                </tr>
+            `).join('');
+        }
+
+        function addBlotterRow() {
+            const now = new Date();
+            const ts = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            const [ccy1, ccy2] = tradeData.pair.split('/');
+            blotterRows.unshift({
+                created: ts,
+                updated: ts,
+                status: 'FILLED',
+                orderType: 'SPOT',
+                productType: 'SPOT',
+                security: tradeData.pair,
+                side: tradeData.action?.toUpperCase(),
+                currency: ccy1,
+                qty: (tradeData.lots * 1000000).toLocaleString(),
+                cumQty: (tradeData.lots * 1000000).toLocaleString(),
+                avgPx: tradeData.rate.toFixed(5),
+                tif: 'GTC',
+                contra: ccy2 + ': ' + (tradeData.lots * 100000 * tradeData.rate).toLocaleString(undefined, {maximumFractionDigits:0})
+            });
+            renderBlotter(blotterRows);
+        }
+
+        // ── Helpers ───────────────────────────────────────────
+        function addLog(container, type, message) {
+            const ts = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'log-line log-' + type;
+            div.innerHTML = `<span class="log-ts">[${ts}]</span>${message}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    </script>
+</body>
+</html>

@@ -203,8 +203,8 @@ module researchAnalyticsApp 'modules/webapp.bicep' = {
     extraAppSettings: [
       { name: 'IntegrationApi__BaseUrl', value: 'https://${baseName}-intg.azurewebsites.net' }
       { name: 'BrokerNotification__EndpointUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/accounts/leads' }
-      { name: 'Orora__ApiUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/orora' }
-      { name: 'Orora__QuoteUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/fx/quote' }
+      { name: 'Aurora__ApiUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/aurora' }
+      { name: 'Aurora__QuoteUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/fx/quote' }
     ]
   }
 }

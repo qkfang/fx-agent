@@ -18,6 +18,7 @@ builder.Services.AddSingleton<TrackingService>();
 builder.Services.AddHttpClient<SuggestionService>();
 builder.Services.AddHttpClient<ChatService>();
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<ChatKitStore>();
 
 var app = builder.Build();
 
@@ -117,15 +118,9 @@ app.MapPost("/api/articles/receive", (NewsIntakeRequest req, ArticleService arti
 
 app.MapRazorPages();
 
-// API: Chat with Foundry research agent
-app.MapPost("/api/chat", async (ChatRequest req, ChatService chatService) =>
-{
-    if (string.IsNullOrWhiteSpace(req.Message))
-        return Results.BadRequest(new { error = "Message is required." });
-
-    var reply = await chatService.SendMessageAsync(req.Message, req.History);
-    return Results.Ok(new { reply });
-});
+// API: ChatKit protocol endpoint (openai/chatkit-js self-hosted backend)
+app.MapPost("/chatkit", (HttpContext ctx, ChatKitStore store, ChatService chatService) =>
+    ChatKitHandler.HandleAsync(ctx, store, chatService));
 
 // API: List all customer suggestions
 app.MapGet("/api/suggestions", (SuggestionService suggestions) =>

@@ -96,31 +96,15 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/tracker.js" asp-append-version="true"></script>
-    <script type="module" src="https://unpkg.com/@@fluentui/web-components"></script>
+    <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- Chat Widget (Fluent UI) -->
-    <div id="chat-widget" class="chat-widget">
-        <fluent-button id="chat-toggle" appearance="accent" class="chat-toggle" title="Ask Research Assistant">
-            <i class="fa-solid fa-comments"></i>
-        </fluent-button>
-        <fluent-card id="chat-panel" class="chat-panel" style="display:none;">
-            <div class="chat-header">
-                <span><i class="fa-solid fa-robot"></i> Research Assistant</span>
-                <fluent-button id="chat-close" appearance="lightweight" class="chat-close">&times;</fluent-button>
-            </div>
-            <div id="chat-messages" class="chat-messages">
-                <div class="chat-msg assistant">
-                    <div class="chat-bubble">Hi! I'm the FX Research Assistant. Ask me about market insights, currency analysis, or trading strategies.</div>
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <fluent-text-field id="chat-input" class="chat-input" placeholder="Ask about market research..." appearance="outline"></fluent-text-field>
-                <fluent-button id="chat-send" appearance="accent" class="chat-send" title="Send">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </fluent-button>
-            </div>
-        </fluent-card>
+    <!-- Chat Widget (openai/chatkit-js) -->
+    <button id="chatkit-toggle" class="chatkit-float-btn" title="Ask Research Assistant">
+        <i class="fa-solid fa-comments"></i>
+    </button>
+    <div id="chatkit-panel" class="chatkit-float-panel">
+        <openai-chatkit id="research-chatkit"></openai-chatkit>
     </div>
     <script src="~/js/chat.js" asp-append-version="true"></script>
 </body>

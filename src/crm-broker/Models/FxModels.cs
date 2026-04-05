@@ -214,8 +214,8 @@ namespace FxWebApi.Models
         public DateTime DateTime { get; set; }
     }
 
-    /// <summary>Trade request submitted through the Orora trading popup in Research Analytics.</summary>
-    public class OroraTradeRequest
+    /// <summary>Trade request submitted through the Aurora trading popup in Research Analytics.</summary>
+    public class AuroraTradeRequest
     {
         /// <summary>Trade direction: "Buy" or "Sell".</summary>
         public string Direction { get; set; } = string.Empty;
@@ -229,8 +229,8 @@ namespace FxWebApi.Models
         public string CustomerName { get; set; } = string.Empty;
     }
 
-    /// <summary>Result returned by the Orora trade endpoint.</summary>
-    public class OroraTradeResult
+    /// <summary>Result returned by the Aurora trade endpoint.</summary>
+    public class AuroraTradeResult
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;

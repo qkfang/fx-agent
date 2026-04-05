@@ -165,10 +165,10 @@
                                         ⚡ Action
                                     </button>
                                 </form>
-                                <a href="/Account/OroraWorkflow?customer=@Uri.EscapeDataString(s.CustomerName)&pair=@Uri.EscapeDataString(s.CurrencyPair)&signal=@Uri.EscapeDataString(s.Direction)"
-                                   class="btn btn-xs btn-orora"
-                                   title="Open Orora workflow for @s.CustomerName">
-                                    ✦ Orora
+                                <a href="/Account/AuroraWorkflow?customer=@Uri.EscapeDataString(s.CustomerName)&pair=@Uri.EscapeDataString(s.CurrencyPair)&signal=@Uri.EscapeDataString(s.Direction)"
+                                   class="btn btn-xs btn-aurora"
+                                   title="Open Aurora workflow for @s.CustomerName">
+                                    ✦ Aurora
                                 </a>
                             </td>
                         </tr>
@@ -184,46 +184,46 @@
 
 </div>
 
-<div class="modal fade" id="ororaModal" tabindex="-1" aria-labelledby="ororaModalLabel" aria-hidden="true">
+<div class="modal fade" id="auroraModal" tabindex="-1" aria-labelledby="auroraModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content orora-modal-content">
-            <div class="modal-header orora-header">
+        <div class="modal-content aurora-modal-content">
+            <div class="modal-header aurora-header">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="orora-logo">✦</span>
-                    <h5 class="modal-title mb-0" id="ororaModalLabel">Orora Trading</h5>
+                    <span class="aurora-logo">✦</span>
+                    <h5 class="modal-title mb-0" id="auroraModalLabel">Aurora Trading</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <!-- Customer info -->
-                <div class="orora-customer-info mb-3">
+                <div class="aurora-customer-info mb-3">
                     <div class="text-muted small mb-1">Trading for</div>
-                    <div class="fw-semibold" id="ororaCustomerName">—</div>
+                    <div class="fw-semibold" id="auroraCustomerName">—</div>
                     <div class="small text-muted mt-1">
-                        <span id="ororaPair">AUD/USD</span> &nbsp;·&nbsp;
-                        AI signal: <span id="ororaSignal" class="fw-semibold">—</span>
+                        <span id="auroraPair">AUD/USD</span> &nbsp;·&nbsp;
+                        AI signal: <span id="auroraSignal" class="fw-semibold">—</span>
                     </div>
                 </div>
 
                 <!-- Live rate display -->
-                <div class="orora-rate-row mb-3">
-                    <div class="orora-rate-side orora-sell-side">
-                        <div class="orora-rate-label">SELL</div>
-                        <div class="orora-rate-value" id="ororaSellRate">—</div>
+                <div class="aurora-rate-row mb-3">
+                    <div class="aurora-rate-side aurora-sell-side">
+                        <div class="aurora-rate-label">SELL</div>
+                        <div class="aurora-rate-value" id="auroraSellRate">—</div>
                     </div>
-                    <div class="orora-rate-middle">
+                    <div class="aurora-rate-middle">
                         <i class="fa-solid fa-arrow-right-arrow-left text-muted"></i>
                     </div>
-                    <div class="orora-rate-side orora-buy-side">
-                        <div class="orora-rate-label">BUY</div>
-                        <div class="orora-rate-value" id="ororaBuyRate">—</div>
+                    <div class="aurora-rate-side aurora-buy-side">
+                        <div class="aurora-rate-label">BUY</div>
+                        <div class="aurora-rate-value" id="auroraBuyRate">—</div>
                     </div>
                 </div>
 
                 <!-- Account selector -->
                 <div class="mb-3">
                     <label class="form-label small fw-semibold">CRM Account</label>
-                    <select class="form-select form-select-sm" id="ororaAccountSelect">
+                    <select class="form-select form-select-sm" id="auroraAccountSelect">
                         <option value="">Loading accounts…</option>
                     </select>
                 </div>
@@ -231,28 +231,28 @@
                 <!-- Lots input -->
                 <div class="mb-2">
                     <label class="form-label small fw-semibold">Volume (Lots)</label>
-                    <input type="number" class="form-control form-control-sm" id="ororaLotsInput"
+                    <input type="number" class="form-control form-control-sm" id="auroraLotsInput"
                            value="0.10" min="0.01" max="100" step="0.01"
-                           oninput="updateOroraMargin()">
+                           oninput="updateAuroraMargin()">
                     <div class="d-flex gap-1 mt-2 flex-wrap">
-                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setOroraLots(0.01)">0.01</button>
-                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setOroraLots(0.10)">0.10</button>
-                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setOroraLots(0.50)">0.50</button>
-                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setOroraLots(1.00)">1.00</button>
-                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setOroraLots(5.00)">5.00</button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setAuroraLots(0.01)">0.01</button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setAuroraLots(0.10)">0.10</button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setAuroraLots(0.50)">0.50</button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setAuroraLots(1.00)">1.00</button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary" onclick="setAuroraLots(5.00)">5.00</button>
                     </div>
                 </div>
-                <div class="text-muted small mb-3" id="ororaMarginInfo">Est. notional: —</div>
+                <div class="text-muted small mb-3" id="auroraMarginInfo">Est. notional: —</div>
 
                 <!-- Result message -->
-                <div id="ororaResultMsg" class="alert d-none mb-3" role="alert"></div>
+                <div id="auroraResultMsg" class="alert d-none mb-3" role="alert"></div>
 
                 <!-- Trade buttons -->
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn orora-btn-buy flex-fill" id="ororaBuyBtn" onclick="executeOrora('Buy')">
+                    <button type="button" class="btn aurora-btn-buy flex-fill" id="auroraBuyBtn" onclick="executeAurora('Buy')">
                         <i class="fa-solid fa-arrow-trend-up me-1"></i> BUY
                     </button>
-                    <button type="button" class="btn orora-btn-sell flex-fill" id="ororaSellBtn" onclick="executeOrora('Sell')">
+                    <button type="button" class="btn aurora-btn-sell flex-fill" id="auroraSellBtn" onclick="executeAurora('Sell')">
                         <i class="fa-solid fa-arrow-trend-down me-1"></i> SELL
                     </button>
                 </div>
@@ -263,7 +263,7 @@
 
 @section Scripts {
 <style>
-.btn-orora {
+.btn-aurora {
     background: linear-gradient(135deg, #2d1b69, #0f3460);
     color: #c084fc;
     border: 1px solid #7c3aed;
@@ -275,81 +275,81 @@
     text-decoration: none;
     display: inline-block;
 }
-.btn-orora:hover { 
+.btn-aurora:hover { 
     background: linear-gradient(135deg, #4c1d95, #1e3a5f); 
     color: #e9d5ff;
     text-decoration: none;
 }
-.orora-modal-content { background: #0f0f1a; color: #e2e8f0; border: 1px solid #4c1d95; border-radius: 12px; }
-.orora-header { background: linear-gradient(135deg, #1e1b4b, #0f3460); border-bottom: 1px solid #4c1d95; border-radius: 12px 12px 0 0; }
-.orora-logo { font-size: 1.4rem; color: #c084fc; }
-.orora-customer-info { background: #1a1a2e; border: 1px solid #2d2d4e; border-radius: 8px; padding: 10px 14px; }
-.orora-rate-row { display: flex; gap: 8px; align-items: center; }
-.orora-rate-side { flex: 1; text-align: center; padding: 10px; border-radius: 8px; }
-.orora-sell-side { background: #2d0e0e; border: 1px solid #7f1d1d; }
-.orora-buy-side  { background: #0e2d14; border: 1px solid #14532d; }
-.orora-rate-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
-.orora-sell-side .orora-rate-label { color: #fca5a5; }
-.orora-buy-side  .orora-rate-label { color: #86efac; }
-.orora-rate-value { font-size: 1.35rem; font-weight: 800; font-family: monospace; }
-.orora-sell-side .orora-rate-value { color: #f87171; }
-.orora-buy-side  .orora-rate-value { color: #4ade80; }
-.orora-rate-middle { color: #6b7280; }
-.orora-btn-buy  { background: #15803d; color: #fff; font-weight: 700; border: none; }
-.orora-btn-buy:hover  { background: #166534; color: #fff; }
-.orora-btn-sell { background: #b91c1c; color: #fff; font-weight: 700; border: none; }
-.orora-btn-sell:hover { background: #991b1b; color: #fff; }
-.orora-btn-buy:disabled, .orora-btn-sell:disabled { opacity: 0.45; cursor: not-allowed; }
-#ororaModal .form-select, #ororaModal .form-control { background: #1a1a2e; color: #e2e8f0; border-color: #4c1d95; }
-#ororaModal .form-select option { background: #1a1a2e; }
-#ororaModal label { color: #a5b4fc; }
+.aurora-modal-content { background: #0f0f1a; color: #e2e8f0; border: 1px solid #4c1d95; border-radius: 12px; }
+.aurora-header { background: linear-gradient(135deg, #1e1b4b, #0f3460); border-bottom: 1px solid #4c1d95; border-radius: 12px 12px 0 0; }
+.aurora-logo { font-size: 1.4rem; color: #c084fc; }
+.aurora-customer-info { background: #1a1a2e; border: 1px solid #2d2d4e; border-radius: 8px; padding: 10px 14px; }
+.aurora-rate-row { display: flex; gap: 8px; align-items: center; }
+.aurora-rate-side { flex: 1; text-align: center; padding: 10px; border-radius: 8px; }
+.aurora-sell-side { background: #2d0e0e; border: 1px solid #7f1d1d; }
+.aurora-buy-side  { background: #0e2d14; border: 1px solid #14532d; }
+.aurora-rate-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+.aurora-sell-side .aurora-rate-label { color: #fca5a5; }
+.aurora-buy-side  .aurora-rate-label { color: #86efac; }
+.aurora-rate-value { font-size: 1.35rem; font-weight: 800; font-family: monospace; }
+.aurora-sell-side .aurora-rate-value { color: #f87171; }
+.aurora-buy-side  .aurora-rate-value { color: #4ade80; }
+.aurora-rate-middle { color: #6b7280; }
+.aurora-btn-buy  { background: #15803d; color: #fff; font-weight: 700; border: none; }
+.aurora-btn-buy:hover  { background: #166534; color: #fff; }
+.aurora-btn-sell { background: #b91c1c; color: #fff; font-weight: 700; border: none; }
+.aurora-btn-sell:hover { background: #991b1b; color: #fff; }
+.aurora-btn-buy:disabled, .aurora-btn-sell:disabled { opacity: 0.45; cursor: not-allowed; }
+#auroraModal .form-select, #auroraModal .form-control { background: #1a1a2e; color: #e2e8f0; border-color: #4c1d95; }
+#auroraModal .form-select option { background: #1a1a2e; }
+#auroraModal label { color: #a5b4fc; }
 </style>
 <script>
 (function () {
-    const ORORA_API   = '@Model.OroraApiUrl';
-    const ORORA_QUOTE = '@Model.OroraQuoteUrl';
+    const ORORA_API   = '@Model.AuroraApiUrl';
+    const ORORA_QUOTE = '@Model.AuroraQuoteUrl';
 
-    let ororaRateInterval = null;
+    let auroraRateInterval = null;
 
-    window.openOrora = function (customerName, pair, signal) {
-        document.getElementById('ororaCustomerName').textContent = customerName;
-        document.getElementById('ororaPair').textContent = pair;
+    window.openAurora = function (customerName, pair, signal) {
+        document.getElementById('auroraCustomerName').textContent = customerName;
+        document.getElementById('auroraPair').textContent = pair;
 
-        var sigEl = document.getElementById('ororaSignal');
+        var sigEl = document.getElementById('auroraSignal');
         sigEl.textContent = signal;
         sigEl.className = 'fw-semibold ' + (signal === 'Buy' ? 'text-success' : 'text-danger');
 
-        document.getElementById('ororaLotsInput').value = '0.10';
-        document.getElementById('ororaResultMsg').className = 'alert d-none mb-3';
+        document.getElementById('auroraLotsInput').value = '0.10';
+        document.getElementById('auroraResultMsg').className = 'alert d-none mb-3';
         setBtnsDisabled(false);
 
-        loadOroraAccounts();
-        fetchOroraRate();
+        loadAuroraAccounts();
+        fetchAuroraRate();
 
-        if (ororaRateInterval) clearInterval(ororaRateInterval);
-        ororaRateInterval = setInterval(fetchOroraRate, 3000);
+        if (auroraRateInterval) clearInterval(auroraRateInterval);
+        auroraRateInterval = setInterval(fetchAuroraRate, 3000);
 
-        var modal = new bootstrap.Modal(document.getElementById('ororaModal'));
+        var modal = new bootstrap.Modal(document.getElementById('auroraModal'));
         modal.show();
 
-        document.getElementById('ororaModal').addEventListener('hidden.bs.modal', function () {
-            if (ororaRateInterval) { clearInterval(ororaRateInterval); ororaRateInterval = null; }
+        document.getElementById('auroraModal').addEventListener('hidden.bs.modal', function () {
+            if (auroraRateInterval) { clearInterval(auroraRateInterval); auroraRateInterval = null; }
         }, { once: true });
     };
 
-    async function fetchOroraRate() {
+    async function fetchAuroraRate() {
         try {
             var res = await fetch(ORORA_QUOTE);
             if (!res.ok) return;
             var q = await res.json();
-            document.getElementById('ororaSellRate').textContent = q.bid.toFixed(4);
-            document.getElementById('ororaBuyRate').textContent  = q.ask.toFixed(4);
-            updateOroraMargin(q.mid);
+            document.getElementById('auroraSellRate').textContent = q.bid.toFixed(4);
+            document.getElementById('auroraBuyRate').textContent  = q.ask.toFixed(4);
+            updateAuroraMargin(q.mid);
         } catch (_) {}
     }
 
-    async function loadOroraAccounts() {
-        var sel = document.getElementById('ororaAccountSelect');
+    async function loadAuroraAccounts() {
+        var sel = document.getElementById('auroraAccountSelect');
         sel.innerHTML = '<option value="">Loading…</option>';
         try {
             var res = await fetch(ORORA_API + '/accounts');
@@ -364,37 +364,37 @@
         }
     }
 
-    window.updateOroraMargin = function (mid) {
-        var lots  = parseFloat(document.getElementById('ororaLotsInput').value) || 0;
-        var price = mid || parseFloat(document.getElementById('ororaBuyRate').textContent) || 0.655;
+    window.updateAuroraMargin = function (mid) {
+        var lots  = parseFloat(document.getElementById('auroraLotsInput').value) || 0;
+        var price = mid || parseFloat(document.getElementById('auroraBuyRate').textContent) || 0.655;
         var notional = Math.round(lots * 100000 * price);
-        document.getElementById('ororaMarginInfo').textContent =
+        document.getElementById('auroraMarginInfo').textContent =
             notional > 0 ? 'Est. notional: $' + notional.toLocaleString() + ' AUD' : 'Est. notional: —';
     };
 
-    window.setOroraLots = function (v) {
-        document.getElementById('ororaLotsInput').value = v.toFixed(2);
-        updateOroraMargin();
+    window.setAuroraLots = function (v) {
+        document.getElementById('auroraLotsInput').value = v.toFixed(2);
+        updateAuroraMargin();
     };
 
     function setBtnsDisabled(disabled) {
-        document.getElementById('ororaBuyBtn').disabled  = disabled;
-        document.getElementById('ororaSellBtn').disabled = disabled;
+        document.getElementById('auroraBuyBtn').disabled  = disabled;
+        document.getElementById('auroraSellBtn').disabled = disabled;
     }
 
-    window.executeOrora = async function (direction) {
-        var lots      = parseFloat(document.getElementById('ororaLotsInput').value);
-        var accountId = parseInt(document.getElementById('ororaAccountSelect').value) || 1;
-        var customer  = document.getElementById('ororaCustomerName').textContent;
-        var pair      = document.getElementById('ororaPair').textContent;
+    window.executeAurora = async function (direction) {
+        var lots      = parseFloat(document.getElementById('auroraLotsInput').value);
+        var accountId = parseInt(document.getElementById('auroraAccountSelect').value) || 1;
+        var customer  = document.getElementById('auroraCustomerName').textContent;
+        var pair      = document.getElementById('auroraPair').textContent;
 
         if (!lots || lots <= 0) {
-            showOroraMsg('Please enter a valid lot size.', false);
+            showAuroraMsg('Please enter a valid lot size.', false);
             return;
         }
 
         setBtnsDisabled(true);
-        showOroraMsg('Executing trade via Orora…', null);
+        showAuroraMsg('Executing trade via Aurora…', null);
 
         try {
             var res = await fetch(ORORA_API + '/trade', {
@@ -411,19 +411,19 @@
             var data = await res.json();
             if (data.success) {
                 var rate = data.rate ? data.rate.toFixed(4) : '—';
-                showOroraMsg('✓ ' + direction + ' ' + lots + ' lots ' + pair + ' executed at ' + rate + '. Tx: ' + data.transactionId, true);
+                showAuroraMsg('✓ ' + direction + ' ' + lots + ' lots ' + pair + ' executed at ' + rate + '. Tx: ' + data.transactionId, true);
             } else {
-                showOroraMsg('✗ Trade failed: ' + data.message, false);
+                showAuroraMsg('✗ Trade failed: ' + data.message, false);
                 setBtnsDisabled(false);
             }
         } catch (err) {
-            showOroraMsg('✗ Connection error: ' + err.message, false);
+            showAuroraMsg('✗ Connection error: ' + err.message, false);
             setBtnsDisabled(false);
         }
     };
 
-    function showOroraMsg(text, success) {
-        var el = document.getElementById('ororaResultMsg');
+    function showAuroraMsg(text, success) {
+        var el = document.getElementById('auroraResultMsg');
         if (success === null) {
             el.className = 'alert alert-secondary mb-3';
         } else {

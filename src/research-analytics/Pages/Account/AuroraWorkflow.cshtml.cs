@@ -3,17 +3,17 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace FxWebPortal.Pages.Account
 {
-    public class OroraWorkflowModel : PageModel
+    public class AuroraWorkflowModel : PageModel
     {
         private readonly IConfiguration _configuration;
 
         public string CustomerName { get; set; } = string.Empty;
         public string CurrencyPair { get; set; } = string.Empty;
         public string Signal { get; set; } = string.Empty;
-        public string OroraApiUrl { get; set; } = string.Empty;
-        public string OroraQuoteUrl { get; set; } = string.Empty;
+        public string AuroraApiUrl { get; set; } = string.Empty;
+        public string AuroraQuoteUrl { get; set; } = string.Empty;
 
-        public OroraWorkflowModel(IConfiguration configuration)
+        public AuroraWorkflowModel(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -25,8 +25,8 @@ namespace FxWebPortal.Pages.Account
             Signal = signal ?? "Buy";
 
             var brokerApiUrl = _configuration["BrokerCrmApiUrl"] ?? "http://localhost:5002";
-            OroraApiUrl = $"{brokerApiUrl}/api/orora";
-            OroraQuoteUrl = $"{brokerApiUrl}/api/orora/quote/audusd";
+            AuroraApiUrl = $"{brokerApiUrl}/api/aurora";
+            AuroraQuoteUrl = $"{brokerApiUrl}/api/aurora/quote/audusd";
         }
     }
 }

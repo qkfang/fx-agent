@@ -28,7 +28,6 @@ var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"] ?? "gpt
 
 AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
-var bingConnectionName = Environment.GetEnvironmentVariable("BING_CONNECTION_NAME");
 var researchAgent = new FxAgResearch(aiProjectClient, deploymentName);
 
 var apiMcpUrl = app.Configuration["API_MCP_URL"] ?? "http://localhost:5005";
@@ -41,9 +40,19 @@ app.Lifetime.ApplicationStopped.Register(() => mcpClient.DisposeAsync().AsTask()
 var mcpTools = await mcpClient.ListToolsAsync();
 logger.LogInformation("MCP tools loaded: {Tools}", string.Join(", ", mcpTools.Select(t => t.Name)));
 
+var tradingMcpUrl = app.Configuration["TRADING_MCP_URL"] ?? "http://localhost:5249";
+var tradingMcpClient = await McpClient.CreateAsync(new HttpClientTransport(new HttpClientTransportOptions
+{
+    Endpoint = new Uri($"{tradingMcpUrl}/mcp"),
+    Name = "TradingPlatform"
+}));
+app.Lifetime.ApplicationStopped.Register(() => tradingMcpClient.DisposeAsync().AsTask().Wait());
+var tradingMcpTools = await tradingMcpClient.ListToolsAsync();
+logger.LogInformation("Trading MCP tools loaded: {Tools}", string.Join(", ", tradingMcpTools.Select(t => t.Name)));
+
 var suggestionAgent = new FxAgSuggestion(aiProjectClient, deploymentName, [.. mcpTools.Cast<AITool>()]);
-var traderAgent = new FxAgTrader(aiProjectClient, deploymentName);
-var insightAgent = new FxAgInsight(aiProjectClient, deploymentName);
+var traderAgent = new FxAgTrader(aiProjectClient, deploymentName, [.. tradingMcpTools.Cast<AITool>()]);
+var insightAgent = new FxAgInsight(aiProjectClient, deploymentName, [.. mcpTools.Cast<AITool>()]);
 
 logger.LogInformation("Agents created: fxag-research, fxag-suggestion, fxag-trader, fxag-insight");
 

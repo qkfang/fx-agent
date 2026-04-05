@@ -9,6 +9,10 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<FxDataService>();
 
+builder.Services.AddMcpServer()
+    .WithHttpTransport(options => { options.Stateless = true; })
+    .WithToolsFromAssembly();
+
 // Add CORS
 builder.Services.AddCors();
 
@@ -52,5 +56,6 @@ app.MapGet("/api/portfolio", (FxDataService fxData) =>
 
 app.MapControllers();
 app.MapRazorPages();
+app.MapMcp("/mcp");
 
 app.Run();

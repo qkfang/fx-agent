@@ -14,8 +14,8 @@ public class ChatService
     public ChatService(HttpClient http, IConfiguration config, ILogger<ChatService> logger)
     {
         _http = http;
-        _agentEndpoint = config["FoundryAgent:EndpointUrl"]?.TrimEnd('/') ?? "http://localhost:8088";
-        _agentName = config["FoundryAgent:AgentName"] ?? "forex-trading-agent";
+        _agentEndpoint = config["FoundryAgent:EndpointUrl"]?.TrimEnd('/');
+        _agentName = config["FoundryAgent:AgentName"];
         _logger = logger;
     }
 
