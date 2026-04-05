@@ -25,34 +25,23 @@ var endpoint = app.Configuration["AZURE_AI_PROJECT_ENDPOINT"]
     ?? throw new InvalidOperationException("AZURE_AI_PROJECT_ENDPOINT is not set.");
 var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
 
-AIProjectClient aiProjectClient = new(new Uri(endpoint), new DefaultAzureCredential());
+AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
+const string JokerName = "JokerAgent";
+// Create a server-side agent version using the native SDK.
 ProjectsAgentVersion agentVersion = await aiProjectClient.AgentAdministrationClient.CreateAgentVersionAsync(
-    "ForexTradingAgent",
+    JokerName,
     new ProjectsAgentVersionCreationOptions(
         new DeclarativeAgentDefinition(model: deploymentName)
         {
-            Instructions = """
-                You are an expert forex trading assistant specializing in currency markets.
-
-                Your role:
-                - Provide insights on forex market trends and analysis
-                - Explain currency pair movements and technical indicators
-                - Discuss risk management strategies for forex trading
-                - Analyze macroeconomic factors affecting exchange rates
-                - Share best practices for forex trading
-
-                Guidelines:
-                - Provide clear, professional forex market analysis
-                - Explain complex concepts in accessible terms
-                - Always emphasize risk management and responsible trading
-                - Use proper forex terminology and conventions
-                - Base responses on sound financial principles
-                """
+            Instructions = "You are good at telling jokes.",
         }));
-
+        
+// Wrap the agent version as a FoundryAgent using the AsAIAgent extension.
 FoundryAgent agent = aiProjectClient.AsAIAgent(agentVersion);
-logger.LogInformation("Agent created. Name: {Name}", agent.Name);
+
+// Once you have the agent, you can invoke it like any other AIAgent.
+Console.WriteLine(await agent.RunAsync("Tell me a joke about a pirate."));
 
 app.MapPost("/chat", async (ChatRequest request) =>
 {
@@ -62,8 +51,8 @@ app.MapPost("/chat", async (ChatRequest request) =>
 
 app.Lifetime.ApplicationStopping.Register(() =>
 {
-    aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(agent.Name).GetAwaiter().GetResult();
-    logger.LogInformation("Agent deleted: {Name}", agent.Name);
+    aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(JokerName).GetAwaiter().GetResult();
+    logger.LogInformation("Agent deleted: {Name}", JokerName);
 });
 
 await app.RunAsync();

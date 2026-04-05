@@ -58,7 +58,7 @@ resource gpt4oDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
 
 var cognitiveServicesOpenAIUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 var cognitiveServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
-var azureAIDeveloperRoleId = '64702f94-c441-49e6-a78b-ef80e0188fee'
+var azureAIUserRoleId = '53ca6127-db72-4b80-b1b0-d745d6d5456d'
 
 resource webAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(webAppPrincipalId)) {
   name: guid(aiHub.id, webAppPrincipalId, cognitiveServicesOpenAIUserRoleId)
@@ -100,21 +100,21 @@ resource userCogServicesUserRoleAssignment 'Microsoft.Authorization/roleAssignme
   }
 }]
 
-resource webAppAIDeveloperRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(webAppPrincipalId)) {
-  name: guid(aiHub.id, webAppPrincipalId, azureAIDeveloperRoleId)
+resource webAppAIUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(webAppPrincipalId)) {
+  name: guid(aiHub.id, webAppPrincipalId, azureAIUserRoleId)
   scope: aiHub
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIUserRoleId)
     principalId: webAppPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource userAIDeveloperRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principal in principals: {
-  name: guid(aiHub.id, principal.id, azureAIDeveloperRoleId)
+resource userAIUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principal in principals: {
+  name: guid(aiHub.id, principal.id, azureAIUserRoleId)
   scope: aiHub
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIUserRoleId)
     principalId: principal.id
     principalType: principal.principalType
   }
