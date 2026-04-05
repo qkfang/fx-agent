@@ -1,15 +1,28 @@
+using FxWebApi.Data;
 using FxWebApi.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { 
+        Title = "FX CRM Broker API", 
+        Version = "v1",
+        Description = "CRM Broker API with MCP endpoints for customer information and FX trading"
+    });
+});
+
+builder.Services.AddDbContext<FxDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FxDatabase")));
+
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<FxRateService>();
 builder.Services.AddSingleton<AccountService>();
-builder.Services.AddSingleton<CustomerService>();
+builder.Services.AddScoped<CustomerService>();
 
 // Add CORS for local development
 builder.Services.AddCors(options =>

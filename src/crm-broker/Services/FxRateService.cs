@@ -13,6 +13,8 @@ namespace FxWebApi.Services
         private decimal _mid = 0.6550m;
         private decimal _spread = 0.0002m;        // 2 pips default spread
         private readonly object _lock = new();
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
         // ── Trend / volatility controls ────────────────────────────────────────
         private string _trend = "neutral";        // "up" | "down" | "neutral"
@@ -41,8 +43,10 @@ namespace FxWebApi.Services
         private readonly Random _rng = new();
         private Timer? _timer;
 
-        public FxRateService()
+        public FxRateService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
             _dayOpen = _dayHigh = _dayLow = _mid;
             _candleStart = DateTime.UtcNow;
             _currentCandle = NewCandle(_candleStart, _mid);
@@ -207,6 +211,9 @@ namespace FxWebApi.Services
                 Timestamp = DateTime.UtcNow
             };
 
+            // Push transaction to trading platform
+            _ = Task.Run(() => PushToTradingPlatform(record));
+
             lock (_lock) { _transactions.Insert(0, record); }
 
             return new FxTransactionResult
@@ -331,6 +338,32 @@ namespace FxWebApi.Services
             if (hour < 13)               return "London";
             if (hour < 17)               return "London / New York";
             return "New York";
+        }
+
+        private async void PushToTradingPlatform(TransactionRecord record)
+        {
+            try
+            {
+                var tradingPlatformUrl = _configuration["TradingPlatformUrl"] ?? "http://localhost:5249";
+                var client = _httpClientFactory.CreateClient();
+                
+                var transaction = new
+                {
+                    type = record.Type,
+                    currencyPair = record.CurrencyPair,
+                    amount = record.Amount,
+                    rate = record.Rate,
+                    total = record.Total,
+                    dateTime = record.Timestamp
+                };
+
+                var response = await client.PostAsJsonAsync($"{tradingPlatformUrl}/api/transactions", transaction);
+                response.EnsureSuccessStatusCode();
+            }
+            catch
+            {
+                // Silently fail - trading platform may not be running
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<FxDataService>();
 
@@ -40,6 +41,7 @@ app.MapGet("/api/trades", (FxDataService fxData) =>
 app.MapGet("/api/portfolio", (FxDataService fxData) =>
     Results.Ok(fxData.GetFundSummary()));
 
+app.MapControllers();
 app.MapRazorPages();
 
 app.Run();

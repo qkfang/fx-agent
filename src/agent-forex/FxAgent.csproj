@@ -13,4 +13,9 @@
         <PackageReference Include="Azure.Identity" Version="1.17.1" />
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.3.0" />
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('appsettings.Development.json')" />
+    </ItemGroup>
 </Project>

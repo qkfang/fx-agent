@@ -97,7 +97,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/tracker.js" asp-append-version="true"></script>
     <script type="module" src="https://unpkg.com/@@fluentui/web-components"></script>
-    <script src="~/js/chat.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
     <!-- Chat Widget (Fluent UI) -->
@@ -123,5 +122,6 @@
             </div>
         </fluent-card>
     </div>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
 </body>
 </html>

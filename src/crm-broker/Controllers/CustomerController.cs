@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using FxWebApi.Models;
 using FxWebApi.Services;
 
 namespace FxWebApi.Controllers
@@ -17,15 +18,15 @@ namespace FxWebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<CustomerDto>>> GetAll()
+        public async Task<ActionResult<List<Customer>>> GetAll()
         {
             var customers = await _customerService.GetAllCustomersAsync();
-            if (customers == null) return StatusCode(502, "Failed to retrieve customers from integration API");
+            if (customers == null) return StatusCode(502, "Failed to retrieve customers");
             return Ok(customers);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CustomerDto>> Get(int id)
+        public async Task<ActionResult<Customer>> Get(int id)
         {
             var customer = await _customerService.GetCustomerAsync(id);
             if (customer == null) return NotFound();
@@ -33,7 +34,7 @@ namespace FxWebApi.Controllers
         }
 
         [HttpGet("{id}/histories")]
-        public async Task<ActionResult<List<CustomerHistoryDto>>> GetHistories(int id)
+        public async Task<ActionResult<List<CustomerHistory>>> GetHistories(int id)
         {
             var histories = await _customerService.GetCustomerHistoriesAsync(id);
             if (histories == null) return StatusCode(502, "Failed to retrieve customer histories");
@@ -41,7 +42,7 @@ namespace FxWebApi.Controllers
         }
 
         [HttpGet("{id}/portfolios")]
-        public async Task<ActionResult<List<CustomerPortfolioDto>>> GetPortfolios(int id)
+        public async Task<ActionResult<List<CustomerPortfolio>>> GetPortfolios(int id)
         {
             var portfolios = await _customerService.GetCustomerPortfoliosAsync(id);
             if (portfolios == null) return StatusCode(502, "Failed to retrieve customer portfolios");
@@ -49,7 +50,7 @@ namespace FxWebApi.Controllers
         }
 
         [HttpGet("{id}/preferences")]
-        public async Task<ActionResult<CustomerPreferenceDto>> GetPreferences(int id)
+        public async Task<ActionResult<CustomerPreference>> GetPreferences(int id)
         {
             var prefs = await _customerService.GetCustomerPreferencesAsync(id);
             if (prefs == null) return NotFound();

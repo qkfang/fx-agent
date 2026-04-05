@@ -1,78 +1,94 @@
-using System.Text.Json;
+using FxWebApi.Data;
+using FxWebApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FxWebApi.Services
 {
     public class CustomerService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _config;
+        private readonly FxDbContext _dbContext;
         private readonly ILogger<CustomerService> _logger;
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-        public CustomerService(IHttpClientFactory httpClientFactory, IConfiguration config, ILogger<CustomerService> logger)
+        public CustomerService(FxDbContext dbContext, ILogger<CustomerService> logger)
         {
-            _httpClientFactory = httpClientFactory;
-            _config = config;
+            _dbContext = dbContext;
             _logger = logger;
         }
 
-        private string BaseUrl => _config["IntegrationApiUrl"] ?? "http://localhost:5005";
-
-        public async Task<List<CustomerDto>?> GetAllCustomersAsync()
+        public async Task<List<Customer>?> GetAllCustomersAsync()
         {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync($"{BaseUrl}/api/Customers");
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogWarning("Failed to fetch customers: {Status}", response.StatusCode);
+                return await _dbContext.Customers
+                    .Include(c => c.Portfolios)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve customers from database");
                 return null;
             }
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<CustomerDto>>(json, JsonOptions);
         }
 
-        public async Task<CustomerDto?> GetCustomerAsync(int id)
+        public async Task<Customer?> GetCustomerAsync(int id)
         {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync($"{BaseUrl}/api/Customers/{id}");
-            if (!response.IsSuccessStatusCode) return null;
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<CustomerDto>(json, JsonOptions);
-        }
-
-        public async Task<List<CustomerHistoryDto>?> GetCustomerHistoriesAsync(int customerId)
-        {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync($"{BaseUrl}/api/CustomerHistories/customer/{customerId}");
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogWarning("Failed to fetch histories for customer {Id}: {Status}", customerId, response.StatusCode);
+                return await _dbContext.Customers
+                    .Include(c => c.Portfolios)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve customer {Id}", id);
                 return null;
             }
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<CustomerHistoryDto>>(json, JsonOptions);
         }
 
-        public async Task<List<CustomerPortfolioDto>?> GetCustomerPortfoliosAsync(int customerId)
+        public async Task<List<CustomerHistory>?> GetCustomerHistoriesAsync(int customerId)
         {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync($"{BaseUrl}/api/Portfolios/customer/{customerId}");
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogWarning("Failed to fetch portfolios for customer {Id}: {Status}", customerId, response.StatusCode);
+                return await _dbContext.CustomerHistories
+                    .Where(h => h.CustomerId == customerId)
+                    .OrderByDescending(h => h.ClosedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve histories for customer {Id}", customerId);
                 return null;
             }
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<CustomerPortfolioDto>>(json, JsonOptions);
         }
 
-        public async Task<CustomerPreferenceDto?> GetCustomerPreferencesAsync(int customerId)
+        public async Task<List<CustomerPortfolio>?> GetCustomerPortfoliosAsync(int customerId)
         {
-            var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync($"{BaseUrl}/api/CustomerPreferences/customer/{customerId}");
-            if (!response.IsSuccessStatusCode) return null;
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<CustomerPreferenceDto>(json, JsonOptions);
+            try
+            {
+                return await _dbContext.CustomerPortfolios
+                    .Where(p => p.CustomerId == customerId)
+                    .OrderByDescending(p => p.OpenedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve portfolios for customer {Id}", customerId);
+                return null;
+            }
+        }
+
+        public async Task<CustomerPreference?> GetCustomerPreferencesAsync(int customerId)
+        {
+            try
+            {
+                return await _dbContext.CustomerPreferences
+                    .FirstOrDefaultAsync(p => p.CustomerId == customerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve preferences for customer {Id}", customerId);
+                return null;
+            }
         }
 
         public async Task<CustomerProfileDto?> GetCustomerProfileAsync(int customerId)
@@ -87,71 +103,18 @@ namespace FxWebApi.Services
             return new CustomerProfileDto
             {
                 Customer = customer,
-                Histories = histories ?? new List<CustomerHistoryDto>(),
-                Portfolios = portfolios ?? new List<CustomerPortfolioDto>(),
+                Histories = histories ?? new List<CustomerHistory>(),
+                Portfolios = portfolios ?? new List<CustomerPortfolio>(),
                 Preferences = preferences
             };
         }
     }
 
-    public class CustomerDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public string Company { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public List<CustomerPortfolioDto> Portfolios { get; set; } = new();
-    }
-
-    public class CustomerHistoryDto
-    {
-        public int Id { get; set; }
-        public int CustomerId { get; set; }
-        public string CurrencyPair { get; set; } = string.Empty;
-        public string Direction { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public decimal EntryRate { get; set; }
-        public decimal ExitRate { get; set; }
-        public decimal PnL { get; set; }
-        public DateTime OpenedAt { get; set; }
-        public DateTime ClosedAt { get; set; }
-        public string Notes { get; set; } = string.Empty;
-    }
-
-    public class CustomerPortfolioDto
-    {
-        public int Id { get; set; }
-        public int CustomerId { get; set; }
-        public string CurrencyPair { get; set; } = string.Empty;
-        public string Direction { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public decimal EntryRate { get; set; }
-        public DateTime OpenedAt { get; set; }
-        public string Status { get; set; } = string.Empty;
-    }
-
-    public class CustomerPreferenceDto
-    {
-        public int Id { get; set; }
-        public int CustomerId { get; set; }
-        public string PreferredCurrencyPairs { get; set; } = string.Empty;
-        public string RiskTolerance { get; set; } = string.Empty;
-        public decimal MaxPositionSize { get; set; }
-        public decimal StopLossPercent { get; set; }
-        public decimal TakeProfitPercent { get; set; }
-        public string TradingStyle { get; set; } = string.Empty;
-        public bool EnableNotifications { get; set; }
-        public string NotificationChannels { get; set; } = string.Empty;
-        public DateTime UpdatedAt { get; set; }
-    }
-
     public class CustomerProfileDto
     {
-        public CustomerDto Customer { get; set; } = null!;
-        public List<CustomerHistoryDto> Histories { get; set; } = new();
-        public List<CustomerPortfolioDto> Portfolios { get; set; } = new();
-        public CustomerPreferenceDto? Preferences { get; set; }
+        public Customer Customer { get; set; } = null!;
+        public List<CustomerHistory> Histories { get; set; } = new();
+        public List<CustomerPortfolio> Portfolios { get; set; } = new();
+        public CustomerPreference? Preferences { get; set; }
     }
 }

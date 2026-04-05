@@ -6,11 +6,20 @@ using Azure.AI.Projects.OpenAI;
 using Azure.Identity;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 
-var endpoint = Environment.GetEnvironmentVariable("AZURE_AI_PROJECT_ENDPOINT")
-    ?? throw new InvalidOperationException("AZURE_AI_PROJECT_ENDPOINT is not set.");
-var deploymentName = Environment.GetEnvironmentVariable("MODEL_DEPLOYMENT_NAME") ?? "gpt-4.1";
-var crmBrokerUrl = Environment.GetEnvironmentVariable("CRM_BROKER_URL") ?? "http://localhost:5148";
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: true)
+    .AddJsonFile("appsettings.Development.json", optional: true)
+    .AddEnvironmentVariables()
+    .Build();
+
+var endpoint = config["AZURE_AI_PROJECT_ENDPOINT"];
+if (string.IsNullOrEmpty(endpoint))
+    throw new InvalidOperationException("AZURE_AI_PROJECT_ENDPOINT is not set.");
+var deploymentName = config["MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
+var crmBrokerUrl = config["CRM_BROKER_URL"] ?? "http://localhost:5148";
 
 Console.WriteLine($"Project Endpoint: {endpoint}");
 Console.WriteLine($"Model Deployment: {deploymentName}");

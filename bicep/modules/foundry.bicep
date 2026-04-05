@@ -7,7 +7,7 @@ param principals array = []
 
 resource aiHub 'Microsoft.CognitiveServices/accounts@2025-10-01-preview' = {
   name: name
-  location: location
+  location: 'WestUS3'
   tags: tags
   identity: {
     type: 'SystemAssigned'
@@ -30,7 +30,7 @@ resource aiHub 'Microsoft.CognitiveServices/accounts@2025-10-01-preview' = {
 resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {
   parent: aiHub
   name: '${name}-project'
-  location: location
+  location: 'WestUS3'
   identity: {
     type: 'SystemAssigned'
   }
@@ -58,6 +58,7 @@ resource gpt4oDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
 
 var cognitiveServicesOpenAIUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 var cognitiveServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
+var azureAIDeveloperRoleId = '64702f94-c441-49e6-a78b-ef80e0188fee'
 
 resource webAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(webAppPrincipalId)) {
   name: guid(aiHub.id, webAppPrincipalId, cognitiveServicesOpenAIUserRoleId)
@@ -94,6 +95,26 @@ resource userCogServicesUserRoleAssignment 'Microsoft.Authorization/roleAssignme
   scope: aiHub
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesUserRoleId)
+    principalId: principal.id
+    principalType: principal.principalType
+  }
+}]
+
+resource webAppAIDeveloperRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(webAppPrincipalId)) {
+  name: guid(aiHub.id, webAppPrincipalId, azureAIDeveloperRoleId)
+  scope: aiHub
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
+    principalId: webAppPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource userAIDeveloperRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principal in principals: {
+  name: guid(aiHub.id, principal.id, azureAIDeveloperRoleId)
+  scope: aiHub
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
     principalId: principal.id
     principalType: principal.principalType
   }
