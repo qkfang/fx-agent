@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/api-integration/**"
+      - "src/api-intg/**"
   workflow_dispatch:
 
 jobs:
@@ -19,22 +19,22 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        working-directory: src/api-integration
+        working-directory: src/api-intg
         run: dotnet restore
 
       - name: Build
-        working-directory: src/api-integration
+        working-directory: src/api-intg
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        working-directory: src/api-integration
+        working-directory: src/api-intg
         run: dotnet publish --configuration Release --no-build --output ./publish
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: api-integration-dist
-          path: src/api-integration/publish
+          name: api-intg-dist
+          path: src/api-intg/publish
 
   deploy-dev:
     needs: build
@@ -49,7 +49,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: api-integration-dist
+          name: api-intg-dist
           path: dist
 
       - name: Deploy to Azure App Service
