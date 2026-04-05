@@ -8,15 +8,15 @@ public class FxDbContext : DbContext
     public FxDbContext(DbContextOptions<FxDbContext> options) : base(options) { }
 
     public DbSet<ResearchArticle> ResearchArticles => Set<ResearchArticle>();
+    public DbSet<ResearchDraft> ResearchDrafts => Set<ResearchDraft>();
+    public DbSet<ResearchPattern> ResearchPatterns => Set<ResearchPattern>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerPortfolio> CustomerPortfolios => Set<CustomerPortfolio>();
     public DbSet<CustomerHistory> CustomerHistories => Set<CustomerHistory>();
+    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
     public DbSet<Trader> Traders => Set<Trader>();
     public DbSet<TraderRecommendation> TraderRecommendations => Set<TraderRecommendation>();
     public DbSet<TraderNewsFeed> TraderNewsFeeds => Set<TraderNewsFeed>();
-    public DbSet<ResearchDraft> ResearchDrafts => Set<ResearchDraft>();
-    public DbSet<ResearchPattern> ResearchPatterns => Set<ResearchPattern>();
-    public DbSet<CustomerPreference> CustomerPreferences => Set<CustomerPreference>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -165,11 +165,11 @@
                                         ⚡ Action
                                     </button>
                                 </form>
-                                <button class="btn btn-xs btn-orora"
-                                        onclick="openOrora('@s.CustomerName', '@s.CurrencyPair', '@s.Direction')"
-                                        title="Open Orora to trade for @s.CustomerName">
+                                <a href="/Account/OroraWorkflow?customer=@Uri.EscapeDataString(s.CustomerName)&pair=@Uri.EscapeDataString(s.CurrencyPair)&signal=@Uri.EscapeDataString(s.Direction)"
+                                   class="btn btn-xs btn-orora"
+                                   title="Open Orora workflow for @s.CustomerName">
                                     ✦ Orora
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     }
@@ -184,7 +184,27 @@
 
 </div>
 
-<!-- ── Orora Trading Popup ── -->
+@section Scripts {
+<style>
+.btn-orora {
+    background: linear-gradient(135deg, #2d1b69, #0f3460);
+    color: #c084fc;
+    border: 1px solid #7c3aed;
+    font-weight: 600;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-orora:hover { 
+    background: linear-gradient(135deg, #4c1d95, #1e3a5f); 
+    color: #e9d5ff;
+    text-decoration: none;
+}
+</style>
+}
 <div class="modal fade" id="ororaModal" tabindex="-1" aria-labelledby="ororaModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content orora-modal-content">
@@ -273,8 +293,14 @@
     padding: 2px 8px;
     border-radius: 4px;
     transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
-.btn-orora:hover { background: linear-gradient(135deg, #4c1d95, #1e3a5f); color: #e9d5ff; }
+.btn-orora:hover { 
+    background: linear-gradient(135deg, #4c1d95, #1e3a5f); 
+    color: #e9d5ff;
+    text-decoration: none;
+}
 .orora-modal-content { background: #0f0f1a; color: #e2e8f0; border: 1px solid #4c1d95; border-radius: 12px; }
 .orora-header { background: linear-gradient(135deg, #1e1b4b, #0f3460); border-bottom: 1px solid #4c1d95; border-radius: 12px 12px 0 0; }
 .orora-logo { font-size: 1.4rem; color: #c084fc; }

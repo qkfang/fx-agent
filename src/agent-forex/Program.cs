@@ -1,90 +1,75 @@
-using System.ClientModel.Primitives;
 using Azure.AI.AgentServer.AgentFramework.Extensions;
 using Azure.AI.OpenAI;
-using Azure.AI.Projects;
-using Azure.AI.Projects.OpenAI;
 using Azure.Identity;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Configuration;
 
-var config = new ConfigurationBuilder()
-    .SetBasePath(AppContext.BaseDirectory)
-    .AddJsonFile("appsettings.json", optional: true)
-    .AddJsonFile("appsettings.Development.json", optional: true)
-    .AddEnvironmentVariables()
-    .Build();
+var builder = WebApplication.CreateBuilder(args);
 
-var endpoint = config["AZURE_AI_PROJECT_ENDPOINT"];
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
+
+var endpoint = builder.Configuration["AZURE_OPENAI_ENDPOINT"];
 if (string.IsNullOrEmpty(endpoint))
-    throw new InvalidOperationException("AZURE_AI_PROJECT_ENDPOINT is not set.");
-var deploymentName = config["MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
-var crmBrokerUrl = config["CRM_BROKER_URL"] ?? "http://localhost:5148";
+    throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT is not set.");
 
-Console.WriteLine($"Project Endpoint: {endpoint}");
-Console.WriteLine($"Model Deployment: {deploymentName}");
-Console.WriteLine($"CRM Broker URL: {crmBrokerUrl}");
+var deploymentName = builder.Configuration["MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
 
-var httpClient = new HttpClient { BaseAddress = new Uri(crmBrokerUrl) };
-var tools = new FxTools(httpClient);
-
-var credential = new DefaultAzureCredential();
-AIProjectClient projectClient = new AIProjectClient(new Uri(endpoint), credential);
-
-await FoundryProvisioner.ProvisionAsync(projectClient, deploymentName);
-
-ClientConnection connection = projectClient.GetConnection(typeof(AzureOpenAIClient).FullName!);
-
-if (!connection.TryGetLocatorAsUri(out Uri? openAiEndpoint) || openAiEndpoint is null)
+builder.Services.AddSingleton<IChatClient>(sp =>
 {
-    throw new InvalidOperationException("Failed to get OpenAI endpoint from project connection.");
+    var credential = new DefaultAzureCredential();
+    return new AzureOpenAIClient(new Uri(endpoint), credential)
+        .GetChatClient(deploymentName)
+        .AsIChatClient()
+        .AsBuilder()
+        .UseOpenTelemetry(sourceName: "Agents", configure: cfg => cfg.EnableSensitiveData = false)
+        .Build();
+});
+
+builder.Services.AddSingleton<AIAgent>(sp =>
+{
+    var chatClient = sp.GetRequiredService<IChatClient>();
+
+    var agent = new ChatClientAgent(chatClient,
+        name: "ForexTradingAgent",
+        instructions: """
+            You are an expert forex trading assistant specializing in currency markets.
+
+            Your role:
+            - Provide insights on forex market trends and analysis
+            - Explain currency pair movements and technical indicators
+            - Discuss risk management strategies for forex trading
+            - Analyze macroeconomic factors affecting exchange rates
+            - Share best practices for forex trading
+
+            Guidelines:
+            - Provide clear, professional forex market analysis
+            - Explain complex concepts in accessible terms
+            - Always emphasize risk management and responsible trading
+            - Use proper forex terminology and conventions
+            - Base responses on sound financial principles
+            """);
+
+    return agent
+        .AsBuilder()
+        .UseOpenTelemetry(sourceName: "Agents", configure: cfg => cfg.EnableSensitiveData = false)
+        .Build();
+});
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-openAiEndpoint = new Uri($"https://{openAiEndpoint.Host}");
-Console.WriteLine($"OpenAI Endpoint: {openAiEndpoint}");
 
-var chatClient = new AzureOpenAIClient(openAiEndpoint, credential)
-    .GetChatClient(deploymentName)
-    .AsIChatClient()
-    .AsBuilder()
-    .UseOpenTelemetry(sourceName: "Agents", configure: cfg => cfg.EnableSensitiveData = false)
-    .Build();
+app.MapHealthChecks("/health");
 
-var agent = new ChatClientAgent(chatClient,
-    name: "ForexTradingAgent",
-    instructions: """
-        You are an expert forex trading assistant for AUD/USD currency pair.
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Forex Trading Agent Server started");
+logger.LogInformation("Azure OpenAI Endpoint: {Endpoint}", endpoint);
+logger.LogInformation("Model Deployment: {DeploymentName}", deploymentName);
 
-        Your capabilities:
-        - View real-time FX quotes (bid/ask/spread)
-        - Check market status (trend, volatility, day statistics)
-        - View price history candles
-        - List trading accounts and their balances
-        - Execute buy and sell trades
-        - Close open positions
-        - View transaction history
-
-        Guidelines:
-        - Always show the current quote before executing trades
-        - Warn about risks before executing large trades
-        - Present account information clearly with key metrics
-        - When asked about market conditions, use both quote and status tools
-        - Format currency values to 4 decimal places for rates and 2 for account balances
-        """,
-    tools:
-    [
-        AIFunctionFactory.Create(tools.GetFxQuote),
-        AIFunctionFactory.Create(tools.GetMarketStatus),
-        AIFunctionFactory.Create(tools.GetPriceHistory),
-        AIFunctionFactory.Create(tools.GetAccounts),
-        AIFunctionFactory.Create(tools.GetAccountBalance),
-        AIFunctionFactory.Create(tools.ExecuteBuy),
-        AIFunctionFactory.Create(tools.ExecuteSell),
-        AIFunctionFactory.Create(tools.ClosePosition),
-        AIFunctionFactory.Create(tools.GetTransactions)
-    ])
-    .AsBuilder()
-    .UseOpenTelemetry(sourceName: "Agents", configure: cfg => cfg.EnableSensitiveData = false)
-    .Build();
-
-Console.WriteLine("Forex Trading Agent Server running on http://localhost:8088");
-await agent.RunAIAgentAsync(telemetrySourceName: "Agents");
+await app.RunAsync();

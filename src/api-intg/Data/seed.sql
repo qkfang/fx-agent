@@ -43,19 +43,59 @@ INSERT INTO Customers (Id, Name, Email, Phone, Company, CreatedAt) VALUES
 SET IDENTITY_INSERT Customers OFF;
 
 -------------------------------------------------------
--- CustomerPreferences (10 records)
+-- CustomerPreferences (25 records)
 -------------------------------------------------------
 INSERT INTO CustomerPreferences (CustomerId, PreferredCurrencyPairs, RiskTolerance, MaxPositionSize, StopLossPercent, TakeProfitPercent, TradingStyle, EnableNotifications, NotificationChannels, UpdatedAt) VALUES
+-- Aggressive high-frequency trader, focuses on major pairs with tight stops
 (0, 'EUR/USD,GBP/USD',     'High',   200000.0000, 2.00, 4.00, 'Swing',    1, 'Email,SMS',   '2026-03-10T08:00:00'),
+-- Conservative day trader, prefers liquid Asian pairs, moderate risk
 (1, 'USD/JPY,AUD/USD',     'Medium', 100000.0000, 1.50, 3.00, 'Day',      1, 'Email',       '2026-03-12T10:30:00'),
+-- Long-term position trader, low risk tolerance, prefers European crosses
 (2, 'EUR/GBP,USD/CHF',     'Low',    150000.0000, 1.00, 2.00, 'Position', 1, 'Email',       '2026-03-15T09:00:00'),
+-- Aggressive swing trader specializing in emerging markets, high position sizes
 (3, 'USD/CNH,AUD/NZD',     'High',   300000.0000, 2.50, 5.00, 'Swing',    0, 'Email',       '2026-03-18T04:00:00'),
+-- Nordic currency specialist, day trading strategy with medium risk
 (4, 'EUR/SEK,NOK/SEK',     'Medium', 250000.0000, 1.50, 3.50, 'Day',      1, 'Email,Push',  '2026-03-20T08:45:00'),
+-- Ultra-conservative institutional trader, very large positions with minimal stops
 (5, 'USD/AED,EUR/USD',     'Low',    500000.0000, 0.50, 1.50, 'Position', 1, 'Email,SMS',   '2026-03-22T10:00:00'),
+-- High-frequency scalper, Asian markets focus, aggressive entry/exit
 (6, 'USD/KRW,GBP/JPY',     'High',   150000.0000, 2.00, 4.50, 'Scalp',    1, 'Push',        '2026-03-25T02:30:00'),
+-- LatAm specialist, swing trader with medium risk, prefers carry trades
 (7, 'USD/MXN,EUR/USD',     'Medium', 175000.0000, 1.50, 3.00, 'Swing',    0, 'Email',       '2026-03-28T16:00:00'),
+-- Oceanic pairs trader, conservative day trading, small position sizes
 (8, 'AUD/USD,NZD/USD',     'Medium', 60000.0000,  1.00, 2.50, 'Day',      1, 'Email,SMS',   '2026-04-01T01:00:00'),
-(9, 'USD/ZAR,GBP/USD',     'High',   200000.0000, 3.00, 6.00, 'Position', 1, 'Email,Push',  '2026-04-02T12:00:00');
+-- Frontier markets specialist, very aggressive, wide stops for volatility
+(9, 'USD/ZAR,GBP/USD',     'High',   200000.0000, 3.00, 6.00, 'Position', 1, 'Email,Push',  '2026-04-02T12:00:00'),
+-- Algorithmic scalper, EUR focus, extremely tight risk management
+(10, 'EUR/USD,EUR/GBP',    'High',   350000.0000, 0.80, 1.50, 'Scalp',    1, 'Push,SMS',    '2026-04-03T09:15:00'),
+-- Commodity currency specialist, follows oil/gold trends, swing strategy
+(11, 'USD/CAD,AUD/USD',    'Medium', 220000.0000, 1.80, 3.50, 'Swing',    1, 'Email',       '2026-04-03T11:30:00'),
+-- Safe-haven focused, buys on fear, very conservative with longer holds
+(12, 'USD/CHF,USD/JPY',    'Low',    180000.0000, 0.75, 1.80, 'Position', 1, 'Email,SMS',   '2026-04-03T14:00:00'),
+-- Breakout specialist, waits for volatility then strikes aggressively
+(13, 'GBP/JPY,EUR/JPY',    'High',   280000.0000, 2.20, 5.50, 'Day',      1, 'Push',        '2026-04-04T07:00:00'),
+-- Cross-currency arbitrage trader, medium risk, multiple small positions
+(14, 'EUR/NOK,GBP/SEK',    'Medium', 140000.0000, 1.20, 2.80, 'Day',      1, 'Email',       '2026-04-04T08:30:00'),
+-- EM carry trade specialist, sells low yield/buys high yield, patient approach
+(15, 'USD/TRY,USD/BRL',    'Medium', 190000.0000, 2.00, 4.50, 'Position', 0, 'Email',       '2026-04-04T10:00:00'),
+-- Momentum trader, follows trends aggressively, quick to cut losses
+(16, 'EUR/USD,USD/JPY',    'High',   320000.0000, 1.50, 4.00, 'Swing',    1, 'Email,Push',  '2026-04-04T11:45:00'),
+-- Mean reversion specialist, counter-trend trader, very patient
+(17, 'GBP/USD,AUD/NZD',    'Low',    95000.0000,  0.90, 2.20, 'Position', 1, 'Email',       '2026-04-04T13:00:00'),
+-- News-driven trader, reacts to economic releases, aggressive entries
+(18, 'EUR/USD,GBP/USD,USD/JPY', 'High', 275000.0000, 1.80, 3.80, 'Day',   1, 'Push,SMS',    '2026-04-04T14:30:00'),
+-- Options hedger, uses spot for delta hedging, very conservative
+(19, 'EUR/USD,USD/CHF',    'Low',    420000.0000, 0.60, 1.40, 'Position', 1, 'Email,SMS',   '2026-04-04T16:00:00'),
+-- Asian session scalper, focuses on JPY crosses during Tokyo hours
+(20, 'USD/JPY,EUR/JPY,AUD/JPY', 'High', 165000.0000, 1.00, 2.50, 'Scalp', 1, 'Push',        '2026-04-05T02:00:00'),
+-- Range-bound trader, sells resistance/buys support, medium risk
+(21, 'EUR/GBP,NZD/USD',    'Medium', 130000.0000, 1.30, 2.70, 'Day',      1, 'Email',       '2026-04-05T03:30:00'),
+-- Macro fundamental trader, long-term positions based on central bank policy
+(22, 'EUR/USD,USD/JPY,GBP/USD', 'Low', 550000.0000, 1.50, 3.00, 'Position', 1, 'Email',    '2026-04-05T05:00:00'),
+-- Event-driven swing trader, trades political/economic events, aggressive
+(23, 'GBP/USD,EUR/GBP',    'High',   240000.0000, 2.30, 5.00, 'Swing',    1, 'Email,Push',  '2026-04-05T06:30:00'),
+-- Diversified portfolio trader, multiple pairs, balanced risk approach
+(24, 'EUR/USD,GBP/JPY,AUD/NZD,USD/CAD', 'Medium', 200000.0000, 1.60, 3.20, 'Swing', 1, 'Email,SMS', '2026-04-05T08:00:00');
 
 -------------------------------------------------------
 -- ResearchArticles (15 records)
