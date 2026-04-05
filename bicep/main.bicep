@@ -21,6 +21,7 @@ var logAnalyticsWorkspaceName = '${baseName}-log'
 var webAppPlanName = '${baseName}-asp'
 var staticWebAppName = '${baseName}-swa'
 var foundryName = '${baseName}-foundry'
+var fabricCapacityName = '${baseName}fabric'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: webAppPlanName
@@ -189,6 +190,21 @@ module tradingPlatformApp 'modules/webapp.bicep' = {
     location: location
     appServicePlanId: appServicePlan.id
     appInsightsConnectionString: appInsights.outputs.connectionString
+  }
+}
+
+module fabricCapacity 'modules/fabric.bicep' = {
+  name: 'fabricCapacityDeployment'
+  params: {
+    name: fabricCapacityName
+    location: location
+    tags: commonTags
+    adminMembers: concat(
+      [
+        'danielfang@MngEnvMCAP951655.onmicrosoft.com'
+        'fabric@MngEnvMCAP951655.onmicrosoft.com'
+      ]
+    )
   }
 }
 
