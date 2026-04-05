@@ -183,6 +183,16 @@ module researchAnalyticsApp 'modules/webapp.bicep' = {
   }
 }
 
+module apiIntegrationApp 'modules/webapp.bicep' = {
+  name: 'apiIntegrationDeployment'
+  params: {
+    name: '${baseName}-integration'
+    location: location
+    appServicePlanId: appServicePlan.id
+    appInsightsConnectionString: appInsights.outputs.connectionString
+  }
+}
+
 module tradingPlatformApp 'modules/webapp.bicep' = {
   name: 'tradingPlatformDeployment'
   params: {

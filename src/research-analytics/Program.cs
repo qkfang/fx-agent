@@ -1,7 +1,5 @@
 using FxWebPortal.Models;
 using FxWebPortal.Services;
-using FxWebPortal.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Json;
 
@@ -14,9 +12,6 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
-builder.Services.AddDbContext<FxDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FxDatabase")));
 
 builder.Services.AddSingleton<ArticleService>();
 builder.Services.AddSingleton<TrackingService>();
