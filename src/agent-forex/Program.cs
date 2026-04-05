@@ -1,6 +1,8 @@
 using Azure.AI.Projects;
 using Azure.Identity;
 using FxAgent.Agents;
+using Microsoft.Extensions.AI;
+using ModelContextProtocol.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +30,18 @@ AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential(
 
 var bingConnectionName = Environment.GetEnvironmentVariable("BING_CONNECTION_NAME");
 var researchAgent = new FxAgResearch(aiProjectClient, deploymentName);
-var suggestionAgent = new FxAgSuggestion(aiProjectClient, deploymentName);
+
+var apiMcpUrl = app.Configuration["API_MCP_URL"] ?? "http://localhost:5005";
+var mcpClient = await McpClient.CreateAsync(new HttpClientTransport(new HttpClientTransportOptions
+{
+    Endpoint = new Uri($"{apiMcpUrl}/mcp"),
+    Name = "FxIntegrationApi"
+}));
+app.Lifetime.ApplicationStopped.Register(() => mcpClient.DisposeAsync().AsTask().Wait());
+var mcpTools = await mcpClient.ListToolsAsync();
+logger.LogInformation("MCP tools loaded: {Tools}", string.Join(", ", mcpTools.Select(t => t.Name)));
+
+var suggestionAgent = new FxAgSuggestion(aiProjectClient, deploymentName, [.. mcpTools.Cast<AITool>()]);
 var traderAgent = new FxAgTrader(aiProjectClient, deploymentName);
 var insightAgent = new FxAgInsight(aiProjectClient, deploymentName);
 
