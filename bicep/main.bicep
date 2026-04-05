@@ -28,8 +28,8 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   location: location
   kind: 'linux'
   sku: {
-    name: 'S1'
-    tier: 'Standard'
+    name: 'P1v3'
+    tier: 'PremiumV3'
   }
   properties: {
     reserved: true
@@ -186,7 +186,7 @@ module researchAnalyticsApp 'modules/webapp.bicep' = {
 module apiIntegrationApp 'modules/webapp.bicep' = {
   name: 'apiIntegrationDeployment'
   params: {
-    name: '${baseName}-integration'
+    name: '${baseName}-intg'
     location: location
     appServicePlanId: appServicePlan.id
     appInsightsConnectionString: appInsights.outputs.connectionString
