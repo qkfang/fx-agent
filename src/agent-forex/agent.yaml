@@ -1,0 +1,31 @@
+name: forex-trading-agent
+description: >
+  A forex trading assistant agent for AUD/USD that provides real-time quotes,
+  market status, account management, and trade execution via the crm-broker API.
+  Uses Microsoft Agent Framework with Azure AI Foundry.
+metadata:
+  authors:
+    - Microsoft
+  tags:
+    - Azure AI AgentServer
+    - Microsoft Agent Framework
+    - Local Tools
+    - Forex Trading
+    - AUD/USD
+template:
+  name: forex-trading-agent
+  kind: hosted
+  protocols:
+    - protocol: responses
+      version: v1
+  environment_variables:
+    - name: AZURE_AI_PROJECT_ENDPOINT
+      value: ${AZURE_AI_PROJECT_ENDPOINT}
+    - name: MODEL_DEPLOYMENT_NAME
+      value: "{{chat}}"
+    - name: CRM_BROKER_URL
+      value: ${CRM_BROKER_URL}
+resources:
+  - kind: model
+    id: gpt-4.1
+    name: chat

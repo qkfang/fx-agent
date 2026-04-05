@@ -1,0 +1,8 @@
+**/.dockerignore
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/out
+**/.foundry
