@@ -11,3 +11,4 @@
 
 - must only use microsoft agent framework 1.0, and foundry agent server v2 
 - agent interaction must use openai responeses apis only 
+- MAF documentation here: https://github.com/microsoft/agent-framework/tree/main/dotnet/samples/02-agents/AgentsWithFoundry/Agent_Step00_FoundryAgentLifecycle

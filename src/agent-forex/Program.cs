@@ -1,61 +1,13 @@
-using Azure.AI.AgentServer.AgentFramework.Extensions;
-using Azure.AI.OpenAI;
+using Azure.AI.Projects;
+using Azure.AI.Projects.Agents;
 using Azure.Identity;
-using Microsoft.Agents.AI;
-using Microsoft.Extensions.AI;
+using Microsoft.Agents.AI.Foundry;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
-
-var endpoint = builder.Configuration["AZURE_OPENAI_ENDPOINT"];
-if (string.IsNullOrEmpty(endpoint))
-    throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT is not set.");
-
-var deploymentName = builder.Configuration["MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
-
-builder.Services.AddSingleton<IChatClient>(sp =>
-{
-    var credential = new DefaultAzureCredential();
-    return new AzureOpenAIClient(new Uri(endpoint), credential)
-        .GetChatClient(deploymentName)
-        .AsIChatClient()
-        .AsBuilder()
-        .UseOpenTelemetry(sourceName: "Agents", configure: cfg => cfg.EnableSensitiveData = false)
-        .Build();
-});
-
-builder.Services.AddSingleton<AIAgent>(sp =>
-{
-    var chatClient = sp.GetRequiredService<IChatClient>();
-
-    var agent = new ChatClientAgent(chatClient,
-        name: "ForexTradingAgent",
-        instructions: """
-            You are an expert forex trading assistant specializing in currency markets.
-
-            Your role:
-            - Provide insights on forex market trends and analysis
-            - Explain currency pair movements and technical indicators
-            - Discuss risk management strategies for forex trading
-            - Analyze macroeconomic factors affecting exchange rates
-            - Share best practices for forex trading
-
-            Guidelines:
-            - Provide clear, professional forex market analysis
-            - Explain complex concepts in accessible terms
-            - Always emphasize risk management and responsible trading
-            - Use proper forex terminology and conventions
-            - Base responses on sound financial principles
-            """);
-
-    return agent
-        .AsBuilder()
-        .UseOpenTelemetry(sourceName: "Agents", configure: cfg => cfg.EnableSensitiveData = false)
-        .Build();
-});
 
 var app = builder.Build();
 
@@ -68,8 +20,52 @@ if (app.Environment.IsDevelopment())
 app.MapHealthChecks("/health");
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Forex Trading Agent Server started");
-logger.LogInformation("Azure OpenAI Endpoint: {Endpoint}", endpoint);
-logger.LogInformation("Model Deployment: {DeploymentName}", deploymentName);
+
+var endpoint = app.Configuration["AZURE_AI_PROJECT_ENDPOINT"]
+    ?? throw new InvalidOperationException("AZURE_AI_PROJECT_ENDPOINT is not set.");
+var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
+
+AIProjectClient aiProjectClient = new(new Uri(endpoint), new DefaultAzureCredential());
+
+ProjectsAgentVersion agentVersion = await aiProjectClient.AgentAdministrationClient.CreateAgentVersionAsync(
+    "ForexTradingAgent",
+    new ProjectsAgentVersionCreationOptions(
+        new DeclarativeAgentDefinition(model: deploymentName)
+        {
+            Instructions = """
+                You are an expert forex trading assistant specializing in currency markets.
+
+                Your role:
+                - Provide insights on forex market trends and analysis
+                - Explain currency pair movements and technical indicators
+                - Discuss risk management strategies for forex trading
+                - Analyze macroeconomic factors affecting exchange rates
+                - Share best practices for forex trading
+
+                Guidelines:
+                - Provide clear, professional forex market analysis
+                - Explain complex concepts in accessible terms
+                - Always emphasize risk management and responsible trading
+                - Use proper forex terminology and conventions
+                - Base responses on sound financial principles
+                """
+        }));
+
+FoundryAgent agent = aiProjectClient.AsAIAgent(agentVersion);
+logger.LogInformation("Agent created. Name: {Name}", agent.Name);
+
+app.MapPost("/chat", async (ChatRequest request) =>
+{
+    var response = await agent.RunAsync(request.Message);
+    return Results.Ok(new { response });
+});
+
+app.Lifetime.ApplicationStopping.Register(() =>
+{
+    aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(agent.Name).GetAwaiter().GetResult();
+    logger.LogInformation("Agent deleted: {Name}", agent.Name);
+});
 
 await app.RunAsync();
+
+record ChatRequest(string Message);
