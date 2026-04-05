@@ -39,7 +39,7 @@ public class ChatService
 
         try
         {
-            var response = await _http.PostAsync($"{_agentEndpoint}/v1/responses", content);
+            var response = await _http.PostAsync($"{_agentEndpoint}/openai/v1/responses", content);
             response.EnsureSuccessStatusCode();
             var body = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<AgentResponse>(body, _jsonOptions);
