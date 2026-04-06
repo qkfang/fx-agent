@@ -2,7 +2,7 @@ param name string
 param location string
 param appServicePlanId string
 param appInsightsConnectionString string
-param linuxFxVersion string = 'DOTNETCORE|10.0'
+param linuxFxVersion string = 'DOTNETCORE|9.0'
 param appCommandLine string = ''
 param extraAppSettings array = []
 
