@@ -3,6 +3,9 @@ param location string
 param tags object = {}
 param appInsightsConnectionString string = ''
 param storageAccountName string
+var eventHubName = 'es_fa73e095-515c-48fd-ad54-1ef70ad7bc34'
+var eventHubFullyQualifiedNamespace = 'esehsyw4hwncugmy8frez7.servicebus.windows.net'
+param newsFeedApiUrl string = ''
 
 var planName = '${name}-asp'
 
@@ -49,6 +52,10 @@ resource logicAppStandard 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'WORKFLOWS_RESOURCE_GROUP_NAME', value: resourceGroup().name }
         { name: 'WORKFLOWS_LOCATION_NAME', value: location }
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsightsConnectionString }
+        { name: 'BLOB_CONNECTION_STRING', value: storageConnectionString }
+        { name: 'EVENTHUB_NAME', value: eventHubName }
+        { name: 'EVENTHUB_FULLY_QUALIFIED_NAMESPACE', value: eventHubFullyQualifiedNamespace }
+        { name: 'NEWS_FEED_API_URL', value: newsFeedApiUrl }
       ]
     }
   }

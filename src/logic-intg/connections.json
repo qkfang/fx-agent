@@ -12,7 +12,7 @@
     },
     "EventHub": {
       "parameterValues": {
-        "connectionString": "@appsetting('EVENTHUB_CONNECTION_STRING')"
+        "fullyQualifiedNamespace": "@appsetting('EVENTHUB_FULLY_QUALIFIED_NAMESPACE')"
       },
       "serviceProvider": {
         "id": "/serviceProviders/eventHub"
