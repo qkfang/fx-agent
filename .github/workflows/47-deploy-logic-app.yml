@@ -1,0 +1,47 @@
+name: 47 Deploy Logic App Standard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/logic-app/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package workflows
+        working-directory: src/logic-app
+        run: zip -r ../../logic-app.zip .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logic-app-dist
+          path: logic-app.zip
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: logic-app-dist
+          path: dist
+
+      - name: Deploy to Logic App Standard
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: fxag-logic
+          resource-group-name: rg-melt
+          package: dist/logic-app.zip
