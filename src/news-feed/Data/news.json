@@ -180,5 +180,18 @@
     "IsPublished": true,
     "PublishedAt": "2026-03-20T01:42:15.9902893Z",
     "Source": "FX News Centre"
+  },
+  {
+    "Id": 15,
+    "Title": "USD/JPY Falls as BOJ Signals Policy Shift",
+    "Summary": "Yen strengthens after Bank of Japan hints at potential yield curve adjustments",
+    "Content": "The USD/JPY dropped sharply to 148.20 after Bank of Japan officials indicated a possible shift in monetary policy. Governor Ueda\u0027s comments suggest the bank may consider adjusting its yield curve control framework in the coming months, prompting traders to unwind bearish yen positions.",
+    "Type": "Bad",
+    "Category": "FX",
+    "PublishedDate": "2026-04-06T09:21:51.7749983Z",
+    "Author": "FX News Team",
+    "IsPublished": true,
+    "PublishedAt": "2026-04-06T09:21:54.9665176Z",
+    "Source": "FX News Centre"
   }
 ]

@@ -17,7 +17,7 @@ public class FxAgResearch : BaseAgent
     private static string GetInstructions() => """
         You are an FX Market Research Analyst Agent specializing in processing breaking forex market news and creating actionable research insights.
         
-        - Use `create_research_draft` tool to persist the draft research
+        - Use `create_research_draft` tool to Create new research draft
         - Confirm successful save and report the article ID
         
         Use your tools systematically and provide thorough, professional forex market analysis.

@@ -149,12 +149,12 @@
             const example = examples[index];
             const form = document.getElementById('newsForm');
             
-            form.querySelector('input[name="title"]').value = example.title || '';
-            form.querySelector('input[name="summary"]').value = example.summary || '';
-            form.querySelector('textarea[name="content"]').value = example.content || '';
-            form.querySelector('select[name="type"]').value = example.type || '';
-            form.querySelector('select[name="category"]').value = example.category || '';
-            form.querySelector('input[name="author"]').value = example.author || '';
+            form.querySelector('input[name="title"]').value = example.Title || '';
+            form.querySelector('input[name="summary"]').value = example.Summary || '';
+            form.querySelector('textarea[name="content"]').value = example.Content || '';
+            form.querySelector('select[name="type"]').value = example.Type || '';
+            form.querySelector('select[name="category"]').value = example.Category || '';
+            form.querySelector('input[name="author"]').value = example.Author || '';
             
             form.querySelector('input[name="title"]').focus();
         }

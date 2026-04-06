@@ -8,11 +8,12 @@ using System.Text.Json;
 namespace FxIntegrationApi.Mcp;
 
 [McpServerToolType]
-public class FxMcpTools(FxDbContext db)
+public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
 {
     [McpServerTool(Name = "get_all_customers"), Description("Get all customers with their portfolios")]
     public async Task<string> GetAllCustomers()
     {
+        logger.LogTrace("MCP tool called: get_all_customers");
         var customers = await db.Customers.Include(c => c.Portfolios).ToListAsync();
         return JsonSerializer.Serialize(customers);
     }
@@ -20,6 +21,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_customer"), Description("Get customer by ID")]
     public async Task<string> GetCustomer([Description("Customer ID")] int id)
     {
+        logger.LogTrace("MCP tool called: get_customer, id={Id}", id);
         var customer = await db.Customers.Include(c => c.Portfolios).FirstOrDefaultAsync(c => c.Id == id);
         return customer is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(customer);
     }
@@ -31,6 +33,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Phone number")] string phone,
         [Description("Company name")] string company)
     {
+        logger.LogTrace("MCP tool called: create_customer, name={Name}", name);
         var customer = new Customer { Name = name, Email = email, Phone = phone, Company = company };
         db.Customers.Add(customer);
         await db.SaveChangesAsync();
@@ -45,6 +48,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Phone number")] string phone,
         [Description("Company name")] string company)
     {
+        logger.LogTrace("MCP tool called: update_customer, id={Id}", id);
         var customer = await db.Customers.FindAsync(id);
         if (customer is null) return JsonSerializer.Serialize(new { error = "Not found" });
         customer.Name = name;
@@ -58,6 +62,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "delete_customer"), Description("Delete customer")]
     public async Task<string> DeleteCustomer([Description("Customer ID")] int id)
     {
+        logger.LogTrace("MCP tool called: delete_customer, id={Id}", id);
         var customer = await db.Customers.FindAsync(id);
         if (customer is null) return JsonSerializer.Serialize(new { error = "Not found" });
         db.Customers.Remove(customer);
@@ -68,6 +73,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_customer_portfolios"), Description("Get all portfolios for a customer")]
     public async Task<string> GetCustomerPortfolios([Description("Customer ID")] int customerId)
     {
+        logger.LogTrace("MCP tool called: get_customer_portfolios, customerId={CustomerId}", customerId);
         var portfolios = await db.CustomerPortfolios.Where(p => p.CustomerId == customerId).ToListAsync();
         return JsonSerializer.Serialize(portfolios);
     }
@@ -75,6 +81,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_portfolio"), Description("Get portfolio by ID")]
     public async Task<string> GetPortfolio([Description("Portfolio ID")] int id)
     {
+        logger.LogTrace("MCP tool called: get_portfolio, id={Id}", id);
         var portfolio = await db.CustomerPortfolios.FindAsync(id);
         return portfolio is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(portfolio);
     }
@@ -88,6 +95,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Entry rate")] decimal entryRate,
         [Description("Position status")] string status = "Open")
     {
+        logger.LogTrace("MCP tool called: create_portfolio, customerId={CustomerId}, currencyPair={CurrencyPair}", customerId, currencyPair);
         var portfolio = new CustomerPortfolio { CustomerId = customerId, CurrencyPair = currencyPair, Direction = direction, Amount = amount, EntryRate = entryRate, Status = status };
         db.CustomerPortfolios.Add(portfolio);
         await db.SaveChangesAsync();
@@ -104,6 +112,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Entry rate")] decimal entryRate,
         [Description("Position status")] string status)
     {
+        logger.LogTrace("MCP tool called: update_portfolio, id={Id}", id);
         var portfolio = await db.CustomerPortfolios.FindAsync(id);
         if (portfolio is null) return JsonSerializer.Serialize(new { error = "Not found" });
         portfolio.CustomerId = customerId;
@@ -119,6 +128,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "delete_portfolio"), Description("Delete portfolio position")]
     public async Task<string> DeletePortfolio([Description("Portfolio ID")] int id)
     {
+        logger.LogTrace("MCP tool called: delete_portfolio, id={Id}", id);
         var portfolio = await db.CustomerPortfolios.FindAsync(id);
         if (portfolio is null) return JsonSerializer.Serialize(new { error = "Not found" });
         db.CustomerPortfolios.Remove(portfolio);
@@ -129,6 +139,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_all_traders"), Description("Get all traders with recommendations and feeds")]
     public async Task<string> GetAllTraders()
     {
+        logger.LogTrace("MCP tool called: get_all_traders");
         var traders = await db.Traders.Include(t => t.Recommendations).Include(t => t.NewsFeeds).ToListAsync();
         return JsonSerializer.Serialize(traders);
     }
@@ -136,6 +147,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_trader"), Description("Get trader by ID")]
     public async Task<string> GetTrader([Description("Trader ID")] int id)
     {
+        logger.LogTrace("MCP tool called: get_trader, id={Id}", id);
         var trader = await db.Traders.Include(t => t.Recommendations).Include(t => t.NewsFeeds).FirstOrDefaultAsync(t => t.Id == id);
         return trader is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(trader);
     }
@@ -148,6 +160,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Area of specialization")] string specialization,
         [Description("Trading region")] string region)
     {
+        logger.LogTrace("MCP tool called: create_trader, name={Name}", name);
         var trader = new Trader { Name = name, Email = email, Desk = desk, Specialization = specialization, Region = region, JoinedAt = DateTime.UtcNow };
         db.Traders.Add(trader);
         await db.SaveChangesAsync();
@@ -157,6 +170,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_all_research_articles"), Description("Get all research articles")]
     public async Task<string> GetAllResearchArticles()
     {
+        logger.LogTrace("MCP tool called: get_all_research_articles");
         var articles = await db.ResearchArticles.ToListAsync();
         return JsonSerializer.Serialize(articles);
     }
@@ -164,6 +178,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_research_article"), Description("Get research article by ID")]
     public async Task<string> GetResearchArticle([Description("Article ID")] int id)
     {
+        logger.LogTrace("MCP tool called: get_research_article, id={Id}", id);
         var article = await db.ResearchArticles.FindAsync(id);
         return article is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(article);
     }
@@ -177,6 +192,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Author name")] string author,
         [Description("Sentiment: Bullish, Bearish, or Neutral")] string sentiment = "Neutral")
     {
+        logger.LogTrace("MCP tool called: create_research_article, title={Title}", title);
         var article = new ResearchArticle { Title = title, Summary = summary, Content = content, Category = category, Author = author, Sentiment = sentiment, PublishedDate = DateTime.UtcNow };
         db.ResearchArticles.Add(article);
         await db.SaveChangesAsync();
@@ -186,6 +202,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_customer_preferences"), Description("Get customer trading preferences")]
     public async Task<string> GetCustomerPreferences([Description("Customer ID")] int customerId)
     {
+        logger.LogTrace("MCP tool called: get_customer_preferences, customerId={CustomerId}", customerId);
         var pref = await db.CustomerPreferences.FirstOrDefaultAsync(p => p.CustomerId == customerId);
         return pref is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(pref);
     }
@@ -199,6 +216,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Trading style")] string tradingStyle,
         [Description("Trading objective")] string tradingObjective)
     {
+        logger.LogTrace("MCP tool called: update_customer_preferences, id={Id}, customerId={CustomerId}", id, customerId);
         var pref = await db.CustomerPreferences.FindAsync(id);
         if (pref is null) return JsonSerializer.Serialize(new { error = "Not found" });
         pref.CustomerId = customerId;
@@ -214,6 +232,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_customer_history"), Description("Get customer trading history")]
     public async Task<string> GetCustomerHistory([Description("Customer ID")] int customerId)
     {
+        logger.LogTrace("MCP tool called: get_customer_history, customerId={CustomerId}", customerId);
         var history = await db.CustomerHistories.Where(h => h.CustomerId == customerId).ToListAsync();
         return JsonSerializer.Serialize(history);
     }
@@ -221,6 +240,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_all_research_drafts"), Description("Get all research drafts")]
     public async Task<string> GetAllResearchDrafts()
     {
+        logger.LogTrace("MCP tool called: get_all_research_drafts");
         var drafts = await db.ResearchDrafts.ToListAsync();
         return JsonSerializer.Serialize(drafts);
     }
@@ -233,6 +253,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Category")] string category,
         [Description("Status")] string status = "InProgress")
     {
+        logger.LogTrace("MCP tool called: create_research_draft, title={Title}", title);
         var draft = new ResearchDraft { Title = title, Content = content, Author = author, Category = category, Status = status };
         db.ResearchDrafts.Add(draft);
         await db.SaveChangesAsync();
@@ -242,6 +263,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_all_research_patterns"), Description("Get all identified trading patterns")]
     public async Task<string> GetAllResearchPatterns()
     {
+        logger.LogTrace("MCP tool called: get_all_research_patterns");
         var patterns = await db.ResearchPatterns.ToListAsync();
         return JsonSerializer.Serialize(patterns);
     }
@@ -255,6 +277,7 @@ public class FxMcpTools(FxDbContext db)
         [Description("Pattern description")] string description,
         [Description("Detected by")] string detectedBy)
     {
+        logger.LogTrace("MCP tool called: create_research_pattern, currencyPair={CurrencyPair}, patternName={PatternName}", currencyPair, patternName);
         var pattern = new ResearchPattern { CurrencyPair = currencyPair, PatternName = patternName, Timeframe = timeframe, Direction = direction, Description = description, DetectedBy = detectedBy, DetectedAt = DateTime.UtcNow };
         db.ResearchPatterns.Add(pattern);
         await db.SaveChangesAsync();
@@ -264,6 +287,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_trader_news"), Description("Get news feeds for a trader")]
     public async Task<string> GetTraderNews([Description("Trader ID")] int traderId)
     {
+        logger.LogTrace("MCP tool called: get_trader_news, traderId={TraderId}", traderId);
         var news = await db.TraderNewsFeeds.Where(n => n.TraderId == traderId).ToListAsync();
         return JsonSerializer.Serialize(news);
     }
@@ -271,6 +295,7 @@ public class FxMcpTools(FxDbContext db)
     [McpServerTool(Name = "get_trader_recommendations"), Description("Get trader recommendations")]
     public async Task<string> GetTraderRecommendations([Description("Trader ID")] int traderId)
     {
+        logger.LogTrace("MCP tool called: get_trader_recommendations, traderId={TraderId}", traderId);
         var recs = await db.TraderRecommendations.Where(r => r.TraderId == traderId).ToListAsync();
         return JsonSerializer.Serialize(recs);
     }

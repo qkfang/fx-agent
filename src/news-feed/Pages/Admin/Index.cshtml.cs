@@ -39,7 +39,8 @@ namespace FxWebNews.Pages.Admin
                 if (System.IO.File.Exists(examplesPath))
                 {
                     var json = System.IO.File.ReadAllText(examplesPath);
-                    Examples = JsonSerializer.Deserialize<List<NewsExample>>(json) ?? new();
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    Examples = JsonSerializer.Deserialize<List<NewsExample>>(json, options) ?? new();
                 }
             }
             catch
