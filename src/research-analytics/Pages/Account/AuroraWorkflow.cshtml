@@ -1481,15 +1481,16 @@
             await sleep(500);
             addLog(logs, 'info', 'Sending trade details to trading agent...');
             try {
-                const agentMsg = `Trade executed: ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair} at ${tradeData.rate.toFixed(5)}, transaction ${tradeData.transactionId}, customer ${tradeData.customer}. Please retrieve the latest transaction history and fund summary to confirm.`;
+                const agentMsg = `Trade executed: ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair} at ${tradeData.rate.toFixed(5)}, transaction ${tradeData.transactionId}. Please retrieve the latest transaction history and fund summary to confirm.`;
                 const agentRes = await fetch(FOUNDRY_AGENT + '/trader', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: agentMsg })
                 });
+                if (!agentRes.ok) throw new Error(`Agent returned ${agentRes.status}`);
                 const agentData = await agentRes.json();
                 addLog(logs, 'success', '✓ Trading agent confirmed transaction');
-                if (agentData.response) {
+                if (agentData.response && typeof agentData.response === 'string') {
                     tradeData.agentResponse = agentData.response;
                     addLog(logs, 'info', 'Agent: ' + agentData.response.substring(0, 200));
                 }
