@@ -1,5 +1,4 @@
-name: 47 Deploy Logic App Standard
-
+name: 47 Deploy Logic Intg
 on:
   push:
     branches: [main]
