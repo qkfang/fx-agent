@@ -10,12 +10,17 @@ namespace FxIntegrationApi.Mcp;
 [McpServerToolType]
 public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
 {
+    private static readonly JsonSerializerOptions _jsonOptions = new() 
+    { 
+        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles 
+    };
+
     [McpServerTool(Name = "get_all_customers"), Description("Get all customers with their portfolios")]
     public async Task<string> GetAllCustomers()
     {
         logger.LogTrace("MCP tool called: get_all_customers");
         var customers = await db.Customers.Include(c => c.Portfolios).ToListAsync();
-        return JsonSerializer.Serialize(customers);
+        return JsonSerializer.Serialize(customers, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_customer"), Description("Get customer by ID")]
@@ -23,7 +28,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_customer, id={Id}", id);
         var customer = await db.Customers.Include(c => c.Portfolios).FirstOrDefaultAsync(c => c.Id == id);
-        return customer is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(customer);
+        return customer is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(customer, _jsonOptions);
     }
 
     [McpServerTool(Name = "create_customer"), Description("Create new customer")]
@@ -37,7 +42,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var customer = new Customer { Name = name, Email = email, Phone = phone, Company = company };
         db.Customers.Add(customer);
         await db.SaveChangesAsync();
-        return JsonSerializer.Serialize(customer);
+        return JsonSerializer.Serialize(customer, _jsonOptions);
     }
 
     [McpServerTool(Name = "update_customer"), Description("Update customer information")]
@@ -75,7 +80,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_customer_portfolios, customerId={CustomerId}", customerId);
         var portfolios = await db.CustomerPortfolios.Where(p => p.CustomerId == customerId).ToListAsync();
-        return JsonSerializer.Serialize(portfolios);
+        return JsonSerializer.Serialize(portfolios, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_portfolio"), Description("Get portfolio by ID")]
@@ -83,7 +88,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_portfolio, id={Id}", id);
         var portfolio = await db.CustomerPortfolios.FindAsync(id);
-        return portfolio is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(portfolio);
+        return portfolio is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(portfolio, _jsonOptions);
     }
 
     [McpServerTool(Name = "create_portfolio"), Description("Create new portfolio position")]
@@ -99,7 +104,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var portfolio = new CustomerPortfolio { CustomerId = customerId, CurrencyPair = currencyPair, Direction = direction, Amount = amount, EntryRate = entryRate, Status = status };
         db.CustomerPortfolios.Add(portfolio);
         await db.SaveChangesAsync();
-        return JsonSerializer.Serialize(portfolio);
+        return JsonSerializer.Serialize(portfolio, _jsonOptions);
     }
 
     [McpServerTool(Name = "update_portfolio"), Description("Update portfolio position")]
@@ -141,7 +146,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_all_traders");
         var traders = await db.Traders.Include(t => t.Recommendations).Include(t => t.NewsFeeds).ToListAsync();
-        return JsonSerializer.Serialize(traders);
+        return JsonSerializer.Serialize(traders, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_trader"), Description("Get trader by ID")]
@@ -149,7 +154,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_trader, id={Id}", id);
         var trader = await db.Traders.Include(t => t.Recommendations).Include(t => t.NewsFeeds).FirstOrDefaultAsync(t => t.Id == id);
-        return trader is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(trader);
+        return trader is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(trader, _jsonOptions);
     }
 
     [McpServerTool(Name = "create_trader"), Description("Create new trader")]
@@ -164,7 +169,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var trader = new Trader { Name = name, Email = email, Desk = desk, Specialization = specialization, Region = region, JoinedAt = DateTime.UtcNow };
         db.Traders.Add(trader);
         await db.SaveChangesAsync();
-        return JsonSerializer.Serialize(trader);
+        return JsonSerializer.Serialize(trader, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_all_research_articles"), Description("Get all research articles")]
@@ -172,7 +177,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_all_research_articles");
         var articles = await db.ResearchArticles.ToListAsync();
-        return JsonSerializer.Serialize(articles);
+        return JsonSerializer.Serialize(articles, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_research_article"), Description("Get research article by ID")]
@@ -180,7 +185,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_research_article, id={Id}", id);
         var article = await db.ResearchArticles.FindAsync(id);
-        return article is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(article);
+        return article is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(article, _jsonOptions);
     }
 
     [McpServerTool(Name = "create_research_article"), Description("Create new research article")]
@@ -196,7 +201,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var article = new ResearchArticle { Title = title, Summary = summary, Content = content, Category = category, Author = author, Sentiment = sentiment, PublishedDate = DateTime.UtcNow };
         db.ResearchArticles.Add(article);
         await db.SaveChangesAsync();
-        return JsonSerializer.Serialize(article);
+        return JsonSerializer.Serialize(article, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_customer_preferences"), Description("Get customer trading preferences")]
@@ -204,7 +209,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_customer_preferences, customerId={CustomerId}", customerId);
         var pref = await db.CustomerPreferences.FirstOrDefaultAsync(p => p.CustomerId == customerId);
-        return pref is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(pref);
+        return pref is null ? JsonSerializer.Serialize(new { error = "Not found" }) : JsonSerializer.Serialize(pref, _jsonOptions);
     }
 
     [McpServerTool(Name = "update_customer_preferences"), Description("Update customer trading preferences")]
@@ -234,7 +239,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_customer_history, customerId={CustomerId}", customerId);
         var history = await db.CustomerHistories.Where(h => h.CustomerId == customerId).ToListAsync();
-        return JsonSerializer.Serialize(history);
+        return JsonSerializer.Serialize(history, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_all_research_drafts"), Description("Get all research drafts")]
@@ -242,7 +247,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_all_research_drafts");
         var drafts = await db.ResearchDrafts.ToListAsync();
-        return JsonSerializer.Serialize(drafts);
+        return JsonSerializer.Serialize(drafts, _jsonOptions);
     }
 
     [McpServerTool(Name = "create_research_draft"), Description("Create new research draft")]
@@ -257,7 +262,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var draft = new ResearchDraft { Title = title, Content = content, Author = author, Category = category, Status = status };
         db.ResearchDrafts.Add(draft);
         await db.SaveChangesAsync();
-        return JsonSerializer.Serialize(draft);
+        return JsonSerializer.Serialize(draft, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_all_research_patterns"), Description("Get all identified trading patterns")]
@@ -265,7 +270,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_all_research_patterns");
         var patterns = await db.ResearchPatterns.ToListAsync();
-        return JsonSerializer.Serialize(patterns);
+        return JsonSerializer.Serialize(patterns, _jsonOptions);
     }
 
     [McpServerTool(Name = "create_research_pattern"), Description("Create new pattern observation")]
@@ -281,7 +286,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var pattern = new ResearchPattern { CurrencyPair = currencyPair, PatternName = patternName, Timeframe = timeframe, Direction = direction, Description = description, DetectedBy = detectedBy, DetectedAt = DateTime.UtcNow };
         db.ResearchPatterns.Add(pattern);
         await db.SaveChangesAsync();
-        return JsonSerializer.Serialize(pattern);
+        return JsonSerializer.Serialize(pattern, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_trader_news"), Description("Get news feeds for a trader")]
@@ -289,7 +294,7 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_trader_news, traderId={TraderId}", traderId);
         var news = await db.TraderNewsFeeds.Where(n => n.TraderId == traderId).ToListAsync();
-        return JsonSerializer.Serialize(news);
+        return JsonSerializer.Serialize(news, _jsonOptions);
     }
 
     [McpServerTool(Name = "get_trader_recommendations"), Description("Get trader recommendations")]
@@ -297,6 +302,6 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
     {
         logger.LogTrace("MCP tool called: get_trader_recommendations, traderId={TraderId}", traderId);
         var recs = await db.TraderRecommendations.Where(r => r.TraderId == traderId).ToListAsync();
-        return JsonSerializer.Serialize(recs);
+        return JsonSerializer.Serialize(recs, _jsonOptions);
     }
 }
