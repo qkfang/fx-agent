@@ -1,4 +1,4 @@
-name: 44 Deploy Research Analytics
+name: 42 Deploy Research Analytics
 
 on:
   push:
