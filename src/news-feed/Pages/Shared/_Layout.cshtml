@@ -27,6 +27,7 @@
                     <a class="fxn-nav-link @(ViewData["ActiveSource"] as string == "" || ViewData["ActiveSource"] == null ? "active" : "")" asp-area="" asp-page="/Index">Markets</a>
                     <a class="fxn-nav-link fxn-nav-morningstar @(ViewData["ActiveSource"] as string == "morningstar" ? "active" : "")" asp-area="" asp-page="/Index" asp-route-source="morningstar">Morningstar</a>
                     <a class="fxn-nav-link fxn-nav-bloomberg @(ViewData["ActiveSource"] as string == "bloomberg" ? "active" : "")" asp-area="" asp-page="/Index" asp-route-source="bloomberg">Bloomberg Terminal</a>
+                    <a class="fxn-nav-link @(ViewData["ActiveSource"] as string == "trader-feeds" ? "active" : "")" asp-area="" asp-page="/Index" asp-route-source="trader-feeds">Trader Feeds</a>
                     <a class="fxn-nav-link" href="/Admin">Newsroom</a>
                 </nav>
             </div>

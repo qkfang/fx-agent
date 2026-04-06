@@ -13,6 +13,10 @@ public class TraderNewsFeedsController : ControllerBase
 
     public TraderNewsFeedsController(FxDbContext db) => _db = db;
 
+    [HttpGet]
+    public async Task<ActionResult<List<TraderNewsFeed>>> GetAll()
+        => await _db.TraderNewsFeeds.OrderByDescending(n => n.PublishedAt).ToListAsync();
+
     [HttpGet("trader/{traderId}")]
     public async Task<ActionResult<List<TraderNewsFeed>>> GetByTrader(int traderId)
         => await _db.TraderNewsFeeds.Where(n => n.TraderId == traderId).ToListAsync();

@@ -10,15 +10,17 @@ public class IndexModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private readonly NewsService _newsService;
     private readonly NewsAggregatorService _aggregatorService;
+    private readonly ApiIntgService _apiIntgService;
 
     public List<NewsArticle> News { get; set; } = new();
     public string ActiveSource { get; set; } = string.Empty;
 
-    public IndexModel(ILogger<IndexModel> logger, NewsService newsService, NewsAggregatorService aggregatorService)
+    public IndexModel(ILogger<IndexModel> logger, NewsService newsService, NewsAggregatorService aggregatorService, ApiIntgService apiIntgService)
     {
         _logger = logger;
         _newsService = newsService;
         _aggregatorService = aggregatorService;
+        _apiIntgService = apiIntgService;
     }
 
     public async Task OnGetAsync(string? source)
@@ -29,6 +31,7 @@ public class IndexModel : PageModel
         {
             "bloomberg" => await _aggregatorService.GetBloombergNewsAsync(),
             "morningstar" => await _aggregatorService.GetMorningstarNewsAsync(),
+            "trader-feeds" => await _apiIntgService.GetTraderNewsFeedsAsync(),
             _ => _newsService.GetAllNews().Where(n => n.IsPublished && n.Source == "FX News Centre").ToList()
         };
 

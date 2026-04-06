@@ -4,9 +4,10 @@
     ViewData["Title"] = "FX Market News";
     var activeSource = Model.ActiveSource;
     var sectionTitle = activeSource switch {
-        "morningstar" => "Morningstar Research",
-        "bloomberg"   => "Bloomberg Terminal",
-        _             => "Market Intelligence"
+        "morningstar"   => "Morningstar Research",
+        "bloomberg"     => "Bloomberg Terminal",
+        "trader-feeds"  => "Trader News Feeds",
+        _               => "Market Intelligence"
     };
     var lead = Model.News.FirstOrDefault();
     var rest = Model.News.Skip(1).ToList();

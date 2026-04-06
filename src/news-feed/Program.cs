@@ -13,6 +13,11 @@ builder.Services.AddHttpClient("aggregator", client =>
     client.DefaultRequestHeaders.Add("User-Agent", "FxNewsAggregator/1.0");
 });
 builder.Services.AddSingleton<NewsAggregatorService>();
+builder.Services.AddHttpClient("api-intg", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+builder.Services.AddSingleton<ApiIntgService>();
 
 var app = builder.Build();
 
