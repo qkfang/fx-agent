@@ -11,4 +11,10 @@
     <PackageReference Include="Azure.Messaging.EventHubs" Version="5.12.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Data\news-examples.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -20,6 +20,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapHealthChecks("/health");
 
+app.MapGet("/", () => Results.Redirect("/swagger"));
+
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 var endpoint = app.Configuration["AZURE_AI_PROJECT_ENDPOINT"]

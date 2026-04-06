@@ -1,0 +1,80 @@
+[
+    {
+        "id": 14,
+        "title": "China Slowdown Hammers Commodity Currencies",
+        "summary": "China Slowdown Hammers Commodity Currencies",
+        "content": "China Slowdown Hammers Commodity Currencies\r\n",
+        "type": "Good",
+        "category": "FX",
+        "publishedDate": "2026-03-20T01:42:12.5455333Z",
+        "author": "FX News Team",
+        "isPublished": true,
+        "publishedAt": "2026-03-20T01:42:15.9902893Z",
+        "source": "FX News Centre"
+    },
+    {
+        "id": 1,
+        "title": "China Slowdown Hammers Commodity Currencies",
+        "summary": "AUD and NZD slide as China's manufacturing PMI contracts for a third straight month.",
+        "content": "China's official manufacturing PMI dropped to 48.7 in February, the third consecutive sub-50 reading, intensifying fears of a prolonged economic slowdown in the world's second-largest economy. Commodity-linked currencies bore the brunt of the sell-off: AUD/USD fell 0.9% to 0.6312 while NZD/USD shed 1.1%. Iron ore futures slid 3.4% in Dalian, amplifying the pain for the Australian dollar. Analysts at major banks are now revising China's full-year GDP forecasts below the official 5% target, citing weak domestic consumption, a moribund property sector, and persistent deflationary pressures. Capital flight from Chinese equity markets has added further headwinds, with the Hang Seng Index logging its seventh decline in eight sessions.",
+        "type": "Bad",
+        "category": "FX",
+        "publishedDate": "2026-03-19T09:00:00",
+        "author": "FX News Team",
+        "isPublished": true,
+        "publishedAt": "2026-03-19T09:05:00",
+        "source": "FX News Centre"
+    },
+    {
+        "id": 2,
+        "title": "Taiwan Strait Tensions Spark Safe-Haven Rally",
+        "summary": "JPY, CHF and gold surge as military posturing in the Taiwan Strait intensifies.",
+        "content": "Heightened military activity near the Taiwan Strait triggered a broad flight to safety in global currency markets. The Japanese yen surged 1.4% against the dollar, pushing USD/JPY below 145, while the Swiss franc appreciated 0.8%. Gold climbed to $2,420 per troy ounce, its highest level since November. Analysts warn that any escalation could severely disrupt global semiconductor supply chains, with Taiwan accounting for over 60% of advanced chip manufacturing capacity. The Taiwan dollar weakened sharply, and regional equity indices in South Korea, Japan and Australia all closed more than 1.5% lower. Strategists at several investment banks are recommending reducing EM exposure while increasing allocations to traditional safe-haven assets.",
+        "type": "Bad",
+        "category": "Macro",
+        "publishedDate": "2026-03-18T14:30:00",
+        "author": "FX News Team",
+        "isPublished": true,
+        "publishedAt": "2026-03-18T14:35:00",
+        "source": "FX News Centre"
+    },
+    {
+        "id": 3,
+        "title": "PBOC Cuts Reserve Requirements Amid Growth Fears",
+        "summary": "China's central bank eases policy as GDP targets look increasingly out of reach.",
+        "content": "The People's Bank of China announced a 50 basis point cut to the reserve requirement ratio (RRR) for most banks, releasing an estimated CNY 1 trillion of liquidity into a struggling economy. The move came days after data showed retail sales growth slowed to its weakest pace in over a year and industrial output contracted for the first time since the pandemic. While the easing was broadly expected, market participants expressed concern that monetary stimulus alone cannot address the structural headwinds facing China: an overleveraged property sector, falling consumer confidence, and slowing export demand from a fragile global economy. The offshore yuan (CNH) initially rallied on the news before giving back gains, and Chinese government bond yields fell to a two-decade low as investors priced in a prolonged low-growth environment.",
+        "type": "Bad",
+        "category": "Rates",
+        "publishedDate": "2026-03-17T11:00:00",
+        "author": "FX News Team",
+        "isPublished": true,
+        "publishedAt": "2026-03-17T11:10:00",
+        "source": "FX News Centre"
+    },
+    {
+        "id": 4,
+        "title": "US Expands Tariffs on Chinese Goods, Renewing Trade War Fears",
+        "summary": "Washington's new 25% tariffs on Chinese tech exports send USD higher and EM currencies lower.",
+        "content": "The United States announced sweeping new 25% tariffs on a broad range of Chinese-manufactured technology products, including electric vehicles, solar panels and advanced semiconductors. The move, framed as a national security measure, drew an immediate pledge of retaliation from Beijing. The US dollar index (DXY) jumped 0.7% as investors priced in a more restrictive global trade environment, while the offshore yuan weakened past 7.35 against the dollar — a level not seen since the 2022 peak. Emerging market currencies with close trade ties to China, including the Thai baht, South Korean won and Malaysian ringgit, fell sharply. Equity markets in Europe and Asia sold off, with tech-heavy indices leading losses on fears of supply-chain disruption. Strategists warn that a full-blown trade war could shave 0.5–0.8 percentage points from global GDP growth in 2026.",
+        "type": "Bad",
+        "category": "Macro",
+        "publishedDate": "2026-03-16T10:15:00",
+        "author": "FX News Team",
+        "isPublished": true,
+        "publishedAt": "2026-03-16T10:20:00",
+        "source": "FX News Centre"
+    },
+    {
+        "id": 5,
+        "title": "China Property Crisis Deepens as Evergrande Sequel Unfolds",
+        "summary": "Second major Chinese developer halts offshore debt payments, triggering global risk-off.",
+        "content": "Country Garden, once China's largest property developer by sales, has formally defaulted on $3.5 billion in offshore bonds after failing to secure a creditor agreement in court-supervised restructuring talks. The news revived memories of the Evergrande collapse and sent shockwaves through global credit markets. High-yield spreads widened sharply in Asia and Europe, the Australian dollar fell 1.2% on fears of reduced Chinese demand for raw materials, and Hong Kong's Hang Seng Index plunged more than 3%. Chinese authorities face growing pressure to launch a direct government bailout of the sector, which historically accounted for about a quarter of GDP. Analysts caution that without a credible resolution mechanism, the property sector overhang could weigh on Chinese growth for years, with knock-on effects for global commodity markets and commodity-linked currencies.",
+        "type": "Bad",
+        "category": "Macro",
+        "publishedDate": "2026-03-15T13:45:00",
+        "author": "FX News Team",
+        "isPublished": true,
+        "publishedAt": "2026-03-15T13:50:00",
+        "source": "FX News Centre"
+    }
+]

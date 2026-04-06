@@ -36,7 +36,7 @@ namespace FxWebNews.Pages.Admin
             try
             {
                 var examplesPath = Path.Combine(_environment.ContentRootPath, "Data", "news-examples.json");
-                if (File.Exists(examplesPath))
+                if (System.IO.File.Exists(examplesPath))
                 {
                     var json = System.IO.File.ReadAllText(examplesPath);
                     Examples = JsonSerializer.Deserialize<List<NewsExample>>(json) ?? new();
