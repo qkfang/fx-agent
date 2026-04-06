@@ -1,4 +1,4 @@
-name: 42 Deploy Agent Forex
+name: 50 Deploy Agent Forex
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: 40 Deploy Logic Intg
+name: 21 Deploy Logic Intg
 on:
   push:
     branches: [main]

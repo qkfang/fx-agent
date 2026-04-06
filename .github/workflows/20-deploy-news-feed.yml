@@ -1,10 +1,10 @@
-name: 45 Deploy Trading Platform
+name: 20 Deploy News Feed
 
 on:
   push:
     branches: [main]
     paths:
-      - "src/trading-platform/**"
+      - "src/news-feed/**"
   workflow_dispatch:
 
 jobs:
@@ -19,22 +19,22 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        working-directory: src/trading-platform
+        working-directory: src/news-feed
         run: dotnet restore
 
       - name: Build
-        working-directory: src/trading-platform
+        working-directory: src/news-feed
         run: dotnet build --configuration Release --no-restore
 
       - name: Publish
-        working-directory: src/trading-platform
+        working-directory: src/news-feed
         run: dotnet publish --configuration Release --no-build --output ./publish
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: trading-platform-dist
-          path: src/trading-platform/publish
+          name: news-feed-dist
+          path: src/news-feed/publish
 
   deploy-dev:
     needs: build
@@ -49,12 +49,12 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: trading-platform-dist
+          name: news-feed-dist
           path: dist
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: fxag-trading
+          app-name: fxag-news
           resource-group-name: rg-fx-agent
           package: dist
