@@ -24,7 +24,7 @@ var webAppPlanName = '${baseName}-asp'
 var staticWebAppName = '${baseName}-swa'
 var foundryName = '${baseName}-foundry'
 var fabricCapacityName = '${baseName}fabric'
-var logicAppStandardName = '${baseName}-logic'
+var logicIntgName = '${baseName}-logic'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: webAppPlanName
@@ -246,10 +246,10 @@ module staticWebApp 'modules/staticwebapp.bicep' = {
   }
 }
 
-module logicAppStandard 'modules/logicapp-standard.bicep' = {
-  name: 'logicAppStandardDeployment'
+module logicIntg 'modules/logicapp-standard.bicep' = {
+  name: 'logicIntgDeployment'
   params: {
-    name: logicAppStandardName
+    name: logicIntgName
     location: location
     tags: commonTags
     storageAccountName: storageAccountName

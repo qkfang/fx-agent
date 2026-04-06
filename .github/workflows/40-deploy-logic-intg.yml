@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/logic-app/**"
+      - "src/logic-intg/**"
   workflow_dispatch:
 
 jobs:
@@ -13,14 +13,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Package workflows
-        working-directory: src/logic-app
-        run: zip -r ../../logic-app.zip .
+        working-directory: src/logic-intg
+        run: zip -r ../../logic-intg.zip .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: logic-app-dist
-          path: logic-app.zip
+          name: logic-intg-dist
+          path: logic-intg.zip
 
   deploy-dev:
     needs: build
@@ -35,7 +35,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: logic-app-dist
+          name: logic-intg-dist
           path: dist
 
       - name: Deploy to Logic App Standard
@@ -43,4 +43,4 @@ jobs:
         with:
           app-name: fxag-logic
           resource-group-name: rg-melt
-          package: dist/logic-app.zip
+          package: dist/logic-intg.zip
