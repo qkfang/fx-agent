@@ -50,8 +50,7 @@ var tradingMcpTools = await tradingMcpClient.ListToolsAsync();
 logger.LogInformation("Trading MCP tools loaded: {Tools}", string.Join(", ", tradingMcpTools.Select(t => t.Name)));
 
 // Create research agent with MCP tools and web search
-var researchTools = new List<AITool>(mcpTools.Cast<AITool>()) { new HostedWebSearchTool() };
-var researchAgent = new FxAgResearch(aiProjectClient, deploymentName, researchTools);
+var researchAgent = new FxAgResearch(aiProjectClient, deploymentName, [.. mcpTools.Cast<AITool>(), new HostedWebSearchTool()]);
 
 var suggestionAgent = new FxAgSuggestion(aiProjectClient, deploymentName, [.. mcpTools.Cast<AITool>()]);
 var traderAgent = new FxAgTrader(aiProjectClient, deploymentName, [.. tradingMcpTools.Cast<AITool>()]);
