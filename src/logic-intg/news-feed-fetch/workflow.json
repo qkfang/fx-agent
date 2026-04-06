@@ -48,16 +48,41 @@
           "Fetch_News_Articles": [ "Succeeded" ]
         }
       },
+      "Filter_Recent_Articles": {
+        "type": "Query",
+        "inputs": {
+          "from": "@body('Parse_Articles')",
+          "where": "@greaterOrEquals(item()?['publishedAt'], formatDateTime(addMinutes(utcNow(), -2), 'yyyy-MM-ddTHH:mm:ssZ'))"
+        },
+        "runAfter": {
+          "Parse_Articles": [ "Succeeded" ]
+        }
+      },
       "For_each_article": {
         "type": "Foreach",
-        "foreach": "@body('Parse_Articles')",
+        "foreach": "@body('Filter_Recent_Articles')",
         "actions": {
+          "Check_Blob_Exists": {
+            "type": "ServiceProvider",
+            "inputs": {
+              "parameters": {
+                "containerName": "articles",
+                "blobName": "@{concat('news/', string(items('For_each_article')?['id']), '.json')}"
+              },
+              "serviceProviderConfiguration": {
+                "connectionName": "AzureBlob",
+                "operationId": "readBlob",
+                "serviceProviderId": "/serviceProviders/AzureBlob"
+              }
+            },
+            "runAfter": {}
+          },
           "Upload_Article_to_Blob": {
             "type": "ServiceProvider",
             "inputs": {
               "parameters": {
                 "containerName": "articles",
-                "blobName": "@{concat('news/', string(items('For_each_article')?['id']), '-', formatDateTime(utcNow(), 'yyyyMMddHHmmss'), '.json')}",
+                "blobName": "@{concat('news/', string(items('For_each_article')?['id']), '.json')}",
                 "content": "@items('For_each_article')"
               },
               "serviceProviderConfiguration": {
@@ -66,7 +91,9 @@
                 "serviceProviderId": "/serviceProviders/AzureBlob"
               }
             },
-            "runAfter": {}
+            "runAfter": {
+              "Check_Blob_Exists": [ "Failed" ]
+            }
           },
           "Send_Article_to_EventHub": {
             "type": "ServiceProvider",
@@ -89,7 +116,7 @@
           }
         },
         "runAfter": {
-          "Parse_Articles": [ "Succeeded" ]
+          "Filter_Recent_Articles": [ "Succeeded" ]
         }
       }
     },
