@@ -33,8 +33,37 @@
         <!-- New Article Form -->
         <div class="col-lg-4">
             <div class="fxn-sidebar-card p-4 h-100">
-                <h5 class="fxn-sidebar-title mb-3">New Article</h5>
-                <form method="post">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fxn-sidebar-title mb-0">New Article</h5>
+                    @if (Model.Examples.Any())
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="examplesDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Use example">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-lightning-fill" viewBox="0 0 16 16">
+                                    <path d="M5.52.359A.5.5 0 0 1 6 0h4a.5.5 0 0 1 .474.658L8.694 6H12.5a.5.5 0 0 1 .395.807l-7 9a.5.5 0 0 1-.873-.454L6.823 9.5H3.5a.5.5 0 0 1-.48-.641z"/>
+                                </svg>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="examplesDropdown">
+                                <li><h6 class="dropdown-header">Load Example</h6></li>
+                                @for (int i = 0; i < Model.Examples.Count; i++)
+                                {
+                                    var example = Model.Examples[i];
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="loadExample(@i); return false;">
+                                            <small class="text-muted d-block">@example.Category • @(example.Type == "Good" ? "▲" : "▼")</small>
+                                            <strong>@example.Title</strong>
+                                        </a>
+                                    </li>
+                                    @if (i < Model.Examples.Count - 1)
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+                <form method="post" id="newsForm">
                     <div class="mb-3">
                         <label class="fxn-label">Headline *</label>
                         <input type="text" class="form-control fxn-input" name="title" placeholder="e.g. EUR/USD surges on ECB surprise" required>
@@ -180,3 +209,25 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        const examples = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Examples));
+
+        function loadExample(index) {
+            if (index < 0 || index >= examples.length) return;
+            
+            const example = examples[index];
+            const form = document.getElementById('newsForm');
+            
+            form.querySelector('input[name="title"]').value = example.title;
+            form.querySelector('input[name="summary"]').value = example.summary;
+            form.querySelector('textarea[name="content"]').value = example.content;
+            form.querySelector('select[name="type"]').value = example.type;
+            form.querySelector('select[name="category"]').value = example.category;
+            form.querySelector('input[name="author"]').value = example.author;
+            
+            form.querySelector('input[name="title"]').focus();
+        }
+    </script>
+}

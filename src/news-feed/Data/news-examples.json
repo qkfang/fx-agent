@@ -1,0 +1,42 @@
+[
+  {
+    "title": "EUR/USD Rallies on ECB Rate Decision",
+    "summary": "Euro gains 120 pips as European Central Bank holds rates steady",
+    "content": "The EUR/USD pair surged to 1.0850 following the European Central Bank's decision to maintain interest rates at current levels. The central bank cited improving economic indicators and stabilizing inflation as key factors. Market participants are now watching for guidance on future policy direction.",
+    "type": "Good",
+    "category": "FX",
+    "author": "FX News Team"
+  },
+  {
+    "title": "USD/JPY Falls as BOJ Signals Policy Shift",
+    "summary": "Yen strengthens after Bank of Japan hints at potential yield curve adjustments",
+    "content": "The USD/JPY dropped sharply to 148.20 after Bank of Japan officials indicated a possible shift in monetary policy. Governor Ueda's comments suggest the bank may consider adjusting its yield curve control framework in the coming months, prompting traders to unwind bearish yen positions.",
+    "type": "Bad",
+    "category": "FX",
+    "author": "FX News Team"
+  },
+  {
+    "title": "Fed Minutes Reveal Hawkish Tone",
+    "summary": "Federal Reserve officials express concern over persistent inflation pressures",
+    "content": "The latest FOMC meeting minutes showed several members advocating for maintaining higher interest rates for an extended period. The committee emphasized the need to ensure inflation returns sustainably to the 2% target before considering rate cuts. This hawkish stance has strengthened the dollar across major pairs.",
+    "type": "Good",
+    "category": "FX",
+    "author": "FX News Team"
+  },
+  {
+    "title": "GBP/USD Under Pressure on UK GDP Miss",
+    "summary": "Sterling weakens as UK economy contracts more than expected",
+    "content": "The British pound fell 0.8% against the dollar after UK GDP data showed a 0.3% contraction in the latest quarter, worse than the forecasted 0.1% decline. Concerns about the UK economic outlook and potential recession risks have weighed on the currency. Cable now trades at 1.2520.",
+    "type": "Bad",
+    "category": "FX",
+    "author": "FX News Team"
+  },
+  {
+    "title": "AUD/USD Climbs on Strong Employment Data",
+    "summary": "Australian dollar gains as jobless rate drops to decade low",
+    "content": "The Australian dollar jumped 1.2% to 0.6680 following robust employment figures that showed unemployment falling to 3.5%, a 10-year low. The strong labor market data has reduced expectations for near-term rate cuts by the Reserve Bank of Australia, providing support for the currency.",
+    "type": "Good",
+    "category": "FX",
+    "author": "FX News Team"
+  }
+]

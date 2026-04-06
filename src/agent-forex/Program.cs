@@ -28,7 +28,6 @@ var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"] ?? "gpt
 
 AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
-var researchAgent = new FxAgResearch(aiProjectClient, deploymentName);
 
 var apiMcpUrl = app.Configuration["API_MCP_URL"] ?? "http://localhost:5005";
 var mcpClient = await McpClient.CreateAsync(new HttpClientTransport(new HttpClientTransportOptions
@@ -49,6 +48,10 @@ var tradingMcpClient = await McpClient.CreateAsync(new HttpClientTransport(new H
 app.Lifetime.ApplicationStopped.Register(() => tradingMcpClient.DisposeAsync().AsTask().Wait());
 var tradingMcpTools = await tradingMcpClient.ListToolsAsync();
 logger.LogInformation("Trading MCP tools loaded: {Tools}", string.Join(", ", tradingMcpTools.Select(t => t.Name)));
+
+// Create research agent with MCP tools and web search
+var researchTools = new List<AITool>(mcpTools.Cast<AITool>()) { new HostedWebSearchTool() };
+var researchAgent = new FxAgResearch(aiProjectClient, deploymentName, researchTools);
 
 var suggestionAgent = new FxAgSuggestion(aiProjectClient, deploymentName, [.. mcpTools.Cast<AITool>()]);
 var traderAgent = new FxAgTrader(aiProjectClient, deploymentName, [.. tradingMcpTools.Cast<AITool>()]);

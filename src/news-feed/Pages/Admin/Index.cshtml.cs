@@ -2,13 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using FxWebNews.Models;
 using FxWebNews.Services;
+using System.Text.Json;
 
 namespace FxWebNews.Pages.Admin
 {
     public class IndexModel : PageModel
     {
         private readonly NewsService _newsService;
+        private readonly IWebHostEnvironment _environment;
         public List<NewsArticle> News { get; set; } = new();
+        public List<NewsExample> Examples { get; set; } = new();
 
         [TempData]
         public string? Message { get; set; }
@@ -16,14 +19,33 @@ namespace FxWebNews.Pages.Admin
         [TempData]
         public string? MessageType { get; set; }
 
-        public IndexModel(NewsService newsService)
+        public IndexModel(NewsService newsService, IWebHostEnvironment environment)
         {
             _newsService = newsService;
+            _environment = environment;
         }
 
         public void OnGet()
         {
             News = _newsService.GetAllNews();
+            LoadExamples();
+        }
+
+        private void LoadExamples()
+        {
+            try
+            {
+                var examplesPath = Path.Combine(_environment.ContentRootPath, "Data", "news-examples.json");
+                if (File.Exists(examplesPath))
+                {
+                    var json = System.IO.File.ReadAllText(examplesPath);
+                    Examples = JsonSerializer.Deserialize<List<NewsExample>>(json) ?? new();
+                }
+            }
+            catch
+            {
+                Examples = new();
+            }
         }
 
         public IActionResult OnPost(string title, string summary, string content, string type, string category, string author)
