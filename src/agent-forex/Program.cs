@@ -56,6 +56,24 @@ var tradingTool = ResponseTool.CreateMcpTool(
 
 var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 
+// Configure Fabric data agent tool for FxAgInsight
+var fabricConnectionName = app.Configuration["FABRIC_CONNECTION_NAME"];
+Action<DeclarativeAgentDefinition>? insightFabricConfig = null;
+if (!string.IsNullOrEmpty(fabricConnectionName))
+{
+    var fabricConnection = aiProjectClient.Connections.GetConnection(fabricConnectionName);
+    var fabricToolOption = new FabricDataAgentToolOptions
+    {
+        ProjectConnections = { new ToolProjectConnection(projectConnectionId: fabricConnection.Id) }
+    };
+    insightFabricConfig = agentDef => agentDef.Tools.Add(new MicrosoftFabricPreviewTool(fabricToolOption));
+    logger.LogInformation("Fabric data agent tool configured for FxAgInsight with connection: {ConnectionName}", fabricConnectionName);
+}
+else
+{
+    logger.LogWarning("FABRIC_CONNECTION_NAME is not set. FxAgInsight will run without Fabric data agent.");
+}
+
 var researchAgent = new FxAgResearch(
     aiProjectClient,
     deploymentName,
@@ -63,7 +81,7 @@ var researchAgent = new FxAgResearch(
     loggerFactory.CreateLogger<FxAgResearch>()
 );
 var suggestionAgent = new FxAgSuggestion(aiProjectClient, deploymentName, [apiIntgTool], loggerFactory.CreateLogger<FxAgSuggestion>());
-var insightAgent = new FxAgInsight(aiProjectClient, deploymentName, [apiIntgTool], loggerFactory.CreateLogger<FxAgInsight>());
+var insightAgent = new FxAgInsight(aiProjectClient, deploymentName, [apiIntgTool], insightFabricConfig, loggerFactory.CreateLogger<FxAgInsight>());
 var traderAgent = new FxAgTrader(aiProjectClient, deploymentName, [tradingTool], loggerFactory.CreateLogger<FxAgTrader>());
 
 app.MapPost("/research", async (ChatRequest request) =>
