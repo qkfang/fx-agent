@@ -6,6 +6,10 @@
     "WORKFLOWS_SUBSCRIPTION_ID": "",
     "WORKFLOWS_RESOURCE_GROUP_NAME": "",
     "WORKFLOWS_LOCATION_NAME": "eastus",
-    "WORKFLOWS_MANAGEMENT_BASE_URI": "https://management.azure.com/"
+    "WORKFLOWS_MANAGEMENT_BASE_URI": "https://management.azure.com/",
+    "NEWS_FEED_API_URL": "http://localhost:5200",
+    "BLOB_CONNECTION_STRING": "",
+    "EVENTHUB_CONNECTION_STRING": "",
+    "EVENTHUB_NAME": "articles"
   }
 }

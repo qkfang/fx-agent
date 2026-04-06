@@ -1,4 +1,23 @@
 {
   "managedApiConnections": {},
-  "serviceProviderConnections": {}
+  "serviceProviderConnections": {
+    "AzureBlob": {
+      "parameterValues": {
+        "connectionString": "@appsetting('BLOB_CONNECTION_STRING')"
+      },
+      "serviceProvider": {
+        "id": "/serviceProviders/AzureBlob"
+      },
+      "displayName": "AzureBlob"
+    },
+    "EventHub": {
+      "parameterValues": {
+        "connectionString": "@appsetting('EVENTHUB_CONNECTION_STRING')"
+      },
+      "serviceProvider": {
+        "id": "/serviceProviders/eventHub"
+      },
+      "displayName": "EventHub"
+    }
+  }
 }

@@ -1,0 +1,99 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "triggers": {
+      "Recurrence": {
+        "type": "Recurrence",
+        "recurrence": {
+          "frequency": "Minute",
+          "interval": 15
+        }
+      }
+    },
+    "actions": {
+      "Fetch_News_Articles": {
+        "type": "Http",
+        "inputs": {
+          "method": "GET",
+          "uri": "@{concat(appsetting('NEWS_FEED_API_URL'), '/api/news?source=FX News Centre')}"
+        },
+        "runAfter": {}
+      },
+      "Parse_Articles": {
+        "type": "ParseJson",
+        "inputs": {
+          "content": "@body('Fetch_News_Articles')",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "title": { "type": "string" },
+                "summary": { "type": "string" },
+                "content": { "type": "string" },
+                "type": { "type": "string" },
+                "category": { "type": "string" },
+                "publishedDate": { "type": "string" },
+                "author": { "type": "string" },
+                "isPublished": { "type": "boolean" },
+                "publishedAt": { "type": "string" },
+                "source": { "type": "string" }
+              }
+            }
+          }
+        },
+        "runAfter": {
+          "Fetch_News_Articles": [ "Succeeded" ]
+        }
+      },
+      "For_each_article": {
+        "type": "Foreach",
+        "foreach": "@body('Parse_Articles')",
+        "actions": {
+          "Upload_Article_to_Blob": {
+            "type": "ServiceProvider",
+            "inputs": {
+              "parameters": {
+                "containerName": "articles",
+                "blobName": "@{concat('news/', string(items('For_each_article')?['id']), '-', formatDateTime(utcNow(), 'yyyyMMddHHmmss'), '.json')}",
+                "content": "@items('For_each_article')"
+              },
+              "serviceProviderConfiguration": {
+                "connectionName": "AzureBlob",
+                "operationId": "uploadBlob",
+                "serviceProviderId": "/serviceProviders/AzureBlob"
+              }
+            },
+            "runAfter": {}
+          },
+          "Send_Article_to_EventHub": {
+            "type": "ServiceProvider",
+            "inputs": {
+              "parameters": {
+                "eventHubName": "@appsetting('EVENTHUB_NAME')",
+                "message": {
+                  "contentData": "@items('For_each_article')"
+                }
+              },
+              "serviceProviderConfiguration": {
+                "connectionName": "EventHub",
+                "operationId": "sendEvent",
+                "serviceProviderId": "/serviceProviders/eventHub"
+              }
+            },
+            "runAfter": {
+              "Upload_Article_to_Blob": [ "Succeeded" ]
+            }
+          }
+        },
+        "runAfter": {
+          "Parse_Articles": [ "Succeeded" ]
+        }
+      }
+    },
+    "outputs": {}
+  },
+  "kind": "Stateful"
+}
