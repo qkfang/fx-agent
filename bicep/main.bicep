@@ -8,7 +8,7 @@ param azureAIFoundryEndpoint string = 'https://fxag-foundry.openai.azure.com'
 param azureAIFoundryDeployment string = 'gpt-4.1'
 param azureAIFoundryTenantId string = '9d2116ce-afe6-4ce8-8bc3-c7c7b69856c2'
 
-param fabricDatabaseConnectionString string = 'Data Source=zylcdhpgv7uezc6dy7d3ngcwyi-b5l3uoo37ijuxbntne4gq2ska4.database.fabric.microsoft.com,1433;Initial Catalog=fx_data_sqldb-af3802bf-c4ca-4c83-aa5a-366c574104d4;Multiple Active Result Sets=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Authentication=Active Directory Interactive'
+param fabricDatabaseConnectionString string = 'Data Source=zylcdhpgv7uezc6dy7d3ngcwyi-b5l3uoo37ijuxbntne4gq2ska4.database.fabric.microsoft.com,1433;Initial Catalog=fx_data_sqldb-af3802bf-c4ca-4c83-aa5a-366c574104d4;Multiple Active Result Sets=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Authentication=Active Directory Default'
 
 var eventHubFullyQualifiedNamespace = 'esehsyw4hwncugmy8frez7.servicebus.windows.net'
 var eventHubName = 'es_fa73e095-515c-48fd-ad54-1ef70ad7bc34'

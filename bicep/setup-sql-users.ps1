@@ -4,4 +4,9 @@ Invoke-Sqlcmd -ServerInstance "zylcdhpgv7uezc6dy7d3ngcwyi-b5l3uoo37ijuxbntne4gq2
 IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'sp-demo-01')
     CREATE USER [sp-demo-01] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_owner ADD MEMBER [sp-demo-01];
+
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'fxag-intg')
+    CREATE USER [fxag-intg] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_owner ADD MEMBER [fxag-intg];
 "@
+
