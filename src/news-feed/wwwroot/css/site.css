@@ -475,3 +475,49 @@ a:hover { color: var(--fxn-orange-dk); }
 .alert-warning { background: rgba(245,166,35,.1);  border-color: var(--fxn-orange); color: var(--fxn-orange); }
 .alert-danger  { background: rgba(232,64,64,.1);   border-color: var(--fxn-bear);  color: var(--fxn-bear); }
 .btn-close     { filter: invert(1) grayscale(1); }
+
+/* ---- Modal overrides for New Article ---- */
+#newArticleModal .modal-content {
+  background: var(--fxn-black);
+  border: 1px solid var(--fxn-border);
+}
+
+#newArticleModal .modal-header {
+  background: var(--fxn-black);
+  border-bottom: 1px solid var(--fxn-border);
+}
+
+#newArticleModal .modal-title {
+  color: var(--fxn-orange);
+  font-weight: 700;
+}
+
+#newArticleModal .modal-body {
+  background: var(--fxn-black);
+}
+
+#newArticleModal .fxn-label {
+  color: var(--fxn-orange);
+}
+
+#newArticleModal .dropdown-menu {
+  background: var(--fxn-black);
+  border: 1px solid var(--fxn-border);
+}
+
+#newArticleModal .dropdown-item {
+  color: var(--fxn-text);
+}
+
+#newArticleModal .dropdown-item:hover {
+  background: var(--fxn-surface);
+  color: var(--fxn-orange);
+}
+
+#newArticleModal .dropdown-header {
+  color: var(--fxn-orange);
+}
+
+#newArticleModal .dropdown-divider {
+  border-color: var(--fxn-border);
+}
