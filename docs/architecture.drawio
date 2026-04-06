@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="24.0.0">
+  <diagram id="FxArchDiagram" name="FX Trading Agent Architecture">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- =================== EXTERNAL SERVICES =================== -->
+
+        <!-- Bloomberg RSS -->
+        <mxCell id="ext_bloomberg" value="Bloomberg RSS" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="150" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Morningstar RSS -->
+        <mxCell id="ext_morningstar" value="Morningstar RSS" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="210" y="30" width="160" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Azure AI Foundry -->
+        <mxCell id="ext_foundry" value="Azure AI Foundry&#xa;GPT-4.1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="820" y="20" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Azure EventHub -->
+        <mxCell id="ext_eventhub" value="Azure EventHub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="30" width="180" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- =================== NEWS-FEED (Port 5003) =================== -->
+
+        <mxCell id="newsfeed" value="News-Feed  :5003" style="swimlane;startSize=35;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="30" y="140" width="260" height="195" as="geometry" />
+        </mxCell>
+        <mxCell id="newsfeed_apis" value="RSS Feed Aggregator&#xa;  (Bloomberg, Morningstar)&#xa;POST /api/articles/receive&#xa;Azure EventHub Publisher&#xa;Admin UI (Razor Pages)" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;whiteSpace=wrap;fontSize=11;" vertex="1" parent="newsfeed">
+          <mxGeometry x="5" y="40" width="250" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- =================== RESEARCH-ANALYTICS (Port 5003) =================== -->
+
+        <mxCell id="research" value="Research-Analytics  :5003" style="swimlane;startSize=35;fillColor=#ffe6cc;strokeColor=#d6b656;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="310" y="140" width="300" height="195" as="geometry" />
+        </mxCell>
+        <mxCell id="research_apis" value="POST /api/track&#xa;POST /api/articles/receive&#xa;POST /api/chat/ask&#xa;POST /chatkit&#xa;GET  /api/suggestions&#xa;Razor Pages UI" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;whiteSpace=wrap;fontSize=11;" vertex="1" parent="research">
+          <mxGeometry x="5" y="40" width="290" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- =================== AGENT-FOREX (Port 5001) =================== -->
+
+        <mxCell id="agentforex" value="Agent-Forex  :5001" style="swimlane;startSize=35;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="670" y="120" width="540" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="agentforex_apis" value="POST /research   POST /suggestion&#xa;POST /trader       POST /insight&#xa;GET  /health" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;whiteSpace=wrap;fontSize=11;" vertex="1" parent="agentforex">
+          <mxGeometry x="5" y="40" width="530" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Agent chips inside Agent-Forex -->
+        <mxCell id="ag_research" value="FxAgResearch&#xa;(no tools)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontStyle=1;" vertex="1" parent="agentforex">
+          <mxGeometry x="10" y="100" width="110" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ag_suggestion" value="FxAgSuggestion&#xa;(MCP: api-intg)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontStyle=1;" vertex="1" parent="agentforex">
+          <mxGeometry x="140" y="100" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ag_trader" value="FxAgTrader&#xa;(MCP: trading)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontStyle=1;" vertex="1" parent="agentforex">
+          <mxGeometry x="280" y="100" width="120" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="ag_insight" value="FxAgInsight&#xa;(MCP: api-intg)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;fontStyle=1;" vertex="1" parent="agentforex">
+          <mxGeometry x="420" y="100" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ag_label" value="Microsoft Agent Framework 1.0  |  Azure AI Foundry Agent Server v2  |  OpenAI Responses API" style="text;html=1;align=center;verticalAlign=top;fontSize=10;fontStyle=2;fontColor=#9673a6;" vertex="1" parent="agentforex">
+          <mxGeometry x="5" y="165" width="530" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- =================== API-INTG (Port 5005) =================== -->
+
+        <mxCell id="apiintg" value="API-INTG  :5005  (REST + MCP Server)" style="swimlane;startSize=35;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="30" y="410" width="350" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="apiintg_apis" value="GET/POST /api/customers&#xa;GET/POST /api/portfolios&#xa;GET/POST /api/traders&#xa;GET/POST /api/researcharticles&#xa;GET/POST /api/researchdrafts&#xa;GET/POST /api/researchpatterns&#xa;GET/POST /api/traderrecommendations&#xa;GET/POST /api/tradernewsfeeds&#xa;GET/POST /api/customerhistories&#xa;GET/POST /api/customerpreferences&#xa;POST /mcp  (27 MCP tools)" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;whiteSpace=wrap;fontSize=10;" vertex="1" parent="apiintg">
+          <mxGeometry x="5" y="40" width="340" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- =================== TRADING-PLATFORM (Port 5249) =================== -->
+
+        <mxCell id="trading" value="Trading-Platform  :5249  (REST + MCP Server)" style="swimlane;startSize=35;fillColor=#ffe6cc;strokeColor=#d6b656;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="400" y="410" width="320" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="trading_apis" value="GET  /api/trades&#xa;POST /api/trades&#xa;GET  /api/portfolio&#xa;GET  /api/transactions/summary&#xa;POST /mcp  (2 MCP tools)&#xa;  - get_transactions(limit)&#xa;  - get_fund_summary()&#xa;Razor Pages Trading UI" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;whiteSpace=wrap;fontSize=11;" vertex="1" parent="trading">
+          <mxGeometry x="5" y="40" width="310" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- =================== CRM-BROKER (Port 5269) =================== -->
+
+        <mxCell id="crm" value="CRM-Broker  :5269" style="swimlane;startSize=35;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="740" y="410" width="390" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="crm_apis" value="GET  /api/fx/rate           GET  /api/fx/quote&#xa;GET  /api/fx/history        GET  /api/fx/orderbook&#xa;GET  /api/fx/status         GET  /api/fx/transactions&#xa;POST /api/fx/trend          POST /api/fx/buy&#xa;POST /api/fx/sell&#xa;GET  /api/accounts          GET  /api/accounts/{id}/balance&#xa;POST /api/accounts/{id}/buy   POST /api/accounts/{id}/sell&#xa;POST /api/accounts/{id}/close/{positionId}&#xa;POST /api/accounts/leads    GET  /api/accounts/leads&#xa;GET  /api/customers/{id}/profile&#xa;GET  /api/customers/{id}/portfolios&#xa;POST /api/aurora/trade      GET  /api/aurora/accounts&#xa;GET  /mcp/tools             POST /mcp/call" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;whiteSpace=wrap;fontSize=10;" vertex="1" parent="crm">
+          <mxGeometry x="5" y="40" width="380" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- =================== DATA LAYER =================== -->
+
+        <!-- Microsoft Fabric SQL DB -->
+        <mxCell id="db_fabric" value="Microsoft Fabric SQL DB&#xa;fx_data_sqldb&#xa;Customers · Portfolios · Traders&#xa;Research · Preferences · History" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="130" y="710" width="290" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- In-Memory Trading Data -->
+        <mxCell id="db_memory" value="In-Memory Store&#xa;Trades · Fund Summary&#xa;(Trading-Platform)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="470" y="710" width="220" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Fabric SQL (CRM) -->
+        <mxCell id="db_crm" value="Microsoft Fabric SQL DB&#xa;fx_data_sqldb&#xa;Customers · Portfolios · FX History" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="770" y="710" width="290" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- =================== EDGES / CONNECTIONS =================== -->
+
+        <!-- Bloomberg → News-Feed -->
+        <mxCell id="e_bloomberg_newsfeed" value="RSS GET" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.2;entryY=0;strokeColor=#b85450;fontColor=#b85450;fontSize=10;" edge="1" source="ext_bloomberg" target="newsfeed" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Morningstar → News-Feed -->
+        <mxCell id="e_morningstar_newsfeed" value="RSS GET" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#b85450;fontColor=#b85450;fontSize=10;" edge="1" source="ext_morningstar" target="newsfeed" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- News-Feed → EventHub -->
+        <mxCell id="e_newsfeed_eventhub" value="publish events" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.3;entryX=0;entryY=0.5;strokeColor=#0078D4;fontColor=#0078D4;fontSize=10;" edge="1" source="newsfeed" target="ext_eventhub" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- News-Feed → Research-Analytics -->
+        <mxCell id="e_newsfeed_research" value="POST /api/articles/receive" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#6c8ebf;fontColor=#6c8ebf;fontSize=10;" edge="1" source="newsfeed" target="research" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Research-Analytics → Agent-Forex (Insight) -->
+        <mxCell id="e_research_agent" value="POST /insight" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.3;entryX=0;entryY=0.5;strokeColor=#9673a6;fontColor=#9673a6;fontSize=10;" edge="1" source="research" target="agentforex" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Agent-Forex → Azure AI Foundry -->
+        <mxCell id="e_agent_foundry" value="Azure AI SDK" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;strokeColor=#0078D4;fontColor=#0078D4;fontSize=10;" edge="1" source="agentforex" target="ext_foundry" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Agent-Forex → API-INTG (MCP, 27 tools) -->
+        <mxCell id="e_agent_apiintg" value="MCP client&#xa;27 tools" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.1;exitY=1;entryX=0.7;entryY=0;strokeColor=#82b366;fontColor=#82b366;fontSize=10;" edge="1" source="agentforex" target="apiintg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Agent-Forex → Trading-Platform (MCP, 2 tools) -->
+        <mxCell id="e_agent_trading" value="MCP client&#xa;2 tools" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.3;exitY=1;entryX=0.5;entryY=0;strokeColor=#d6b656;fontColor=#d6b656;fontSize=10;" edge="1" source="agentforex" target="trading" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Research-Analytics → API-INTG (data) -->
+        <mxCell id="e_research_apiintg" value="REST data" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.2;exitY=1;entryX=0.5;entryY=0;strokeColor=#82b366;fontColor=#82b366;fontSize=10;" edge="1" source="research" target="apiintg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Research-Analytics → CRM-Broker (leads + FX quote) -->
+        <mxCell id="e_research_crm" value="POST /api/accounts/leads&#xa;GET /api/fx/quote" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.7;entryX=0;entryY=0.3;strokeColor=#82b366;fontColor=#82b366;fontSize=10;" edge="1" source="research" target="crm" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- CRM-Broker → API-INTG (HTTP) -->
+        <mxCell id="e_crm_apiintg" value="REST HTTP" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;entryX=1;entryY=0.5;strokeColor=#82b366;fontColor=#82b366;fontSize=10;" edge="1" source="crm" target="apiintg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- CRM-Broker → Trading-Platform (HTTP) -->
+        <mxCell id="e_crm_trading" value="REST HTTP" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.1;exitY=0;entryX=0.9;entryY=1;strokeColor=#d6b656;fontColor=#d6b656;fontSize=10;" edge="1" source="crm" target="trading" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API-INTG → Fabric SQL -->
+        <mxCell id="e_apiintg_db" value="EF Core / SQL" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#666666;fontColor=#666666;fontSize=10;" edge="1" source="apiintg" target="db_fabric" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Trading-Platform → In-Memory -->
+        <mxCell id="e_trading_db" value="In-Memory" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#666666;fontColor=#666666;fontSize=10;" edge="1" source="trading" target="db_memory" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- CRM-Broker → Fabric SQL (CRM) -->
+        <mxCell id="e_crm_db" value="EF Core / SQL" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#666666;fontColor=#666666;fontSize=10;" edge="1" source="crm" target="db_crm" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
