@@ -1,4 +1,4 @@
-name: 46 Deploy API Integration
+name: 20 Deploy API Integration
 
 on:
   push:
