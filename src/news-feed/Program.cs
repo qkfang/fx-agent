@@ -33,4 +33,12 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+app.MapGet("/api/news", (string source, DateTime? from, NewsService newsService) =>
+{
+    var fromUtc = from.HasValue ? DateTime.SpecifyKind(from.Value, DateTimeKind.Utc) : (DateTime?)null;
+    var articles = newsService.GetNewsBySource(source, fromUtc);
+    return Results.Ok(articles);
+})
+.WithName("GetNewsBySource");
+
 app.Run();

@@ -75,5 +75,16 @@ namespace FxWebNews.Services
             SaveNews();
             return true;
         }
+
+        public List<NewsArticle> GetNewsBySource(string source, DateTime? fromUtc = null)
+        {
+            var query = _newsArticles
+                .Where(n => n.IsPublished && string.Equals(n.Source, source, StringComparison.OrdinalIgnoreCase));
+
+            if (fromUtc.HasValue)
+                query = query.Where(n => n.PublishedAt.HasValue && n.PublishedAt.Value >= fromUtc.Value);
+
+            return query.OrderByDescending(n => n.PublishedAt).ToList();
+        }
     }
 }

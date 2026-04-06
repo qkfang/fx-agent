@@ -24,7 +24,7 @@ var webAppPlanName = '${baseName}-asp'
 var staticWebAppName = '${baseName}-swa'
 var foundryName = '${baseName}-foundry'
 var fabricCapacityName = '${baseName}fabric'
-var bingSearchName = '${baseName}-search-${uniqueSuffix}'
+var logicAppStandardName = '${baseName}-logic'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: webAppPlanName
@@ -153,17 +153,6 @@ module crmBrokerApp 'modules/webapp.bicep' = {
   }
 }
 
-module bingSearch 'modules/bingsearch.bicep' = {
-  name: 'bingSearchDeployment'
-  params: {
-    name: bingSearchName
-    location: location
-    tags: commonTags
-    webAppPrincipalId: crmBrokerApp.outputs.principalId
-    principals: principals
-  }
-}
-
 module fxAgentApp 'modules/webapp.bicep' = {
   name: 'fxAgentDeployment'
   params: {
@@ -175,7 +164,6 @@ module fxAgentApp 'modules/webapp.bicep' = {
       { name: 'AZURE_AI_PROJECT_ENDPOINT', value: azureAIFoundryEndpoint }
       { name: 'MODEL_DEPLOYMENT_NAME', value: azureAIFoundryDeployment }
       { name: 'CRM_BROKER_URL', value: 'https://${baseName}-broker.azurewebsites.net' }
-      { name: 'AZURE_SEARCH_ENDPOINT', value: bingSearch.outputs.endpoint }
     ]
   }
 }
@@ -255,5 +243,16 @@ module staticWebApp 'modules/staticwebapp.bicep' = {
   params: {
     name: staticWebAppName
     location: location
+  }
+}
+
+module logicAppStandard 'modules/logicapp-standard.bicep' = {
+  name: 'logicAppStandardDeployment'
+  params: {
+    name: logicAppStandardName
+    location: location
+    tags: commonTags
+    storageAccountName: storageAccountName
+    appInsightsConnectionString: appInsights.outputs.connectionString
   }
 }
