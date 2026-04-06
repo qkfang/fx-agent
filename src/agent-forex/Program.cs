@@ -24,12 +24,12 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 var endpoint = app.Configuration["AZURE_AI_PROJECT_ENDPOINT"]
     ?? throw new InvalidOperationException("AZURE_AI_PROJECT_ENDPOINT is not set.");
-var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"] ?? "gpt-4.1";
+var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"];
 
 AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
 
-var apiMcpUrl = app.Configuration["API_INTG_MCP_URL"] ?? "http://localhost:5005";
+var apiMcpUrl = app.Configuration["API_INTG_MCP_URL"];
 var mcpClient = await McpClient.CreateAsync(new HttpClientTransport(new HttpClientTransportOptions
 {
     Endpoint = new Uri($"{apiMcpUrl}/mcp"),
@@ -52,7 +52,7 @@ var suggestionToolNames = new[] {
     "update_portfolio", "create_portfolio", "get_portfolio", "delete_portfolio" };
 var suggestionTools = mcpTools.Where(t => suggestionToolNames.Contains(t.Name)).ToList();
 
-var tradingMcpUrl = app.Configuration["TRADING_PLATFORM_MCP_URL"] ?? "http://localhost:5249";
+var tradingMcpUrl = app.Configuration["TRADING_PLATFORM_MCP_URL"];
 var tradingMcpClient = await McpClient.CreateAsync(new HttpClientTransport(new HttpClientTransportOptions
 {
     Endpoint = new Uri($"{tradingMcpUrl}/mcp"),
