@@ -2,6 +2,7 @@
 -- Run against the FxDatabase after migrations have been applied
 
 -- Clear existing data (order matters for FK constraints)
+DELETE FROM TraderSuggestions;
 DELETE FROM TraderNewsFeeds;
 DELETE FROM TraderRecommendations;
 DELETE FROM CustomerHistories;
@@ -24,6 +25,7 @@ DBCC CHECKIDENT ('TraderRecommendations', RESEED, 0);
 DBCC CHECKIDENT ('TraderNewsFeeds', RESEED, 0);
 DBCC CHECKIDENT ('ResearchDrafts', RESEED, 0);
 DBCC CHECKIDENT ('ResearchPatterns', RESEED, 0);
+DBCC CHECKIDENT ('TraderSuggestions', RESEED, 0);
 
 -------------------------------------------------------
 -- Customers (10 records)
@@ -394,3 +396,23 @@ INSERT INTO ResearchPatterns (CurrencyPair, PatternName, Timeframe, Direction, C
 ('EUR/GBP', 'ECB-BoE Rate Convergence', 'Weekly', 'Sell', 73.60, 'ECB holding while BoE signals potential cuts. Rate spread narrowing favors EUR over GBP. EUR/GBP to 0.8850.', 'Emily Carter', '2026-04-03T15:00:00', '2026-05-15T23:59:00', 'Active'),
 ('USD/MXN', 'Banxico Independence Threat', 'Monthly', 'Buy', 82.10, 'Mexican government proposing central bank reform limiting autonomy. Credibility concerns boosting USD/MXN toward 17.65.', 'Hugo Santos', '2026-03-18T16:00:00', '2026-06-30T23:59:00', 'Active'),
 ('AUD/NZD', 'RBA-RBNZ Divergence', 'Weekly', 'Sell', 74.90, 'RBA cutting while RBNZ on hold. Trans-Tasman rate differential shifting in NZD favor. AUD/NZD downside to 1.0650.', 'Liam O''Brien', '2026-04-02T04:30:00', '2026-05-01T23:59:00', 'Active');
+
+-------------------------------------------------------
+-- TraderSuggestions (15 records)
+-------------------------------------------------------
+INSERT INTO TraderSuggestions (TraderId, CustomerId, ResearchArticleId, Reasoning, RelevanceScore, Status, CreatedAt) VALUES
+(1, 1, 1, 'The USD Strength Outlook aligns with this customer''s G10 swing strategy and active EUR/USD exposure. USD bullish sentiment justifies reviewing or trimming long EUR positions.', 'High', 'Sent', '2026-03-29T09:15:00'),
+(2, 3, 2, 'EUR/USD Technical Levels article directly supports this customer''s euro-focused portfolio. The identified support at 1.0780 is actionable for their current long EUR position management.', 'High', 'Sent', '2026-03-31T10:45:00'),
+(3, 4, 5, 'JPY strength thesis in the BOJ Policy Shift article matches this customer''s USD/JPY short preference and Asian session trading focus. Tactical short entry levels are clearly defined.', 'High', 'Pending', '2026-04-01T07:30:00'),
+(1, 2, 6, 'The AUD/NZD Relative Value article fits this customer''s Antipodean pair preference. Current AUD/NZD dislocation represents a carry-efficient opportunity within their risk parameters.', 'Medium', 'Sent', '2026-04-03T11:00:00'),
+(4, 5, 8, 'Scandinavian FX analysis on NOK/SEK divergence suits this customer''s Nordic currency mandate at Nordic FX Partners. Mean-reversion setup with clear risk levels aligns with their swing style.', 'High', 'Pending', '2026-04-04T08:00:00'),
+(2, 1, 10, 'GBP/JPY Breakout Watch from Marco Rossi is relevant given this customer''s GBP/USD position and volatility appetite. A correlated breakout could affect hedging strategy and cross positioning.', 'Medium', 'Pending', '2026-04-05T09:30:00'),
+(5, 8, 7, 'EM Weekly Review highlights BRL and MXN outperformance directly relevant to this LatAm FX Advisors client. Commodity price tailwinds support existing long MXN position rationale.', 'High', 'Sent', '2026-04-05T08:00:00'),
+(3, 4, 3, 'BOJ Policy Shift article reinforces long JPY conviction for this Asia Macro Fund client. BOJ ending NIRP is the catalyst they flagged as a trade trigger in their preference profile.', 'High', 'Sent', '2026-04-02T07:00:00'),
+(1, 6, 9, 'CHF Safe Haven Flows article is relevant for this Gulf Finance Group client holding defensive positions. SNB intervention signals provide timing cues for EUR/CHF tactical trades.', 'Medium', 'Pending', '2026-04-04T10:00:00'),
+(4, 7, 11, 'Quarterly FX Forecast Update covers USD/CNH dynamics relevant to a Seoul Wealth Management client with Asia exposure. Revised forecasts may prompt portfolio rebalancing discussion.', 'Medium', 'Pending', '2026-04-06T09:00:00'),
+(2, 2, 4, 'Central Bank Watch April 2026 is actionable for this institutional day trader. ECB decision probability analysis provides pre-event positioning guidance for their EUR/USD strategy.', 'High', 'Sent', '2026-04-02T08:00:00'),
+(6, 5, 6, 'The NOK/SEK Divergence article directly matches this Nordic FX Partners client''s Scandinavian currency mandate. Our desk recommends they review the long NOK/SEK setup with 0.9850 target.', 'High', 'Pending', '2026-04-05T07:45:00'),
+(5, 9, 7, 'EM Weekly Review outlines MXN and BRL outperformance consistent with this client''s commodity-linked EM long bias at Oceania Partners. Supports holding current positions into the week ahead.', 'Medium', 'Sent', '2026-04-06T08:30:00'),
+(1, 3, 1, 'USD Strength Outlook Q2 highlights DXY range 104-107, directly impacting this client''s EUR/USD short hedge at Euro Capital Ltd. Bearish EUR view aligns with their treasury hedging mandate.', 'High', 'Sent', '2026-03-30T09:00:00'),
+(3, 10, 5, 'BOJ Policy Shift with USD/JPY downside targets is highly relevant for this client''s frontier market diversification strategy at Frontier Markets Inc. JPY longs complement their current safe-haven allocation.', 'Medium', 'Pending', '2026-04-06T11:00:00');

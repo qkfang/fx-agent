@@ -304,4 +304,88 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         var recs = await db.TraderRecommendations.Where(r => r.TraderId == traderId).ToListAsync();
         return JsonSerializer.Serialize(recs, _jsonOptions);
     }
+
+    [McpServerTool(Name = "get_all_trader_suggestions"), Description("Get all trader suggestions matching research articles with customers")]
+    public async Task<string> GetAllTraderSuggestions()
+    {
+        logger.LogTrace("MCP tool called: get_all_trader_suggestions");
+        var suggestions = await db.TraderSuggestions
+            .Include(s => s.Trader)
+            .Include(s => s.Customer)
+            .Include(s => s.ResearchArticle)
+            .ToListAsync();
+        return JsonSerializer.Serialize(suggestions, _jsonOptions);
+    }
+
+    [McpServerTool(Name = "get_trader_suggestions"), Description("Get suggestions created by a specific trader")]
+    public async Task<string> GetTraderSuggestions([Description("Trader ID")] int traderId)
+    {
+        logger.LogTrace("MCP tool called: get_trader_suggestions, traderId={TraderId}", traderId);
+        var suggestions = await db.TraderSuggestions
+            .Include(s => s.Customer)
+            .Include(s => s.ResearchArticle)
+            .Where(s => s.TraderId == traderId)
+            .ToListAsync();
+        return JsonSerializer.Serialize(suggestions, _jsonOptions);
+    }
+
+    [McpServerTool(Name = "get_customer_suggestions"), Description("Get research article suggestions for a specific customer")]
+    public async Task<string> GetCustomerSuggestions([Description("Customer ID")] int customerId)
+    {
+        logger.LogTrace("MCP tool called: get_customer_suggestions, customerId={CustomerId}", customerId);
+        var suggestions = await db.TraderSuggestions
+            .Include(s => s.Trader)
+            .Include(s => s.ResearchArticle)
+            .Where(s => s.CustomerId == customerId)
+            .ToListAsync();
+        return JsonSerializer.Serialize(suggestions, _jsonOptions);
+    }
+
+    [McpServerTool(Name = "create_trader_suggestion"), Description("Create a new trader suggestion matching a research article with a customer")]
+    public async Task<string> CreateTraderSuggestion(
+        [Description("Trader ID creating the suggestion")] int traderId,
+        [Description("Customer ID to receive the suggestion")] int customerId,
+        [Description("Research article ID being suggested")] int researchArticleId,
+        [Description("Reasoning explaining why this article is relevant for this customer")] string reasoning,
+        [Description("Relevance score: High, Medium, or Low")] string relevanceScore = "Medium")
+    {
+        logger.LogTrace("MCP tool called: create_trader_suggestion, traderId={TraderId}, customerId={CustomerId}, articleId={ArticleId}", traderId, customerId, researchArticleId);
+        var suggestion = new TraderSuggestion
+        {
+            TraderId = traderId,
+            CustomerId = customerId,
+            ResearchArticleId = researchArticleId,
+            Reasoning = reasoning,
+            RelevanceScore = relevanceScore,
+            Status = "Pending",
+            CreatedAt = DateTime.UtcNow
+        };
+        db.TraderSuggestions.Add(suggestion);
+        await db.SaveChangesAsync();
+        return JsonSerializer.Serialize(suggestion, _jsonOptions);
+    }
+
+    [McpServerTool(Name = "update_trader_suggestion_status"), Description("Update the status of a trader suggestion (Pending, Sent, Dismissed)")]
+    public async Task<string> UpdateTraderSuggestionStatus(
+        [Description("Suggestion ID")] int id,
+        [Description("New status: Pending, Sent, or Dismissed")] string status)
+    {
+        logger.LogTrace("MCP tool called: update_trader_suggestion_status, id={Id}, status={Status}", id, status);
+        var suggestion = await db.TraderSuggestions.FindAsync(id);
+        if (suggestion is null) return JsonSerializer.Serialize(new { error = "Not found" });
+        suggestion.Status = status;
+        await db.SaveChangesAsync();
+        return JsonSerializer.Serialize(new { success = true });
+    }
+
+    [McpServerTool(Name = "delete_trader_suggestion"), Description("Delete a trader suggestion")]
+    public async Task<string> DeleteTraderSuggestion([Description("Suggestion ID")] int id)
+    {
+        logger.LogTrace("MCP tool called: delete_trader_suggestion, id={Id}", id);
+        var suggestion = await db.TraderSuggestions.FindAsync(id);
+        if (suggestion is null) return JsonSerializer.Serialize(new { error = "Not found" });
+        db.TraderSuggestions.Remove(suggestion);
+        await db.SaveChangesAsync();
+        return JsonSerializer.Serialize(new { success = true });
+    }
 }

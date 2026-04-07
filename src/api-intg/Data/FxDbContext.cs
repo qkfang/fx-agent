@@ -17,6 +17,7 @@ public class FxDbContext : DbContext
     public DbSet<Trader> Traders => Set<Trader>();
     public DbSet<TraderRecommendation> TraderRecommendations => Set<TraderRecommendation>();
     public DbSet<TraderNewsFeed> TraderNewsFeeds => Set<TraderNewsFeed>();
+    public DbSet<TraderSuggestion> TraderSuggestions => Set<TraderSuggestion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -154,6 +155,26 @@ public class FxDbContext : DbContext
             entity.Property(e => e.ConfidenceScore).HasPrecision(5, 2);
             entity.Property(e => e.DetectedBy).HasMaxLength(200);
             entity.Property(e => e.Status).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<TraderSuggestion>(entity =>
+        {
+            entity.ToTable("TraderSuggestions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.RelevanceScore).HasMaxLength(20);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.HasOne(e => e.Trader)
+                  .WithMany(t => t.Suggestions)
+                  .HasForeignKey(e => e.TraderId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Customer)
+                  .WithMany()
+                  .HasForeignKey(e => e.CustomerId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.ResearchArticle)
+                  .WithMany()
+                  .HasForeignKey(e => e.ResearchArticleId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

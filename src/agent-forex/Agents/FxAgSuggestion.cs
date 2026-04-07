@@ -31,10 +31,8 @@ public class FxAgSuggestion : BaseAgent
 
         step 6: Use `get_all_traders` to retrieve available traders and their specializations.
 
-        step 7: Produce a structured recommendation that includes:
-          - A brief summary of the research note insight
-          - A list of customers to contact, with the reason each customer is relevant
-          - The suggested trader to handle outreach for each customer, based on trader specialization and region
-          - Suggested talking points for each customer based on their preferences and positions
+        step 7: 
+
+        
         """;
 }

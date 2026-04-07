@@ -49,17 +49,24 @@ namespace FxWebUI.Services
             File.WriteAllText(transactionsPath, json);
         }
 
-        public List<Transaction> GetTransactions(string accountId)
-        {
-            lock (_lock)
-                return _transactions.Where(t => t.AccountId == accountId).OrderByDescending(t => t.DateTime).ToList();
-        }
-
-        public FundSummary GetFundSummary(string accountId)
+        public List<Transaction> GetTransactions(string? accountId = null)
         {
             lock (_lock)
             {
-                var txns = _transactions.Where(t => t.AccountId == accountId).ToList();
+                var query = string.IsNullOrEmpty(accountId)
+                    ? _transactions
+                    : _transactions.Where(t => t.AccountId == accountId).ToList();
+                return query.OrderByDescending(t => t.DateTime).ToList();
+            }
+        }
+
+        public FundSummary GetFundSummary(string? accountId = null)
+        {
+            lock (_lock)
+            {
+                var txns = string.IsNullOrEmpty(accountId)
+                    ? _transactions
+                    : _transactions.Where(t => t.AccountId == accountId).ToList();
                 var summary = new FundSummary();
                 foreach (var t in txns)
                 {

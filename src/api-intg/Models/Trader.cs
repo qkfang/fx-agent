@@ -13,4 +13,5 @@ public class Trader
 
     public ICollection<TraderRecommendation> Recommendations { get; set; } = new List<TraderRecommendation>();
     public ICollection<TraderNewsFeed> NewsFeeds { get; set; } = new List<TraderNewsFeed>();
+    public ICollection<TraderSuggestion> Suggestions { get; set; } = new List<TraderSuggestion>();
 }
