@@ -169,7 +169,6 @@ module fxAgentApp 'modules/webapp.bicep' = {
     extraAppSettings: [
       { name: 'AZURE_AI_PROJECT_ENDPOINT', value: azureAIFoundryEndpoint }
       { name: 'AZURE_AI_MODEL_DEPLOYMENT_NAME', value: azureAIFoundryDeployment }
-      { name: 'CRM_BROKER_URL', value: 'https://${baseName}-broker.azurewebsites.net' }
       { name: 'API_INTG_MCP_URL', value: 'https://${baseName}-intg.azurewebsites.net' }
       { name: 'TRADING_PLATFORM_MCP_URL', value: 'https://${baseName}-trading.azurewebsites.net' }
       { name: 'FABRIC_CONNECTION_NAME', value: azureFoundry.outputs.fabricConnectionName }

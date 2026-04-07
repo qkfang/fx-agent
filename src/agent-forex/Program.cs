@@ -37,7 +37,16 @@ var deploymentName = app.Configuration["AZURE_AI_MODEL_DEPLOYMENT_NAME"]
     ?? throw new InvalidOperationException("AZURE_AI_MODEL_DEPLOYMENT_NAME is not set.");
 var webSearchTool = ResponseTool.CreateWebSearchTool();
 
-AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
+var scope = "https://ai.azure.com/.default";
+var tokenRequestContext = new Azure.Core.TokenRequestContext([scope]);
+
+var tenantId = app.Configuration["AZURE_TENANT_ID"];
+var defaultCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+{
+    TenantId = tenantId
+});
+
+AIProjectClient aiProjectClient = new(new Uri(endpoint), defaultCredential);
 
 var apiMcpUrl = app.Configuration["API_INTG_MCP_URL"];
 var tradingMcpUrl = app.Configuration["TRADING_PLATFORM_MCP_URL"];
