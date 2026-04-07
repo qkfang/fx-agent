@@ -1,7 +1,7 @@
 [
-  { "id": 1, "name": "Alice Johnson", "email": "ajohnson7482@example.com", "phone": "+1-555-0101", "company": "Global Trading Co", "createdAt": "2025-09-15T08:30:00Z" },
-  { "id": 2, "name": "Diana Chen", "email": "dchen9135@example.com", "phone": "+852-3456-7890", "company": "Asia Macro Fund", "createdAt": "2025-11-05T11:45:00Z" },
-  { "id": 3, "name": "Fatima Al-Rashid", "email": "falrashid2068@example.com", "phone": "+971-4-555-6789", "company": "Gulf Finance Group", "createdAt": "2025-12-01T10:30:00Z" },
-  { "id": 4, "name": "Isla Thompson", "email": "ithompson5391@example.com", "phone": "+61-2-5555-1234", "company": "Oceania Partners", "createdAt": "2026-02-14T08:00:00Z" },
-  { "id": 5, "name": "James Okafor", "email": "jokafor8247@example.com", "phone": "+234-1-555-9012", "company": "Frontier Markets Inc", "createdAt": "2026-03-01T12:30:00Z" }
+  { "id": 1, "name": "Alice Johnson", "email": "ajohnson7482@mail.com", "phone": "+1-555-0101", "company": "Global Trading Co", "createdAt": "2025-09-15T08:30:00Z" },
+  { "id": 2, "name": "Diana Chen", "email": "dchen9135@outlook.com", "phone": "+852-3456-7890", "company": "Asia Macro Fund", "createdAt": "2025-11-05T11:45:00Z" },
+  { "id": 3, "name": "Fatima Al-Rashid", "email": "falrashid2068@yahoo.com", "phone": "+971-4-555-6789", "company": "Gulf Finance Group", "createdAt": "2025-12-01T10:30:00Z" },
+  { "id": 4, "name": "Isla Thompson", "email": "ithompson5391@proton.me", "phone": "+61-2-5555-1234", "company": "Oceania Partners", "createdAt": "2026-02-14T08:00:00Z" },
+  { "id": 5, "name": "James Okafor", "email": "jokafor8247@fastmail.com", "phone": "+234-1-555-9012", "company": "Frontier Markets Inc", "createdAt": "2026-03-01T12:30:00Z" }
 ]
