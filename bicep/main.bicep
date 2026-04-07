@@ -172,6 +172,7 @@ module fxAgentApp 'modules/webapp.bicep' = {
       { name: 'API_INTG_MCP_URL', value: 'https://${baseName}-intg.azurewebsites.net' }
       { name: 'TRADING_PLATFORM_MCP_URL', value: 'https://${baseName}-trading.azurewebsites.net' }
       { name: 'FABRIC_CONNECTION_NAME', value: azureFoundry.outputs.fabricConnectionName }
+      { name: 'AZURE_TENANT_ID', value: azureAIFoundryTenantId }
     ]
   }
 }
