@@ -207,6 +207,28 @@ resource userAIDeveloperRole 'Microsoft.Authorization/roleAssignments@2022-04-01
   }
 }]
 
+resource researchAppAIUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(foundryAccount.id, '${baseName}-research', azureAIUserRoleId)
+  scope: foundryAccount
+  dependsOn: [azureFoundry]
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIUserRoleId)
+    principalId: researchAnalyticsApp.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource researchAppAIDeveloperRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(foundryAccount.id, '${baseName}-research', azureAIDeveloperRoleId)
+  scope: foundryAccount
+  dependsOn: [azureFoundry]
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
+    principalId: researchAnalyticsApp.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
 module keyVault 'modules/keyvault.bicep' = {
   name: 'keyVaultDeployment'
   params: {

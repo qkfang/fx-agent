@@ -7,11 +7,11 @@ namespace FxIntegrationApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PortfoliosController : ControllerBase
+public class CustomerPortfoliosController : ControllerBase
 {
     private readonly FxDbContext _db;
 
-    public PortfoliosController(FxDbContext db) => _db = db;
+    public CustomerPortfoliosController(FxDbContext db) => _db = db;
 
     [HttpGet("customer/{customerId}")]
     public async Task<ActionResult<List<CustomerPortfolio>>> GetByCustomer(int customerId)
