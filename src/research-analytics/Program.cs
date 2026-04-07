@@ -129,10 +129,16 @@ app.MapPost("/api/agent/trader", async (HttpContext ctx, IConfiguration config) 
     var projectEndpoint = config["FoundryAgent:ProjectEndpoint"]
         ?? "https://fxag-foundry.services.ai.azure.com/api/projects/fxag-foundry-project";
 
-    var projectClient = new Azure.AI.Projects.AIProjectClient(
-        new Uri(projectEndpoint), new AzureCliCredential());
 
-    var responseClient = projectClient.ProjectOpenAIClient
+    var tenantId = app.Configuration["AZURE_TENANT_ID"];
+    var defaultCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+    {
+        TenantId = tenantId
+    });
+
+    AIProjectClient aiProjectClient = new(new Uri(projectEndpoint), defaultCredential);
+
+    var responseClient = aiProjectClient.ProjectOpenAIClient
         .GetProjectResponsesClientForAgent("fxag-trader");
 
     var nextOptions = new OpenAI.Responses.CreateResponseOptions

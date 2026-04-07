@@ -250,6 +250,7 @@ module crmBrokerApp 'modules/webapp.bicep' = {
       { name: 'AzureStorage__AccountName', value: storageAccountName }
       { name: 'IntegrationApiUrl', value: 'https://${baseName}-intg.azurewebsites.net' }
       { name: 'TradingPlatformUrl', value: 'https://${baseName}-trading.azurewebsites.net' }
+      { name: 'ConnectionStrings__FxDatabase', value: fabricDatabaseConnectionString }
     ]
   }
 }
@@ -298,8 +299,12 @@ module researchAnalyticsApp 'modules/webapp.bicep' = {
     appInsightsConnectionString: appInsights.outputs.connectionString
     appCommandLine: 'dotnet FxWebPortal.dll'
     extraAppSettings: [
+      { name: 'ConnectionStrings__FxDatabase', value: fabricDatabaseConnectionString }
       { name: 'IntegrationApi__BaseUrl', value: 'https://${baseName}-intg.azurewebsites.net' }
       { name: 'CrmBrokerApi__EndpointUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/accounts/leads' }
+      { name: 'TradingPlatformUrl', value: 'https://${baseName}-trading.azurewebsites.net' }
+      { name: 'FoundryAgent__ProjectEndpoint', value: azureAIFoundryEndpoint }
+      { name: 'FoundryAgent__EndpointUrl', value: 'https://${baseName}-agent.azurewebsites.net' }
       { name: 'Aurora__ApiUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/aurora' }
       { name: 'Aurora__QuoteUrl', value: 'https://${baseName}-broker.azurewebsites.net/api/fx/quote' }
     ]
