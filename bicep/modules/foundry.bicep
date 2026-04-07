@@ -121,15 +121,19 @@ resource userAIUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
 }]
 
 
-resource fabricConnection 'Microsoft.CognitiveServices/accounts/connections@2025-06-01' = if (!empty(fabricDataAgentUrl)) {
+resource fabricConnection 'Microsoft.CognitiveServices/accounts/connections@2025-10-01-preview' = if (!empty(fabricDataAgentUrl)) {
   parent: aiHub
   name: 'fabric-data-agent'
   properties: {
+    authType: 'CustomKeys'
     category: 'CustomKeys'
-    target: fabricDataAgentUrl
-    authType: 'AAD'
+    target: '-'
+    useWorkspaceManagedIdentity: false
+    isSharedToAll: true
     metadata: {
-      type: 'MicrosoftFabricDataAgent'
+      type: 'fabric_dataagent_preview'
+      'workspace-id': '39ba570f-fadb-4b13-85b3-6938686a4a07'
+      'artifact-id': '52e38886-b47c-48f5-9e14-157b0b9f1245'
     }
   }
 }
