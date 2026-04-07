@@ -10,6 +10,8 @@ param azureAIFoundryTenantId string = '9d2116ce-afe6-4ce8-8bc3-c7c7b69856c2'
 
 param fabricDatabaseConnectionString string = 'Data Source=zylcdhpgv7uezc6dy7d3ngcwyi-b5l3uoo37ijuxbntne4gq2ska4.database.fabric.microsoft.com,1433;Initial Catalog=fx_data_sqldb-af3802bf-c4ca-4c83-aa5a-366c574104d4;Multiple Active Result Sets=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Authentication=Active Directory Default'
 
+param fabricDataAgentUrl string = 'https://api.fabric.microsoft.com/v1/workspaces/39ba570f-fadb-4b13-85b3-6938686a4a07/dataagents/52e38886-b47c-48f5-9e14-157b0b9f1245/aiassistant/openai'
+
 var eventHubFullyQualifiedNamespace = 'esehsyw4hwncugmy8frez7.servicebus.windows.net'
 var eventHubName = 'es_fa73e095-515c-48fd-ad54-1ef70ad7bc34'
 
@@ -107,6 +109,7 @@ module azureFoundry 'modules/foundry.bicep' = {
     tags: commonTags
     webAppPrincipalId: crmBrokerApp.outputs.principalId
     principals: principals
+    fabricDataAgentUrl: fabricDataAgentUrl
   }
 }
 
@@ -171,6 +174,7 @@ module fxAgentApp 'modules/webapp.bicep' = {
       { name: 'CRM_BROKER_URL', value: 'https://${baseName}-broker.azurewebsites.net' }
       { name: 'API_INTG_MCP_URL', value: 'https://${baseName}-intg.azurewebsites.net' }
       { name: 'TRADING_PLATFORM_MCP_URL', value: 'https://${baseName}-trading.azurewebsites.net' }
+      { name: 'FABRIC_CONNECTION_NAME', value: azureFoundry.outputs.fabricConnectionName }
     ]
   }
 }
