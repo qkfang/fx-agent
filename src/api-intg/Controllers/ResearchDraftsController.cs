@@ -40,4 +40,14 @@ public class ResearchDraftsController : ControllerBase
         await _db.SaveChangesAsync();
         return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var draft = await _db.ResearchDrafts.FindAsync(id);
+        if (draft is null) return NotFound();
+        _db.ResearchDrafts.Remove(draft);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
 }

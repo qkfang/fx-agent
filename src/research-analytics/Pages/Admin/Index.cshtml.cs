@@ -10,20 +10,23 @@ namespace FxWebPortal.Pages.Admin;
 public class IndexModel : PageModel
 {
     private readonly ArticleService _articles;
+    private readonly DraftService _drafts;
     private readonly TrackingService _tracking;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
 
-    public IndexModel(ArticleService articles, TrackingService tracking,
+    public IndexModel(ArticleService articles, DraftService drafts, TrackingService tracking,
         IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _articles = articles;
+        _drafts = drafts;
         _tracking = tracking;
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
     }
 
     public List<ResearchArticle> Articles { get; set; } = new();
+    public List<ResearchDraft> Drafts { get; set; } = new();
     public List<VisitorLog> Visitors { get; set; } = new();
     public List<VisitorLog> Leads { get; set; } = new();
     public string Message { get; set; } = string.Empty;
@@ -75,6 +78,59 @@ public class IndexModel : PageModel
         if (redirect != null) return redirect;
         _articles.Delete(id);
         Message = "Article deleted.";
+        LoadData();
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostPublishDraft(int id)
+    {
+        var redirect = RequireAdmin();
+        if (redirect != null) return redirect;
+
+        var draft = _drafts.GetById(id);
+        if (draft == null)
+        {
+            Message = "Draft not found.";
+            LoadData();
+            return Page();
+        }
+
+        var article = new ResearchArticle
+        {
+            Title = draft.Title,
+            Content = draft.Content,
+            Author = draft.Author,
+            Category = draft.Category,
+            Tags = draft.Tags,
+            Status = "Published",
+            PublishedDate = DateTime.UtcNow,
+            Sentiment = "Neutral"
+        };
+
+        var created = _articles.Add(article);
+        _drafts.Delete(id);
+
+        // Invoke the research agent with the published article
+        var agentUrl = _configuration["FoundryAgent:EndpointUrl"];
+        if (!string.IsNullOrWhiteSpace(agentUrl))
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                var prompt = $"A new research article has been published. Title: {created.Title}. Content: {created.Content}";
+                var payload = JsonSerializer.Serialize(new { message = prompt });
+                await client.PostAsync($"{agentUrl}/suggestion",
+                    new StringContent(payload, Encoding.UTF8, "application/json"));
+            }
+            catch (Exception ex)
+            {
+                Message = $"Draft published but agent notification failed: {ex.Message}";
+                LoadData();
+                return Page();
+            }
+        }
+
+        Message = $"Draft '{created.Title}' published and suggestion agent notified.";
         LoadData();
         return Page();
     }
@@ -133,6 +189,7 @@ public class IndexModel : PageModel
     private void LoadData()
     {
         Articles = _articles.GetAll();
+        Drafts = _drafts.GetAll();
         Visitors = _tracking.GetAll();
         Leads = _tracking.GetLeads();
         UniqueSessions = _tracking.GetUniqueSessionCount();

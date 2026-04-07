@@ -18,6 +18,7 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddHttpClient<ArticleService>();
+builder.Services.AddHttpClient<DraftService>();
 builder.Services.AddSingleton<TrackingService>();
 builder.Services.AddHttpClient<SuggestionService>();
 builder.Services.AddHttpClient<ChatService>();
