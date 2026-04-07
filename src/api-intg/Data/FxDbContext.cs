@@ -18,6 +18,7 @@ public class FxDbContext : DbContext
     public DbSet<TraderRecommendation> TraderRecommendations => Set<TraderRecommendation>();
     public DbSet<TraderNewsFeed> TraderNewsFeeds => Set<TraderNewsFeed>();
     public DbSet<TraderSuggestion> TraderSuggestions => Set<TraderSuggestion>();
+    public DbSet<CustomerSuggestion> CustomerSuggestions => Set<CustomerSuggestion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -155,6 +156,20 @@ public class FxDbContext : DbContext
             entity.Property(e => e.ConfidenceScore).HasPrecision(5, 2);
             entity.Property(e => e.DetectedBy).HasMaxLength(200);
             entity.Property(e => e.Status).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<CustomerSuggestion>(entity =>
+        {
+            entity.ToTable("CustomerSuggestions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CustomerName).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Email).HasMaxLength(300);
+            entity.Property(e => e.Company).HasMaxLength(300);
+            entity.Property(e => e.CurrencyPair).HasMaxLength(20);
+            entity.Property(e => e.Direction).HasMaxLength(10);
+            entity.Property(e => e.Confidence).HasMaxLength(20);
+            entity.Property(e => e.SuggestedBy).HasMaxLength(200);
         });
 
         modelBuilder.Entity<TraderSuggestion>(entity =>

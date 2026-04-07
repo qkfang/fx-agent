@@ -388,4 +388,54 @@ public class FxMcpTools(FxDbContext db, ILogger<FxMcpTools> logger)
         await db.SaveChangesAsync();
         return JsonSerializer.Serialize(new { success = true });
     }
+
+    [McpServerTool(Name = "get_all_customer_suggestions"), Description("Get all inbound customer suggestions")]
+    public async Task<string> GetAllCustomerSuggestions()
+    {
+        logger.LogTrace("MCP tool called: get_all_customer_suggestions");
+        var suggestions = await db.CustomerSuggestions.ToListAsync();
+        return JsonSerializer.Serialize(suggestions, _jsonOptions);
+    }
+
+    [McpServerTool(Name = "create_customer_suggestion"), Description("Create a new inbound customer suggestion")]
+    public async Task<string> CreateCustomerSuggestion(
+        [Description("Customer name")] string customerName,
+        [Description("Phone number")] string phone,
+        [Description("Email address")] string email,
+        [Description("Company name")] string company,
+        [Description("Currency pair, e.g. EUR/USD")] string currencyPair,
+        [Description("Direction: Buy or Sell")] string direction,
+        [Description("Analysis summary")] string analysis,
+        [Description("Confidence level: High, Medium, or Low")] string confidence,
+        [Description("Suggested by")] string suggestedBy)
+    {
+        logger.LogTrace("MCP tool called: create_customer_suggestion, customerName={CustomerName}", customerName);
+        var suggestion = new CustomerSuggestion
+        {
+            CustomerName = customerName,
+            Phone = phone,
+            Email = email,
+            Company = company,
+            CurrencyPair = currencyPair,
+            Direction = direction,
+            Analysis = analysis,
+            Confidence = confidence,
+            SuggestedBy = suggestedBy,
+            ReceivedAt = DateTime.UtcNow
+        };
+        db.CustomerSuggestions.Add(suggestion);
+        await db.SaveChangesAsync();
+        return JsonSerializer.Serialize(suggestion, _jsonOptions);
+    }
+
+    [McpServerTool(Name = "delete_customer_suggestion"), Description("Delete a customer suggestion")]
+    public async Task<string> DeleteCustomerSuggestion([Description("Suggestion ID")] int id)
+    {
+        logger.LogTrace("MCP tool called: delete_customer_suggestion, id={Id}", id);
+        var suggestion = await db.CustomerSuggestions.FindAsync(id);
+        if (suggestion is null) return JsonSerializer.Serialize(new { error = "Not found" });
+        db.CustomerSuggestions.Remove(suggestion);
+        await db.SaveChangesAsync();
+        return JsonSerializer.Serialize(new { success = true });
+    }
 }

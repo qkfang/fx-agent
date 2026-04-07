@@ -31,8 +31,8 @@ public class FxAgSuggestion : BaseAgent
 
         step 6: Use `get_all_traders` to retrieve available traders and their specializations.
 
-        step 7: 
+        step 7: use `create_customer_suggestion` to create a suggestion for each matched customer, including the trader to contact, the research note reference, and a personalized reasoning based on the customer's profile and the research note insights.
 
-        
+
         """;
 }
