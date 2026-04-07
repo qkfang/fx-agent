@@ -4,7 +4,7 @@ param baseName string = 'fxag'
 @description('Azure region for all resources')
 param location string = 'centralus'
 
-param azureAIFoundryEndpoint string = 'https://fxag-foundry.openai.azure.com'
+param azureAIFoundryEndpoint string = 'https://fxag-foundry.services.ai.azure.com/api/projects/fxag-foundry-project'
 param azureAIFoundryDeployment string = 'gpt-5.4'
 param azureAIFoundryTenantId string = '9d2116ce-afe6-4ce8-8bc3-c7c7b69856c2'
 
@@ -117,6 +117,7 @@ var agentWebAppName = '${baseName}-agent'
 var cognitiveServicesOpenAIUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 var cognitiveServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
 var azureAIUserRoleId = '53ca6127-db72-4b80-b1b0-d745d6d5456d'
+var azureAIDeveloperRoleId = '64702f94-c441-49e6-a78b-ef80e0188fee'
 
 resource webAppOpenAIUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(foundryAccount.id, agentWebAppName, cognitiveServicesOpenAIUserRoleId)
@@ -179,6 +180,28 @@ resource userAIUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   dependsOn: [azureFoundry]
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIUserRoleId)
+    principalId: principal.id
+    principalType: principal.principalType
+  }
+}]
+
+resource webAppAIDeveloperRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(foundryAccount.id, agentWebAppName, azureAIDeveloperRoleId)
+  scope: foundryAccount
+  dependsOn: [azureFoundry]
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
+    principalId: fxAgentApp.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource userAIDeveloperRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for principal in principals: {
+  name: guid(foundryAccount.id, principal.id, azureAIDeveloperRoleId)
+  scope: foundryAccount
+  dependsOn: [azureFoundry]
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAIDeveloperRoleId)
     principalId: principal.id
     principalType: principal.principalType
   }
