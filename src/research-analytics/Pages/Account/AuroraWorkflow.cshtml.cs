@@ -8,6 +8,7 @@ namespace FxWebPortal.Pages.Account
         private readonly IConfiguration _configuration;
 
         public string CustomerName { get; set; } = string.Empty;
+        public string CustomerId { get; set; } = string.Empty;
         public string CurrencyPair { get; set; } = string.Empty;
         public string Signal { get; set; } = string.Empty;
         public string AuroraQuoteUrl { get; set; } = string.Empty;
@@ -19,9 +20,10 @@ namespace FxWebPortal.Pages.Account
             _configuration = configuration;
         }
 
-        public void OnGet(string customer, string pair, string signal)
+        public void OnGet(string customer, string customerId, string pair, string signal)
         {
             CustomerName = customer ?? "Unknown Customer";
+            CustomerId = customerId ?? "";
             CurrencyPair = pair ?? "AUD/USD";
             Signal = signal ?? "Buy";
 

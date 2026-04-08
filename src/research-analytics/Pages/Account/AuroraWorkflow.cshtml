@@ -1042,6 +1042,7 @@
         let currentPhase = 1;
         let tradeData = {
             customer: '@Model.CustomerName',
+            customerId: '@Model.CustomerId',
             pair: '@Model.CurrencyPair',
             signal: '@Model.Signal',
             action: null,
@@ -1340,7 +1341,7 @@
             // Call fxag-trader agent to process the trade response
             addLog(logs, 'info', 'Sending trade details to trading agent...');
             try {
-                const tradePrompt = `Process trade: ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair} at ${tradeData.rate.toFixed(5)}, transaction ${tradeData.transactionId}`;
+                const tradePrompt = `Process trade: ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair} at ${tradeData.rate.toFixed(5)} for account ${tradeData.customerId || 'ACC001'}, customer ${tradeData.customer}. Use account id as the accountId when adding the transaction.`;
 
                 const agentRes = await fetch('/api/agent/trader', {
                     method: 'POST',

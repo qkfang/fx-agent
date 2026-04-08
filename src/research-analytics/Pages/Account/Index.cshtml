@@ -167,7 +167,7 @@
                             <td class="text-muted small">@r.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
                             <td class="text-muted small">@(r.ExpiresAt?.ToString("yyyy-MM-dd") ?? "-")</td>
                             <td>
-                                <a href="/Account/AuroraWorkflow?customer=Trader&pair=@Uri.EscapeDataString(r.CurrencyPair)&signal=@Uri.EscapeDataString(r.Direction)"
+                                <a href="/Account/AuroraWorkflow?customer=Trader&customerId=ACC001&pair=@Uri.EscapeDataString(r.CurrencyPair)&signal=@Uri.EscapeDataString(r.Direction)"
                                    class="btn btn-xs btn-aurora"
                                    title="Open Action workflow for @r.CurrencyPair — @r.Direction">
                                     ✦ Action
@@ -250,7 +250,7 @@
                                 <a href="tel:@(s.Customer?.Phone ?? "")" class="btn btn-xs btn-outline-success" title="Call @customerName at @(s.Customer?.Phone ?? "")">
                                     📞 Call
                                 </a>
-                                <a href="/Account/AuroraWorkflow?customer=@Uri.EscapeDataString(customerName)&pair=@Uri.EscapeDataString(pair)&signal=@Uri.EscapeDataString(signal)"
+                                <a href="/Account/AuroraWorkflow?customer=@Uri.EscapeDataString(customerName)&customerId=@s.CustomerId&pair=@Uri.EscapeDataString(pair)&signal=@Uri.EscapeDataString(signal)"
                                    class="btn btn-xs btn-aurora"
                                    title="Open Action workflow for @customerName — @signal @pair">
                                     ✦ Action

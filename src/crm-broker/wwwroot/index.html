@@ -699,6 +699,10 @@
                                         <div class="sf-detail-value" id="prefTradingStyle">&#8212;</div>
                                     </div>
                                     <div class="sf-detail-field">
+                                        <div class="sf-detail-label">Trading Objective</div>
+                                        <div class="sf-detail-value" id="prefTradingObjective">&#8212;</div>
+                                    </div>
+                                    <div class="sf-detail-field">
                                         <div class="sf-detail-label">Max Position Size</div>
                                         <div class="sf-detail-value" id="prefMaxPosition">&#8212;</div>
                                     </div>
@@ -993,11 +997,12 @@
             document.getElementById('prefStopLoss').textContent = prefs.stopLossPercent + '%';
             document.getElementById('prefTakeProfit').textContent = prefs.takeProfitPercent + '%';
             document.getElementById('prefTradingStyle').textContent = prefs.tradingStyle || '\u2014';
+            document.getElementById('prefTradingObjective').textContent = prefs.tradingObjective || '\u2014';
             document.getElementById('prefNotifications').textContent = prefs.enableNotifications ? 'Enabled' : 'Disabled';
             document.getElementById('prefChannels').textContent = prefs.notificationChannels || '\u2014';
             document.getElementById('prefUpdatedAt').textContent = new Date(prefs.updatedAt).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
         } else {
-            ['prefPairs','prefRiskTolerance','prefMaxPosition','prefStopLoss','prefTakeProfit','prefTradingStyle','prefNotifications','prefChannels','prefUpdatedAt'].forEach(id => {
+            ['prefPairs','prefRiskTolerance','prefMaxPosition','prefStopLoss','prefTakeProfit','prefTradingStyle','prefTradingObjective','prefNotifications','prefChannels','prefUpdatedAt'].forEach(id => {
                 document.getElementById(id).textContent = '\u2014';
             });
         }
