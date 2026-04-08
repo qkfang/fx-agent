@@ -12,6 +12,7 @@ namespace FxWebPortal.Pages.Account
         public string Signal { get; set; } = string.Empty;
         public string AuroraQuoteUrl { get; set; } = string.Empty;
         public string FoundryAgentUrl { get; set; } = string.Empty;
+        public string CrmBrokerUrl { get; set; } = string.Empty;
 
         public AuroraWorkflowModel(IConfiguration configuration)
         {
@@ -25,9 +26,16 @@ namespace FxWebPortal.Pages.Account
             Signal = signal ?? "Buy";
 
             var tradingPlatformUrl = _configuration["TradingPlatformUrl"] ?? "http://localhost:5249";
-            AuroraQuoteUrl = $"{tradingPlatformUrl}/api/quote/audusd";
+            var pairCode = (pair ?? "AUD/USD").Replace("/", "").ToLowerInvariant();
+            AuroraQuoteUrl = $"{tradingPlatformUrl}/api/quote/{pairCode}";
 
             FoundryAgentUrl = _configuration["FoundryAgent:EndpointUrl"]?.TrimEnd('/') ?? "http://localhost:5001";
+
+            var crmBrokerEndpoint = _configuration["CrmBrokerApi:EndpointUrl"] ?? "http://localhost:5269/api/accounts/leads";
+            var crmBaseUrl = crmBrokerEndpoint.Contains("/api/") 
+                ? crmBrokerEndpoint.Substring(0, crmBrokerEndpoint.IndexOf("/api/"))
+                : "http://localhost:5269";
+            CrmBrokerUrl = crmBaseUrl;
         }
     }
 }

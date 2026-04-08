@@ -1036,6 +1036,7 @@
     <script>
         const AURORA_QUOTE = '@Model.AuroraQuoteUrl';
         const FOUNDRY_AGENT = '@Model.FoundryAgentUrl';
+        const CRM_BROKER = '@Model.CrmBrokerUrl';
 
         let quoteInterval = null;
         let currentPhase = 1;
@@ -1272,7 +1273,13 @@
             document.getElementById('ticketCustomer').textContent = tradeData.customer;
             document.getElementById('ticketSignal').textContent = tradeData.signal;
             const rate = tradeData.action === 'Sell' ? tradeData.bid : tradeData.ask;
-            document.getElementById('mktPriceDisplay').textContent = rate ? rate.toFixed(4) : '—';
+            if (rate) {
+                document.getElementById('mktPriceDisplay').textContent = rate.toFixed(4);
+                tradeData.rate = rate;
+            } else {
+                const mid = (tradeData.bid + tradeData.ask) / 2;
+                document.getElementById('mktPriceDisplay').textContent = mid ? mid.toFixed(4) : '—';
+            }
             if (tradeData.action) highlightDirection(tradeData.action);
         }
 
@@ -1320,18 +1327,17 @@
             const btn = document.getElementById('btnStep4Next');
             logs.innerHTML = '';
 
-            await sleep(600);
+            await sleep(200);
             addLog(logs, 'info', 'Connecting to Aurora trading agent...');
-            await sleep(900);
+            await sleep(300);
             addLog(logs, 'success', 'Connection established');
-            await sleep(500);
+            await sleep(200);
             addLog(logs, 'info', `Submitting ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair}...`);
-            await sleep(1100);
+            await sleep(300);
             addLog(logs, 'info', 'Order routed to liquidity provider...');
-            await sleep(1300);
+            await sleep(400);
 
             // Call fxag-trader agent to process the trade response
-            await sleep(500);
             addLog(logs, 'info', 'Sending trade details to trading agent...');
             try {
                 const tradePrompt = `Process trade: ${tradeData.action} ${tradeData.lots} lots ${tradeData.pair} at ${tradeData.rate.toFixed(5)}, transaction ${tradeData.transactionId}`;
@@ -1398,15 +1404,40 @@
             const btn = document.getElementById('btnComplete');
             logs.innerHTML = '';
 
-            await sleep(800); addLog(logs, 'info', 'Connecting to CRM...');
-            await sleep(1000); addLog(logs, 'success', 'Connection established');
-            await sleep(700); addLog(logs, 'info', `Updating customer record: ${tradeData.customer}`);
-            await sleep(900); addLog(logs, 'info', 'Adding transaction to portfolio history...');
-            await sleep(800); addLog(logs, 'info', 'Updating account balance and positions...');
-            await sleep(900); addLog(logs, 'success', '✓ Portfolio updated');
-            await sleep(600); addLog(logs, 'info', 'Generating trade confirmation...');
-            await sleep(700); addLog(logs, 'success', '✓ Confirmation sent');
-            await sleep(500); addLog(logs, 'success', '✓ CRM update complete');
+            addLog(logs, 'info', 'Connecting to CRM...');
+            await sleep(200);
+
+            const notional = Math.round(tradeData.lots * 100000 * tradeData.rate);
+            const payload = {
+                transactionId: tradeData.transactionId || ('TXN-' + Date.now()),
+                customerName: tradeData.customer,
+                currencyPair: tradeData.pair,
+                direction: tradeData.action,
+                lots: tradeData.lots,
+                rate: tradeData.rate,
+                notional: notional,
+                status: 'Filled',
+                executedAt: new Date().toISOString()
+            };
+
+            try {
+                addLog(logs, 'info', 'Sending trade notification to CRM...');
+                const res = await fetch(CRM_BROKER + '/api/accounts/trade-notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('CRM returned ' + res.status);
+                const result = await res.json();
+                addLog(logs, 'success', '✓ CRM notified — trade recorded');
+                addLog(logs, 'info', `Transaction ${result.transactionId} confirmed`);
+            } catch (err) {
+                addLog(logs, 'warn', 'CRM notification failed: ' + err.message);
+                addLog(logs, 'info', 'Trade is still valid — CRM can be updated manually');
+            }
+
+            await sleep(200);
+            addLog(logs, 'success', '✓ Workflow complete');
 
             document.getElementById('crmStatus').textContent = 'DONE';
             document.getElementById('crmStatus').className = 'ticket-status filled';

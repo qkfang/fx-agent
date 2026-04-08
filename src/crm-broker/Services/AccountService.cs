@@ -14,6 +14,7 @@ namespace FxWebApi.Services
         private readonly Dictionary<int, List<Position>> _positions;
         private readonly Dictionary<int, List<AccountTransaction>> _transactions;
         private readonly List<LeadNotification> _leads = new();
+        private readonly List<TradeNotification> _tradeNotifications = new();
         private readonly object _lock = new();
 
         public AccountService(FxRateService fxRateService, IHttpClientFactory httpClientFactory,
@@ -387,6 +388,65 @@ namespace FxWebApi.Services
             lock (_lock)
             {
                 return _leads.OrderByDescending(l => l.ReceivedAt).ToList();
+            }
+        }
+
+        public void AddTradeNotification(TradeNotification notification)
+        {
+            lock (_lock)
+            {
+                _tradeNotifications.Add(notification);
+
+                // Find a matching account by customer name, or use the first account
+                var account = _accounts.FirstOrDefault(a =>
+                    a.CustomerName.Equals(notification.CustomerName, StringComparison.OrdinalIgnoreCase))
+                    ?? _accounts.FirstOrDefault();
+
+                if (account != null)
+                {
+                    var rate = notification.Rate > 0 ? notification.Rate : _fxRateService.GetCurrentRate().Rate;
+                    var margin = CalculateMargin(notification.Lots, rate, account.Leverage);
+
+                    // Add position
+                    _positions[account.Id].Add(new Position
+                    {
+                        PositionId = $"POS{DateTime.UtcNow.Ticks}",
+                        AccountId = account.Id,
+                        CurrencyPair = notification.CurrencyPair,
+                        Type = notification.Direction,
+                        Lots = notification.Lots,
+                        OpenRate = rate,
+                        CurrentRate = rate,
+                        PnL = 0m,
+                        Margin = Math.Round(margin, 2),
+                        OpenTime = DateTime.UtcNow
+                    });
+
+                    // Add transaction
+                    _transactions[account.Id].Add(new AccountTransaction
+                    {
+                        TransactionId = notification.TransactionId,
+                        AccountId = account.Id,
+                        Type = notification.Direction,
+                        CurrencyPair = notification.CurrencyPair,
+                        Lots = notification.Lots,
+                        Rate = rate,
+                        PnL = 0,
+                        BalanceAfter = account.Balance,
+                        Timestamp = DateTime.UtcNow
+                    });
+
+                    _logger.LogInformation("Trade notification applied to account {AccountId} ({Customer}): {Direction} {Lots} lots {Pair} @ {Rate}",
+                        account.Id, account.CustomerName, notification.Direction, notification.Lots, notification.CurrencyPair, rate);
+                }
+            }
+        }
+
+        public List<TradeNotification> GetTradeNotifications()
+        {
+            lock (_lock)
+            {
+                return _tradeNotifications.OrderByDescending(t => t.ReceivedAt).ToList();
             }
         }
 

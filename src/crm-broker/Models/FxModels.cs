@@ -240,4 +240,19 @@ namespace FxWebApi.Models
         public decimal Rate { get; set; }
         public string TransactionId { get; set; } = string.Empty;
     }
+
+    /// <summary>Trade notification sent from the Research Analytics Aurora workflow after a trade is accepted.</summary>
+    public class TradeNotification
+    {
+        public string TransactionId { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string CurrencyPair { get; set; } = string.Empty;
+        public string Direction { get; set; } = string.Empty;
+        public decimal Lots { get; set; }
+        public decimal Rate { get; set; }
+        public decimal Notional { get; set; }
+        public string Status { get; set; } = "Filled";
+        public DateTime ExecutedAt { get; set; }
+        public DateTime ReceivedAt { get; set; }
+    }
 }

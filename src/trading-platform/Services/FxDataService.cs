@@ -112,7 +112,7 @@ namespace FxWebUI.Services
                 // Call the FX API to get current rate
                 var client = _httpClientFactory.CreateClient();
                 // Default to localhost if FX API URL not configured
-                var fxApiUrl = Environment.GetEnvironmentVariable("FX_API_URL") ?? "http://localhost:5001";
+                var fxApiUrl = Environment.GetEnvironmentVariable("FX_API_URL") ?? "http://localhost:5269";
                 var response = await client.GetAsync($"{fxApiUrl}/api/fx/rate");
                 
                 if (response.IsSuccessStatusCode)

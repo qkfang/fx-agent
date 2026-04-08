@@ -73,5 +73,23 @@ namespace FxWebApi.Controllers
         {
             return Ok(_accountService.GetLeads());
         }
+
+        /// <summary>Receive a trade notification from Aurora workflow.</summary>
+        [HttpPost("trade-notifications")]
+        public ActionResult ReceiveTradeNotification([FromBody] TradeNotification notification)
+        {
+            notification.ReceivedAt = DateTime.UtcNow;
+            _accountService.AddTradeNotification(notification);
+            _logger.LogInformation("Trade notification received: {Direction} {Lots} lots {Pair} for {Customer}",
+                notification.Direction, notification.Lots, notification.CurrencyPair, notification.CustomerName);
+            return Ok(new { received = true, transactionId = notification.TransactionId });
+        }
+
+        /// <summary>List all trade notifications received from Aurora workflow.</summary>
+        [HttpGet("trade-notifications")]
+        public ActionResult<List<TradeNotification>> GetTradeNotifications()
+        {
+            return Ok(_accountService.GetTradeNotifications());
+        }
     }
 }
