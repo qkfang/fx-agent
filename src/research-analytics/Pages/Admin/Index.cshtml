@@ -113,15 +113,14 @@
         <div id="publish-progress" class="mb-3" style="display:none">
             <div class="card border-primary">
                 <div class="card-body">
-                    <h6 class="card-title mb-2" id="publish-title">Publishing draft...</h6>
+                    <h6 class="card-title mb-2" id="publish-title">Processing...</h6>
                     <div class="progress mb-2" style="height:22px">
                         <div id="publish-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%">0%</div>
                     </div>
                     <div id="publish-steps">
                         <div id="step-load" class="text-muted small">⏳ Loading draft...</div>
-                        <div id="step-article" class="text-muted small">⏳ Creating research article...</div>
-                        <div id="step-delete" class="text-muted small">⏳ Removing draft...</div>
-                        <div id="step-agent" class="text-muted small">⏳ Notifying suggestion agent...</div>
+                        <div id="step-article" class="text-muted small">⏳ Publishing article & removing draft...</div>
+                        <div id="step-agent" class="text-muted small">⏳ Engaging suggestion agent...</div>
                     </div>
                 </div>
             </div>
@@ -334,7 +333,7 @@
 
         setTimeout(function () {
             setStep('step-load', 'done', 'Draft loaded');
-            setStep('step-article', 'running', 'Creating research article...');
+            setStep('step-article', 'running', 'Publishing article & removing draft...');
             setBar(bar, 30);
 
             fetch('/api/admin/publish-draft/' + draftId, { method: 'POST' })
@@ -342,33 +341,42 @@
                     if (!res.ok) {
                         return res.json().then(function (d) { throw new Error(d.error || d.detail || 'Publish failed'); });
                     }
-                    setStep('step-article', 'done', 'Article created');
-                    setStep('step-delete', 'running', 'Removing draft...');
-                    setBar(bar, 60);
                     return res.json();
                 })
                 .then(function (data) {
-                    setStep('step-delete', 'done', 'Draft removed');
-                    setStep('step-agent', 'running', 'Notifying suggestion agent...');
-                    setBar(bar, 80);
+                    setStep('step-article', 'done', 'Article created & draft removed');
+                    setStep('step-agent', 'running', 'Engaging suggestion agent...');
+                    setBar(bar, 60);
 
-                    setTimeout(function () {
-                        if (data.agentNotified) {
-                            setStep('step-agent', 'done', 'Agent notified');
-                        } else {
-                            setStep('step-agent', 'warn', 'Agent notification skipped');
-                        }
-                        setBar(bar, 100);
-                        bar.classList.remove('progress-bar-animated');
-                        bar.classList.add('bg-success');
+                    var row = document.getElementById('draft-row-' + draftId);
+                    if (row) row.remove();
 
-                        var row = document.getElementById('draft-row-' + draftId);
-                        if (row) row.remove();
-
-                        setTimeout(function () { location.reload(); }, 1500);
-                    }, 600);
+                    return fetch('/api/admin/engage-agent/' + data.articleId, { method: 'POST' });
+                })
+                .then(function (res) {
+                    if (!res.ok) {
+                        setStep('step-agent', 'warn', 'Agent engagement failed');
+                        throw new Error('agent-skip');
+                    }
+                    return res.json();
+                })
+                .then(function (data) {
+                    if (data.agentNotified) {
+                        setStep('step-agent', 'done', 'Suggestion agent engaged');
+                    } else {
+                        setStep('step-agent', 'warn', 'Agent notification skipped');
+                    }
+                    setBar(bar, 100);
+                    bar.classList.remove('progress-bar-animated');
+                    bar.classList.add('bg-success');
                 })
                 .catch(function (err) {
+                    if (err.message === 'agent-skip') {
+                        setBar(bar, 100);
+                        bar.classList.remove('progress-bar-animated');
+                        bar.classList.add('bg-warning');
+                        return;
+                    }
                     setBar(bar, 100);
                     bar.classList.remove('progress-bar-animated');
                     bar.classList.add('bg-danger');

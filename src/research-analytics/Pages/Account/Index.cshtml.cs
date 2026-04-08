@@ -25,7 +25,7 @@ public class IndexModel : PageModel
     }
 
     public List<ResearchArticle> MarketInsights { get; set; } = new();
-    public List<CustomerSuggestion> Suggestions { get; set; } = new();
+    public List<TraderRecommendation> Recommendations { get; set; } = new();
     public List<TraderSuggestion> TraderSuggestions { get; set; } = new();
     public string DisplayName { get; set; } = string.Empty;
     public List<string> Interests { get; set; } = new();
@@ -119,15 +119,26 @@ public class IndexModel : PageModel
             ? allPublished.Where(a => Interests.Contains(a.Category)).ToList()
             : allPublished;
 
-        // Recommendations: suggestions matching user's preferred currency pairs
-        var allSuggestions = _suggestions.GetAll();
-        Suggestions = Interests.Count > 0
-            ? allSuggestions.Where(s => Interests.Contains(s.CurrencyPair)).ToList()
-            : allSuggestions;
+        // Recommendations: load from api-intg filtered by logged-in trader
+        var traderId = HttpContext.Session.GetInt32("TraderId") ?? 1;
+        var apiBase = _configuration["IntegrationApi:BaseUrl"] ?? "http://localhost:5005";
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var recResponse = await client.GetAsync($"{apiBase}/api/traderrecommendations/trader/{traderId}");
+            if (recResponse.IsSuccessStatusCode)
+            {
+                var json = await recResponse.Content.ReadAsStringAsync();
+                Recommendations = System.Text.Json.JsonSerializer.Deserialize<List<TraderRecommendation>>(json, options) ?? new();
+            }
+        }
+        catch
+        {
+            Recommendations = new();
+        }
 
         // Customer Suggestions: load from api-intg filtered by logged-in trader
-        var apiBase = _configuration["IntegrationApi:BaseUrl"] ?? "http://localhost:5005";
-        var traderId = HttpContext.Session.GetInt32("TraderId") ?? 1;
         try
         {
             var client = _httpClientFactory.CreateClient();

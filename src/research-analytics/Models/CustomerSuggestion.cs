@@ -11,6 +11,7 @@ public class CustomerSuggestion
     public string Direction { get; set; } = string.Empty; // "Buy" or "Sell"
     public string Analysis { get; set; } = string.Empty;
     public string Confidence { get; set; } = string.Empty; // High / Medium / Low
+    public int TraderId { get; set; }
     public string SuggestedBy { get; set; } = string.Empty;
     public DateTime ReceivedAt { get; set; } = DateTime.UtcNow;
 }

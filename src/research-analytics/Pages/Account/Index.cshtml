@@ -109,36 +109,33 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h5 class="mb-0">Recommendations</h5>
-                <p class="text-muted small mb-0 mt-1">Prospects matching your interest in <strong>@string.Join(", ", Model.Interests)</strong></p>
+                <p class="text-muted small mb-0 mt-1">Trading recommendations for your account</p>
             </div>
-            <span class="badge bg-danger fs-6">@Model.Suggestions.Count</span>
+            <span class="badge bg-danger fs-6">@Model.Recommendations.Count</span>
         </div>
         <div class="table-responsive">
             <table class="table table-hover admin-table">
                 <thead>
                     <tr>
-                        <th>Customer</th>
-                        <th>Company</th>
                         <th>Pair</th>
                         <th>Direction</th>
+                        <th>Target Rate</th>
+                        <th>Stop Loss</th>
                         <th>Confidence</th>
-                        <th>Analysis</th>
-                        <th>Received</th>
+                        <th>Rationale</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Expires</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var s in Model.Suggestions)
+                    @foreach (var r in Model.Recommendations)
                     {
                         <tr>
+                            <td><span class="cat-badge cat-@(r.CurrencyPair.Replace("/","-").Replace(" ","-").ToLower())">@r.CurrencyPair</span></td>
                             <td>
-                                <div class="fw-semibold">@s.CustomerName</div>
-                                <div class="text-muted small">@s.Email</div>
-                            </td>
-                            <td>@s.Company</td>
-                            <td><span class="cat-badge cat-aud-usd">@s.CurrencyPair</span></td>
-                            <td>
-                                @if (s.Direction == "Buy")
+                                @if (r.Direction == "Buy")
                                 {
                                     <span class="sentiment-badge sentiment-bullish">▲ Buy</span>
                                 }
@@ -147,12 +144,14 @@
                                     <span class="sentiment-badge sentiment-bearish">▼ Sell</span>
                                 }
                             </td>
+                            <td>@r.TargetRate</td>
+                            <td>@r.StopLoss</td>
                             <td>
-                                @if (s.Confidence == "High")
+                                @if (r.Confidence == "High")
                                 {
                                     <span class="badge bg-success">High</span>
                                 }
-                                else if (s.Confidence == "Medium")
+                                else if (r.Confidence == "Medium")
                                 {
                                     <span class="badge bg-warning text-dark">Medium</span>
                                 }
@@ -161,28 +160,24 @@
                                     <span class="badge bg-secondary">Low</span>
                                 }
                             </td>
-                            <td class="suggestion-analysis" title="@s.Analysis">
-                                @TextHelper.Truncate(s.Analysis, 90)
+                            <td class="suggestion-analysis" title="@r.Rationale">
+                                @TextHelper.Truncate(r.Rationale, 90)
                             </td>
-                            <td class="text-muted small">@s.ReceivedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                            <td class="d-flex gap-1 flex-wrap">
-                                <form method="post" asp-page-handler="SendSuggestionToBroker" asp-route-id="@s.Id" style="display:inline">
-                                    <button class="btn btn-xs btn-outline-primary" type="submit"
-                                            title="Push this prospect to Broker CRM">
-                                        ⚡ Action
-                                    </button>
-                                </form>
-                                <a href="/Account/AuroraWorkflow?customer=@Uri.EscapeDataString(s.CustomerName)&pair=@Uri.EscapeDataString(s.CurrencyPair)&signal=@Uri.EscapeDataString(s.Direction)"
+                            <td><span class="badge bg-info text-dark">@r.Status</span></td>
+                            <td class="text-muted small">@r.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="text-muted small">@(r.ExpiresAt?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td>
+                                <a href="/Account/AuroraWorkflow?customer=Trader&pair=@Uri.EscapeDataString(r.CurrencyPair)&signal=@Uri.EscapeDataString(r.Direction)"
                                    class="btn btn-xs btn-aurora"
-                                   title="Open Aurora workflow for @s.CustomerName">
-                                    ✦ Aurora
+                                   title="Open Action workflow for @r.CurrencyPair — @r.Direction">
+                                    ✦ Action
                                 </a>
                             </td>
                         </tr>
                     }
-                    @if (!Model.Suggestions.Any())
+                    @if (!Model.Recommendations.Any())
                     {
-                        <tr><td colspan="8" class="text-center text-muted py-4">No suggestions matching your interests yet.</td></tr>
+                        <tr><td colspan="10" class="text-center text-muted py-4">No recommendations yet.</td></tr>
                     }
                 </tbody>
             </table>
@@ -223,7 +218,7 @@
                             </td>
                             <td>@(s.Customer?.Company ?? "-")</td>
                             <td class="suggestion-analysis" title="@(s.ResearchArticle?.Title ?? "")">
-                                @TextHelper.Truncate(s.ResearchArticle?.Title ?? "-", 60)
+                                <a href="/Article?id=@(s.ResearchArticleId)" target="_blank">@TextHelper.Truncate(s.ResearchArticle?.Title ?? "-", 60)</a>
                             </td>
                             <td class="suggestion-analysis" title="@s.Reasoning">
                                 @TextHelper.Truncate(s.Reasoning, 80)
@@ -257,8 +252,8 @@
                                 </a>
                                 <a href="/Account/AuroraWorkflow?customer=@Uri.EscapeDataString(customerName)&pair=@Uri.EscapeDataString(pair)&signal=@Uri.EscapeDataString(signal)"
                                    class="btn btn-xs btn-aurora"
-                                   title="Open Aurora workflow for @customerName — @signal @pair">
-                                    ✦ Aurora
+                                   title="Open Action workflow for @customerName — @signal @pair">
+                                    ✦ Action
                                 </a>
                             </td>
                         </tr>

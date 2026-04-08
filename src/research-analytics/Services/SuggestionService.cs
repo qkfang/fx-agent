@@ -45,6 +45,7 @@ public class SuggestionService
                         Direction = rec.Direction,
                         Analysis = rec.Rationale,
                         Confidence = rec.Confidence,
+                        TraderId = rec.TraderId,
                         SuggestedBy = rec.Trader?.Name ?? "AI",
                         ReceivedAt = rec.CreatedAt
                     });

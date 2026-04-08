@@ -178,9 +178,8 @@ app.MapPost("/api/agent/trader", async (HttpContext ctx, IConfiguration config) 
 
 app.MapRazorPages();
 
-// API: Publish a research draft → create article, delete draft, invoke agent
-app.MapPost("/api/admin/publish-draft/{id}", async (int id, DraftService drafts, ArticleService articles,
-    IHttpClientFactory httpClientFactory, IConfiguration config) =>
+// API: Publish a research draft → create article, delete draft
+app.MapPost("/api/admin/publish-draft/{id}", async (int id, DraftService drafts, ArticleService articles) =>
 {
     var draft = drafts.GetById(id);
     if (draft == null)
@@ -206,24 +205,34 @@ app.MapPost("/api/admin/publish-draft/{id}", async (int id, DraftService drafts,
     if (!deleted)
         return Results.Problem("Article created but draft could not be deleted.", statusCode: 500);
 
+    return Results.Ok(new { articleId = created.Id, title = created.Title });
+});
+
+// API: Engage suggestion agent for a published article
+app.MapPost("/api/admin/engage-agent/{id}", async (int id, ArticleService articles, IHttpClientFactory httpClientFactory, IConfiguration config) =>
+{
+    var article = articles.GetById(id);
+    if (article == null)
+        return Results.NotFound(new { error = "Article not found." });
+
     var agentUrl = config["FoundryAgent:EndpointUrl"];
-    if (!string.IsNullOrWhiteSpace(agentUrl))
+    if (string.IsNullOrWhiteSpace(agentUrl))
+        return Results.Problem("Agent endpoint not configured.", statusCode: 500);
+
+    try
     {
-        try
-        {
-            var client = httpClientFactory.CreateClient();
-            var prompt = $"A new research article has been published. Title: {created.Title}. Content: {created.Content}";
-            var payload = JsonSerializer.Serialize(new { message = prompt });
-            await client.PostAsync($"{agentUrl}/suggestion",
-                new StringContent(payload, Encoding.UTF8, "application/json"));
-        }
-        catch
-        {
-            return Results.Ok(new { articleId = created.Id, title = created.Title, agentNotified = false });
-        }
+        var client = httpClientFactory.CreateClient();
+        var prompt = $"A new research article has been published. Title: {article.Title}. Content: {article.Content}";
+        var payload = JsonSerializer.Serialize(new { message = prompt });
+        await client.PostAsync($"{agentUrl}/suggestion",
+            new StringContent(payload, Encoding.UTF8, "application/json"));
+    }
+    catch
+    {
+        return Results.Ok(new { articleId = id, agentNotified = false });
     }
 
-    return Results.Ok(new { articleId = created.Id, title = created.Title, agentNotified = true });
+    return Results.Ok(new { articleId = id, agentNotified = true });
 });
 
 // API: ChatKit protocol endpoint (openai/chatkit-js self-hosted backend)

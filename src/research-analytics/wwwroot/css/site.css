@@ -104,12 +104,12 @@ body { background: var(--page-bg); color: var(--text); font-family: var(--font);
     letter-spacing: 0.5px;
     color: #000;
 }
-.cat-aud-usd           { background: #1e8449; }
-.cat-aud-cnh           { background: #1a5276; }
-.cat-aud-gbp           { background: #512e5f; }
-.cat-technical-analysis  { background: #2e4057; }
-.cat-fundamental-analysis{ background: #4a235a; }
-.cat-market-outlook      { background: #154360; }
+.cat-aud-usd           { background: #a9dfbf; color: #1e8449; }
+.cat-aud-cnh           { background: #aed6f1; color: #1a5276; }
+.cat-aud-gbp           { background: #d7bde2; color: #512e5f; }
+.cat-technical-analysis  { background: #aebcc9; color: #2e4057; }
+.cat-fundamental-analysis{ background: #d2b4de; color: #4a235a; }
+.cat-market-outlook      { background: #a9cce3; color: #154360; }
 
 /* ── Sentiment badges ────────────────────────────────────────────────────────── */
 .sentiment-badge {

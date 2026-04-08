@@ -24,7 +24,7 @@ public class LoginModel : PageModel
     public IActionResult OnPost(string username, string password)
     {
         var adminUser = _config["Admin:Username"] ?? "admin";
-        var adminPass = _config["Admin:Password"] ?? "fx@dmin2026";
+        var adminPass = _config["Admin:Password"] ?? "9999";
 
         if (string.Equals(username, adminUser, StringComparison.Ordinal)
             && string.Equals(password, adminPass, StringComparison.Ordinal))
