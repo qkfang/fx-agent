@@ -222,19 +222,35 @@ app.MapPost("/api/admin/engage-agent/{id}", async (int id, ArticleService articl
     if (string.IsNullOrWhiteSpace(agentUrl))
         return Results.Problem("Agent endpoint not configured.", statusCode: 500);
 
+    var client = httpClientFactory.CreateClient();
+    var prompt = $"A new research article has been published. Title: {article.Title}. Content: {article.Content}";
+    var payload = JsonSerializer.Serialize(new
+    {
+        message = prompt,
+        article = new
+        {
+            article.Id,
+            article.Title,
+            article.Summary,
+            article.Content,
+            article.Category,
+            article.Author,
+            article.PublishedDate,
+            article.Status,
+            article.Tags,
+            article.Sentiment
+        }
+    });
     try
     {
-        var client = httpClientFactory.CreateClient();
-        var prompt = $"A new research article has been published. Title: {article.Title}. Content: {article.Content}";
-        var payload = JsonSerializer.Serialize(new { message = prompt });
         var response = await client.PostAsync($"{agentUrl}/suggestion",
             new StringContent(payload, Encoding.UTF8, "application/json"));
         var responseBody = await response.Content.ReadAsStringAsync();
         return Results.Ok(new { articleId = id, agentNotified = true, requestBody = payload, responseBody });
     }
-    catch
+    catch (Exception ex)
     {
-        return Results.Ok(new { articleId = id, agentNotified = false });
+        return Results.Ok(new { articleId = id, agentNotified = false, requestBody = payload, responseBody = ex.Message });
     }
 });
 
