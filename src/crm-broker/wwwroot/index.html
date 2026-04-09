@@ -160,6 +160,16 @@
         .pnl-pos { color: var(--sf-green); }
         .pnl-neg { color: var(--sf-red); }
         .pnl-zero{ color: var(--sf-text-3); }
+        /* SKELETON LOADER */
+        .sf-skeleton-loader { padding: 8px 14px; }
+        .sf-skeleton-item {
+            height: 62px; border-radius: 4px; margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--sf-bg) 25%, #e8ecf0 50%, var(--sf-bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s ease-in-out infinite;
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
         .sf-sidebar-footer {
             padding: 10px 14px; margin-top: auto;
             border-top: 1px solid var(--sf-border); color: var(--sf-text-3); font-size: 11px;
@@ -448,7 +458,15 @@
                 <input type="text" id="searchInput" placeholder="Search accounts..." oninput="filterAccounts()">
             </div>
         </div>
-        <div id="accountList"></div>
+        <div id="accountList">
+            <div class="sf-skeleton-loader">
+                <div class="sf-skeleton-item" style="animation-delay:0s"></div>
+                <div class="sf-skeleton-item" style="animation-delay:.1s"></div>
+                <div class="sf-skeleton-item" style="animation-delay:.2s"></div>
+                <div class="sf-skeleton-item" style="animation-delay:.3s"></div>
+                <div class="sf-skeleton-item" style="animation-delay:.4s"></div>
+            </div>
+        </div>
         <div class="sf-sidebar-footer">
             <i class="fa-solid fa-shield-halved" style="margin-right:5px;color:var(--sf-blue);"></i>FX CRM Brokerage System v2.4
         </div>

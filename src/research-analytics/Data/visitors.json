@@ -7432,5 +7432,41 @@
     "Timezone": "Australia/Sydney",
     "ScreenSize": "1664x1110",
     "VisitedAt": "2026-04-08T03:11:17.3424237Z"
+  },
+  {
+    "Id": 414,
+    "SessionId": "6f49983f-d3ff-4c8f-8a86-f12d30a8e49c",
+    "ArticleId": null,
+    "PageUrl": "/?category=All",
+    "IpAddress": "::1",
+    "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "Referrer": "http://localhost:5003/?category=EUR%2FUSD",
+    "TimeSpentSeconds": 24992,
+    "ClickCount": 1,
+    "UserName": "",
+    "UserEmail": "",
+    "UserCompany": "",
+    "Language": "en-GB",
+    "Timezone": "Australia/Sydney",
+    "ScreenSize": "1664x1110",
+    "VisitedAt": "2026-04-08T07:51:02.0783041Z"
+  },
+  {
+    "Id": 415,
+    "SessionId": "6f49983f-d3ff-4c8f-8a86-f12d30a8e49c",
+    "ArticleId": null,
+    "PageUrl": "/?category=All",
+    "IpAddress": "::1",
+    "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "Referrer": "http://localhost:5003/?category=EUR%2FUSD",
+    "TimeSpentSeconds": 38661,
+    "ClickCount": 1,
+    "UserName": "",
+    "UserEmail": "",
+    "UserCompany": "",
+    "Language": "en-GB",
+    "Timezone": "Australia/Sydney",
+    "ScreenSize": "1664x1110",
+    "VisitedAt": "2026-04-08T11:38:51.4512105Z"
   }
 ]

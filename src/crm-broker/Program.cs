@@ -52,4 +52,20 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
+// Warm up database connection on startup to avoid slow first request
+_ = Task.Run(async () =>
+{
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<FxDbContext>();
+        await db.Customers.CountAsync();
+        app.Logger.LogInformation("Database warmup completed");
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "Database warmup failed");
+    }
+});
+
 app.Run();
