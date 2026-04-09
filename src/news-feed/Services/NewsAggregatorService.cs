@@ -10,7 +10,7 @@ namespace FxWebNews.Services
         private readonly NewsService _newsService;
 
         private const string BloombergRssUrl = "https://feeds.bloomberg.com/markets/news.rss";
-        private const string MorningstarRssUrl = "https://www.morningstar.com/feeds/all-articles.xml";
+        private const string MorningstarRssUrl = "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664";
 
         public NewsAggregatorService(
             IHttpClientFactory httpClientFactory,

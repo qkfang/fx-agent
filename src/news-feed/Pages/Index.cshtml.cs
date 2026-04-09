@@ -33,5 +33,6 @@ public class IndexModel : PageModel
         };
 
         ViewData["ActiveSource"] = ActiveSource;
+        ViewData["TickerHeadlines"] = News.Take(10).Select(n => n.Title).ToList();
     }
 }

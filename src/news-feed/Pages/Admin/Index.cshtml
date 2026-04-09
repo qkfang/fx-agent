@@ -2,7 +2,6 @@
 @model FxWebNews.Pages.Admin.IndexModel
 @{
     ViewData["Title"] = "Newsroom";
-    var drafts = Model.News.Where(n => !n.IsPublished).ToList();
     var published = Model.News.Where(n => n.IsPublished).ToList();
 }
 
@@ -36,55 +35,6 @@
 
     <!-- Article tables -->
 
-            <!-- Drafts -->
-            <div class="fxn-table-card mb-4">
-                <div class="fxn-table-header d-flex align-items-center justify-content-between px-4 py-3">
-                    <span class="fxn-table-title">Drafts <span class="fxn-counter">@drafts.Count</span></span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table fxn-table mb-0">
-                        <thead>
-                            <tr>
-                                <th>Headline</th>
-                                <th>Cat.</th>
-                                <th>Sentiment</th>
-                                <th>Created</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (drafts.Any())
-                            {
-                                foreach (var a in drafts)
-                                {
-                                    <tr>
-                                        <td class="fxn-td-headline">@a.Title</td>
-                                        <td><span class="fxn-category-badge">@a.Category</span></td>
-                                        <td>
-                                            <span class="badge @(a.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
-                                                @(a.Type == "Good" ? "▲" : "▼")
-                                            </span>
-                                        </td>
-                                        <td class="fxn-td-date">@a.PublishedDate.ToString("dd MMM, HH:mm")</td>
-                                        <td class="text-end">
-                                            <a href="/Admin/Publish/@a.Id" class="btn btn-sm fxn-btn-review me-1">Review &amp; Publish</a>
-                                            <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" style="display:inline">
-                                                <button type="submit" class="btn btn-sm fxn-btn-delete"
-                                                        onclick="return confirm('Delete this draft?')">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr><td colspan="5" class="text-center text-muted py-3">No drafts</td></tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <!-- Published -->
             <div class="fxn-table-card">
                 <div class="fxn-table-header d-flex align-items-center justify-content-between px-4 py-3">
@@ -96,7 +46,6 @@
                             <tr>
                                 <th>Headline</th>
                                 <th>Cat.</th>
-                                <th>Sentiment</th>
                                 <th>Published</th>
                                 <th class="text-end">Actions</th>
                             </tr>
@@ -109,14 +58,12 @@
                                     <tr>
                                         <td class="fxn-td-headline">@a.Title</td>
                                         <td><span class="fxn-category-badge">@a.Category</span></td>
-                                        <td>
-                                            <span class="badge @(a.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
-                                                @(a.Type == "Good" ? "▲" : "▼")
-                                            </span>
-                                        </td>
-                                        <td class="fxn-td-date">@(a.PublishedAt?.ToString("dd MMM, HH:mm") ?? "—")</td>
+                                        <td class="fxn-td-date">@(a.PublishedAt?.ToString("dd MMM, HH:mm") ?? "\u2014")</td>
                                         <td class="text-end">
                                             <a href="/Admin/Publish/@a.Id" class="btn btn-sm fxn-btn-review me-1">View</a>
+                                            <form method="post" asp-page-handler="RetryFabric" asp-route-id="@a.Id" style="display:inline">
+                                                <button type="submit" class="btn btn-sm fxn-btn-secondary me-1" title="Retry sending to Fabric">Retry Fabric</button>
+                                            </form>
                                             <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" style="display:inline">
                                                 <button type="submit" class="btn btn-sm fxn-btn-delete"
                                                         onclick="return confirm('Delete this article?')">Delete</button>
@@ -184,7 +131,7 @@
                                     var example = Model.Examples[i];
                                     <li>
                                         <a class="dropdown-item" href="#" onclick="loadExample(@i); return false;">
-                                            <small class="text-muted d-block">@example.Category • @(example.Type == "Good" ? "▲" : "▼")</small>
+                                            <small class="text-muted d-block">@example.Category</small>
                                             <strong>@example.Title</strong>
                                         </a>
                                     </li>
@@ -215,14 +162,6 @@
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="fxn-label">Sentiment</label>
-                            <select class="form-select fxn-input" name="type" required>
-                                <option value="" selected disabled>Choose sentiment...</option>
-                                <option value="Good">▲ Bullish</option>
-                                <option value="Bad">▼ Bearish</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
                             <label class="fxn-label">Category</label>
                             <select class="form-select fxn-input" name="category">
                                 <option value="" selected disabled>Choose category...</option>
@@ -241,7 +180,7 @@
                     </div>
                     <div class="d-flex gap-2 justify-content-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn fxn-btn-create">Save as Draft</button>
+                        <button type="submit" class="btn fxn-btn-create">Publish</button>
                     </div>
                 </form>
             </div>

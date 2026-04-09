@@ -55,6 +55,26 @@ a:hover { color: var(--fxn-orange-dk); }
 .fxn-tick-bull    { color: var(--fxn-bull); }
 .fxn-tick-bear    { color: var(--fxn-bear); }
 
+.fxn-topbar-ticker {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 28px;
+  margin: 0 1rem;
+  border-radius: 2px;
+  background: var(--fxn-surface);
+}
+.fxn-topbar-ticker .fxn-ticker-label {
+  font-size: 0.6rem;
+  padding: 0 0.5rem;
+  height: 100%;
+}
+.fxn-topbar-ticker .fxn-ticker-item {
+  font-size: 0.75rem;
+  color: var(--fxn-text);
+}
+
 .fxn-nav-link {
   color: var(--fxn-muted);
   font-size: 0.85rem;
@@ -109,6 +129,7 @@ a:hover { color: var(--fxn-orange-dk); }
   cursor: pointer;
   border-radius: 2px;
   transition: color .15s, background .15s;
+  text-decoration: none;
 }
 .fxn-catbar-item:hover,
 .fxn-catbar-item.active {
@@ -179,18 +200,6 @@ a:hover { color: var(--fxn-orange-dk); }
 }
 
 /* ---- Badges ---- */
-.fxn-badge-bull {
-  background: rgba(0,196,140,.18);
-  color: var(--fxn-bull);
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-.fxn-badge-bear {
-  background: rgba(232,64,64,.18);
-  color: var(--fxn-bear);
-  font-size: 0.7rem;
-  font-weight: 600;
-}
 .fxn-badge-live {
   background: var(--fxn-bear);
   color: #fff;
@@ -228,17 +237,6 @@ a:hover { color: var(--fxn-orange-dk); }
 .fxn-lead-body    { font-size: 0.9rem; line-height: 1.7; color: var(--fxn-text); }
 .fxn-lead-sidebar { background: rgba(255,255,255,.03); border-left: 1px solid var(--fxn-border); }
 .fxn-lead-stat-title { font-size: 0.72rem; font-weight: 600; color: var(--fxn-muted); text-transform: uppercase; letter-spacing: .08em; }
-
-/* ---- Sentiment meter ---- */
-.fxn-sentiment-meter { padding: 0.5rem 0; }
-.fxn-sentiment-label { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
-.fxn-sentiment-meter.bull .fxn-sentiment-label { color: var(--fxn-bull); }
-.fxn-sentiment-meter.bear .fxn-sentiment-label { color: var(--fxn-bear); }
-.fxn-sentiment-bar  { height: 8px; background: var(--fxn-border); border-radius: 4px; overflow: hidden; margin-bottom: 0.25rem; }
-.fxn-sentiment-fill { height: 100%; border-radius: 4px; }
-.fxn-sentiment-meter.bull .fxn-sentiment-fill { background: var(--fxn-bull); }
-.fxn-sentiment-meter.bear .fxn-sentiment-fill { background: var(--fxn-bear); }
-.fxn-sentiment-ends { font-size: 0.7rem; color: var(--fxn-muted); }
 
 /* ---- Article cards ---- */
 .fxn-article-card {

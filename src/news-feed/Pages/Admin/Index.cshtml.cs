@@ -9,6 +9,7 @@ namespace FxWebNews.Pages.Admin
     public class IndexModel : PageModel
     {
         private readonly NewsService _newsService;
+        private readonly EventHubPublishService _eventHubService;
         private readonly IWebHostEnvironment _environment;
         public List<NewsArticle> News { get; set; } = new();
         public List<NewsExample> Examples { get; set; } = new();
@@ -19,9 +20,10 @@ namespace FxWebNews.Pages.Admin
         [TempData]
         public string? MessageType { get; set; }
 
-        public IndexModel(NewsService newsService, IWebHostEnvironment environment)
+        public IndexModel(NewsService newsService, EventHubPublishService eventHubService, IWebHostEnvironment environment)
         {
             _newsService = newsService;
+            _eventHubService = eventHubService;
             _environment = environment;
         }
 
@@ -49,7 +51,7 @@ namespace FxWebNews.Pages.Admin
             }
         }
 
-        public IActionResult OnPost(string title, string summary, string content, string type, string category, string author)
+        public async Task<IActionResult> OnPostAsync(string title, string summary, string content, string type, string category, string author)
         {
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(content))
             {
@@ -66,12 +68,50 @@ namespace FxWebNews.Pages.Admin
                 Type = type,
                 Category = category ?? "FX",
                 Author = string.IsNullOrWhiteSpace(author) ? "FX News Team" : author,
-                IsPublished = false
+                IsPublished = true,
+                PublishedAt = DateTime.UtcNow
             };
 
             _newsService.AddNews(article);
-            Message = $"Article \"{title}\" saved as draft. Go to the article to publish it.";
-            MessageType = "info";
+
+            var (success, fabricMessage, _) = await _eventHubService.PublishBatchAsync(new List<NewsArticle> { article });
+
+            if (success)
+            {
+                Message = $"Article \"{title}\" published and sent to Fabric. {fabricMessage}";
+                MessageType = "success";
+            }
+            else
+            {
+                Message = $"Article \"{title}\" published locally, but Fabric send failed: {fabricMessage}";
+                MessageType = "warning";
+            }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostRetryFabricAsync(int id)
+        {
+            var article = _newsService.GetNewsById(id);
+            if (article == null)
+            {
+                Message = "Article not found.";
+                MessageType = "danger";
+                return RedirectToPage();
+            }
+
+            var (success, fabricMessage, _) = await _eventHubService.PublishBatchAsync(new List<NewsArticle> { article });
+
+            if (success)
+            {
+                Message = $"Article \"{article.Title}\" sent to Fabric successfully. {fabricMessage}";
+                MessageType = "success";
+            }
+            else
+            {
+                Message = $"Retry failed for \"{article.Title}\": {fabricMessage}";
+                MessageType = "danger";
+            }
 
             return RedirectToPage();
         }

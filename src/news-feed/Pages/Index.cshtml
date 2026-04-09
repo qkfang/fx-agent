@@ -12,25 +12,6 @@
     var rest = Model.News.Skip(1).ToList();
 }
 
-<!-- Breaking news ticker -->
-@if (Model.News.Any())
-{
-    <div class="fxn-ticker">
-        <span class="fxn-ticker-label">LIVE</span>
-        <div class="fxn-ticker-track">
-            <span class="fxn-ticker-items">
-                @foreach (var a in Model.News)
-                {
-                    <span class="fxn-ticker-item">
-                        <span class="@(a.Type == "Good" ? "fxn-tick-bull" : "fxn-tick-bear")">@(a.Type == "Good" ? "▲" : "▼")</span>
-                        @a.Title &nbsp;&nbsp;&nbsp;
-                    </span>
-                }
-            </span>
-        </div>
-    </div>
-}
-
 <div class="container-fluid px-4 py-4">
 
     <!-- Section title + filters -->
@@ -57,13 +38,10 @@
         {
             <div class="fxn-lead-story mb-5">
                 <div class="row g-0">
-                    <div class="col-lg-8 p-4 p-lg-5">
+                    <div class="col-lg-12 p-4 p-lg-5">
                         <div class="d-flex gap-2 mb-3">
                             <span class="fxn-source-badge fxn-source-@(lead.Source.ToLower().Replace(" ", "-"))">@lead.Source</span>
                             <span class="fxn-category-badge">@lead.Category</span>
-                            <span class="badge @(lead.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
-                                @(lead.Type == "Good" ? "▲ BULLISH" : "▼ BEARISH")
-                            </span>
                         </div>
                         <h2 class="fxn-lead-title">@lead.Title</h2>
                         @if (!string.IsNullOrWhiteSpace(lead.Summary))
@@ -77,18 +55,7 @@
                             <span>@(lead.PublishedAt?.ToString("dd MMM yyyy, HH:mm") ?? lead.PublishedDate.ToString("dd MMM yyyy, HH:mm")) UTC</span>
                         </div>
                     </div>
-                    <div class="col-lg-4 fxn-lead-sidebar p-4">
-                        <div class="fxn-lead-stat-title mb-3">Sentiment Indicator</div>
-                        <div class="fxn-sentiment-meter @(lead.Type == "Good" ? "bull" : "bear")">
-                            <div class="fxn-sentiment-label">@(lead.Type == "Good" ? "BULLISH" : "BEARISH")</div>
-                            <div class="fxn-sentiment-bar">
-                                <div class="fxn-sentiment-fill" style="width: @(lead.Type == "Good" ? "72" : "35")%"></div>
-                            </div>
-                            <div class="d-flex justify-content-between fxn-sentiment-ends">
-                                <small>Bear</small><small>Bull</small>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         }
@@ -106,9 +73,6 @@
                                 <div class="d-flex align-items-center gap-2 mb-2">
                                     <span class="fxn-source-badge fxn-source-@(a.Source.ToLower().Replace(" ", "-"))">@a.Source</span>
                                     <span class="fxn-category-badge">@a.Category</span>
-                                    <span class="badge @(a.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
-                                        @(a.Type == "Good" ? "▲" : "▼")
-                                    </span>
                                 </div>
                                 <h5 class="fxn-card-title">@a.Title</h5>
                                 @if (!string.IsNullOrWhiteSpace(a.Summary))

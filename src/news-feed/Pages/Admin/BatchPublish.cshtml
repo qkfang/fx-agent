@@ -50,7 +50,7 @@
                                     <th style="width:40px"><input type="checkbox" id="chkAllPublished" onclick="toggleAll('published')"></th>
                                     <th>Headline</th>
                                     <th>Cat.</th>
-                                    <th>Sentiment</th>
+
                                     <th>Published</th>
                                 </tr>
                             </thead>
@@ -63,11 +63,6 @@
                                             <td><input type="checkbox" name="selectedArticles" value="@a.Id" class="chk-published article-checkbox"></td>
                                             <td class="fxn-td-headline">@a.Title</td>
                                             <td><span class="fxn-category-badge">@a.Category</span></td>
-                                            <td>
-                                                <span class="badge @(a.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
-                                                    @(a.Type == "Good" ? "▲" : "▼")
-                                                </span>
-                                            </td>
                                             <td class="fxn-td-date">@(a.PublishedAt?.ToString("dd MMM, HH:mm") ?? "—")</td>
                                         </tr>
                                     }
@@ -94,7 +89,7 @@
                                     <th style="width:40px"><input type="checkbox" id="chkAllDrafts" onclick="toggleAll('drafts')"></th>
                                     <th>Headline</th>
                                     <th>Cat.</th>
-                                    <th>Sentiment</th>
+
                                     <th>Created</th>
                                 </tr>
                             </thead>
@@ -107,11 +102,6 @@
                                             <td><input type="checkbox" name="selectedArticles" value="@a.Id" class="chk-drafts article-checkbox"></td>
                                             <td class="fxn-td-headline">@a.Title</td>
                                             <td><span class="fxn-category-badge">@a.Category</span></td>
-                                            <td>
-                                                <span class="badge @(a.Type == "Good" ? "fxn-badge-bull" : "fxn-badge-bear")">
-                                                    @(a.Type == "Good" ? "▲" : "▼")
-                                                </span>
-                                            </td>
                                             <td class="fxn-td-date">@a.PublishedDate.ToString("dd MMM, HH:mm")</td>
                                         </tr>
                                     }

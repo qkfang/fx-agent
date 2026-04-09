@@ -206,5 +206,31 @@
     "IsPublished": true,
     "PublishedAt": "2026-04-09T09:59:35.5517076Z",
     "Source": "FX News Centre"
+  },
+  {
+    "Id": 17,
+    "Title": "USD/JPY Falls as BOJ Signals Policy Shift",
+    "Summary": "Yen strengthens after Bank of Japan hints at potential yield curve adjustments",
+    "Content": "The USD/JPY dropped sharply to 148.20 after Bank of Japan officials indicated a possible shift in monetary policy. Governor Ueda\u0027s comments suggest the bank may consider adjusting its yield curve control framework in the coming months, prompting traders to unwind bearish yen positions.",
+    "Type": "Bad",
+    "Category": "FX",
+    "PublishedDate": "2026-04-09T10:31:06.5589038Z",
+    "Author": "FX News Team",
+    "IsPublished": true,
+    "PublishedAt": "2026-04-09T10:31:06.5582654Z",
+    "Source": "FX News Centre"
+  },
+  {
+    "Id": 18,
+    "Title": "AUD/USD Climbs on Strong Employment Data",
+    "Summary": "Australian dollar gains as jobless rate drops to decade low",
+    "Content": "The Australian dollar jumped 1.2% to 0.6680 following robust employment figures that showed unemployment falling to 3.5%, a 10-year low. The strong labor market data has reduced expectations for near-term rate cuts by the Reserve Bank of Australia, providing support for the currency.",
+    "Type": null,
+    "Category": "FX",
+    "PublishedDate": "2026-04-09T10:41:55.8048524Z",
+    "Author": "FX News Team",
+    "IsPublished": true,
+    "PublishedAt": "2026-04-09T10:41:55.8041748Z",
+    "Source": "FX News Centre"
   }
 ]

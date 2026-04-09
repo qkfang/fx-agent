@@ -34,49 +34,9 @@ namespace FxWebNews.Pages.Admin
             return Page();
         }
 
-        public async Task<IActionResult> OnPostPublishAsync(int id)
+        public IActionResult OnPostDelete(int id)
         {
-            var article = _newsService.GetNewsById(id);
-            if (article == null)
-            {
-                return RedirectToPage("/Admin/Index");
-            }
-
-            article.IsPublished = true;
-            article.PublishedAt = DateTime.UtcNow;
-            _newsService.UpdateNews(article);
-
-            var (success, pushMessage) = await _publishService.PushArticleAsync(article);
-
-            if (success)
-            {
-                Message = $"Article \"{article.Title}\" published successfully! {pushMessage}";
-                MessageType = "success";
-            }
-            else
-            {
-                Message = $"Article \"{article.Title}\" published locally, but external push failed: {pushMessage}";
-                MessageType = "warning";
-            }
-
-            return RedirectToPage("/Admin/Index");
-        }
-
-        public IActionResult OnPostUnpublish(int id)
-        {
-            var article = _newsService.GetNewsById(id);
-            if (article == null)
-            {
-                return RedirectToPage("/Admin/Index");
-            }
-
-            article.IsPublished = false;
-            article.PublishedAt = null;
-            _newsService.UpdateNews(article);
-
-            Message = $"Article \"{article.Title}\" moved back to Draft.";
-            MessageType = "info";
-
+            _newsService.DeleteNews(id);
             return RedirectToPage("/Admin/Index");
         }
     }

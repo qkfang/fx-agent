@@ -16,17 +16,21 @@
                 <a class="fxn-brand" asp-area="" asp-page="/Index">
                     <span class="fxn-brand-fx">FX</span><span class="fxn-brand-news">News Centre</span>
                 </a>
-                <div class="fxn-market-strip d-none d-md-flex gap-4">
-                    <span class="fxn-market-pair"><span class="fxn-pair-label">EUR/USD</span> <span class="fxn-tick-bull">1.0842 ▲</span></span>
-                    <span class="fxn-market-pair"><span class="fxn-pair-label">GBP/USD</span> <span class="fxn-tick-bull">1.2731 ▲</span></span>
-                    <span class="fxn-market-pair"><span class="fxn-pair-label">USD/JPY</span> <span class="fxn-tick-bear">148.23 ▼</span></span>
-                    <span class="fxn-market-pair"><span class="fxn-pair-label">AUD/USD</span> <span class="fxn-tick-bear">0.6512 ▼</span></span>
-                    <span class="fxn-market-pair"><span class="fxn-pair-label">XAU/USD</span> <span class="fxn-tick-bull">2341.50 ▲</span></span>
-                </div>
+                @if (ViewData["TickerHeadlines"] is List<string> headlines && headlines.Any())
+                {
+                    <div class="fxn-topbar-ticker d-none d-md-flex">
+                        <span class="fxn-ticker-label">LIVE</span>
+                        <div class="fxn-ticker-track">
+                            <span class="fxn-ticker-items">
+                                @foreach (var h in headlines)
+                                {
+                                    <span class="fxn-ticker-item">@h &nbsp;&nbsp;&nbsp;</span>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                }
                 <nav class="fxn-nav d-flex gap-3 align-items-center">
-                    <a class="fxn-nav-link @(ViewData["ActiveSource"] as string == "" || ViewData["ActiveSource"] == null ? "active" : "")" asp-area="" asp-page="/Index">Markets</a>
-                    <a class="fxn-nav-link fxn-nav-morningstar @(ViewData["ActiveSource"] as string == "morningstar" ? "active" : "")" asp-area="" asp-page="/Index" asp-route-source="morningstar">Morningstar</a>
-                    <a class="fxn-nav-link fxn-nav-bloomberg @(ViewData["ActiveSource"] as string == "bloomberg" ? "active" : "")" asp-area="" asp-page="/Index" asp-route-source="bloomberg">Bloomberg Terminal</a>
                     <a class="fxn-nav-link" href="/Admin">Newsroom</a>
                 </nav>
             </div>
@@ -34,13 +38,8 @@
         <!-- Category nav bar -->
         <div class="fxn-catbar">
             <div class="container-fluid px-4">
-                <span class="fxn-catbar-item active">All</span>
-                <span class="fxn-catbar-item">FX</span>
-                <span class="fxn-catbar-item">Equities</span>
-                <span class="fxn-catbar-item">Commodities</span>
-                <span class="fxn-catbar-item">Crypto</span>
-                <span class="fxn-catbar-item">Rates</span>
-                <span class="fxn-catbar-item">Macro</span>
+                <a class="fxn-catbar-item @(ViewData["ActiveSource"] as string == "morningstar" ? "active" : "")" href="/?source=morningstar">Morningstar</a>
+                <a class="fxn-catbar-item @(ViewData["ActiveSource"] as string == "bloomberg" ? "active" : "")" href="/?source=bloomberg">Bloomberg Terminal</a>
             </div>
         </div>
     </header>
